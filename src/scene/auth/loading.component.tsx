@@ -26,6 +26,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
     .then(value => {
       if (value) {
         console.log("Login check Succeess");
+        props.navigation.navigate(AppRoute.SIGN_IN);
       } else {
         console.log("Login check Failed");
         props.navigation.navigate(AppRoute.SIGN_IN);
