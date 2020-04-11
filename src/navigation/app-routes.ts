@@ -9,4 +9,8 @@ export enum AppRoute {
     CHECK_LOGIN = 'Check Login',
     LOGOUT = 'Logout',
     PROFILE = 'Profile',
+    SEARCH = 'Search',
+    SEARCH_MAIN = 'Search_Main',
+    CHECK = 'Check',
+    CHECK_MAIN = 'Check_Main',
 }

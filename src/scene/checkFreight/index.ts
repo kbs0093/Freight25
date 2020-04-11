@@ -1,0 +1,1 @@
+export { CheckScreen } from './check.component';
