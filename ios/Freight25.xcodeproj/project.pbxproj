@@ -20,6 +20,10 @@
 		63753B07B8D27A054B103F59 /* libPods-Freight25-Freight25Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 814CD7EF187D424BBDFB17D4 /* libPods-Freight25-Freight25Tests.a */; };
 		749D317F4090548384BEBC24 /* libPods-Freight25.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DCA7B0AA6DF8A79B4B1BA87 /* libPods-Freight25.a */; };
 		BD398A5FDDB7FDAC4330E361 /* libPods-Freight25-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 660550CFA540E22CD6953CFF /* libPods-Freight25-tvOS.a */; };
+		E7FA7AA72448A77700CFD69A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */; };
+		E7FA7AA82448A77700CFD69A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */; };
+		E7FA7AA92448A77700CFD69A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */; };
+		E7FA7AAA2448A77700CFD69A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +68,7 @@
 		BED98E9FA47D588E225EDC38 /* Pods-Freight25-Freight25Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-Freight25Tests.release.xcconfig"; path = "Target Support Files/Pods-Freight25-Freight25Tests/Pods-Freight25-Freight25Tests.release.xcconfig"; sourceTree = "<group>"; };
 		C86900778E66295C832C4A9E /* Pods-Freight25-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Freight25-tvOSTests/Pods-Freight25-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		D0DE10319F4F92C01C0956CA /* Pods-Freight25-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Freight25-tvOS/Pods-Freight25-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Freight25/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		F64DA7F7BA61D2F5E83E8ED9 /* Pods-Freight25-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Freight25-tvOSTests/Pods-Freight25-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -125,6 +130,7 @@
 		13B07FAE1A68108700A75B9A /* Freight25 */ = {
 			isa = PBXGroup;
 			children = (
+				E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -330,6 +336,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7FA7AA82448A77700CFD69A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,6 +346,7 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				E7FA7AA72448A77700CFD69A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,6 +355,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */,
+				E7FA7AA92448A77700CFD69A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,6 +363,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7FA7AAA2448A77700CFD69A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
