@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "582689498848",
+    "firebase_url": "https://freight25-79b3b.firebaseio.com",
+    "project_id": "freight25-79b3b",
+    "storage_bucket": "freight25-79b3b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582689498848:android:8653672ae06b0248839285",
+        "android_client_info": {
+          "package_name": "com.freight25"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "582689498848-gp3dhpnl75bekhk1kt32fhjh7e2pardj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALVbVA12voI0gbzjU_BD0e2IFRYKJnJj0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582689498848-gp3dhpnl75bekhk1kt32fhjh7e2pardj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
