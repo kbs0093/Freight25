@@ -59,20 +59,53 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </OverflowMenu>
   );
 
+  const infoText = {};
+
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <TopNavigation
-        title="  화물 25"
+        title="화물 25"
         titleStyle={styles.titleStyles}
         rightControls={renderMenuAction()}
       />
-      <View style={styles.viewForm}>
-        <Text>화물 확인화면입니다</Text>
+      <View style={styles.freightContainer}>
+        <Text style={styles.Subtitle}>나의 배차</Text>
       </View>
-      <View style={styles.totalInfoText}>
-        <Text>총 운행 거리</Text>
-        <Text>총 운행 운임</Text>
+      <View style={styles.freightInfoContainer}>
+        <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoTitle}>운행 거리</Text>
+          <Text style={styles.infoTitle}>KM / 가격</Text>
+          <Text style={styles.infoTitle}>남은 시각</Text>
+          <Text style={styles.infoTitle}>상차지 주소</Text>
+        </View>
+        <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoTitle}>운행 거리</Text>
+          <Text style={styles.infoTitle}>KM / 가격</Text>
+          <Text style={styles.infoTitle}>남은 시각</Text>
+          <Text style={styles.infoTitle}>상차지 주소</Text>
+        </View>
+      </View>
+      <View style={styles.freightContainer}>
+        <Text style={styles.Subtitle}>경유지 화물</Text>
+      </View>
+      <View style={styles.freightInfoContainer}>
+        <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoTitle}>운행 거리</Text>
+          <Text style={styles.infoTitle}>KM / 가격</Text>
+          <Text style={styles.infoTitle}>남은 시각</Text>
+          <Text style={styles.infoTitle}>상차지 주소</Text>
+        </View>
+        <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoTitle}>운행 거리</Text>
+          <Text style={styles.infoTitle}>KM / 가격</Text>
+          <Text style={styles.infoTitle}>남은 시각</Text>
+          <Text style={styles.infoTitle}>상차지 주소</Text>
+        </View>
+      </View>
+      <View style={styles.totalInfoContainer}>
+        <Text style={styles.infoTitle}>총 운행 거리</Text>
+        <Text style={styles.infoTitle}>총 운행 거리</Text>
       </View>
     </React.Fragment>
   );
@@ -80,19 +113,56 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
 
 const styles = StyleSheet.create({
   viewForm: {
+    fontSize: 30,
     flex: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    fontWeight: 'bold',
   },
   titleStyles: {
+    paddingHorizontal: 20,
     fontSize: 20,
     fontWeight: 'bold',
   },
-  totalInfoText: {
-    fontSize: 30,
+  Subtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  freightContainer: {
+    paddingHorizontal: 25,
+    paddingVertical: 10,
+    flex: 1.5,
+    alignItems: 'flex-start',
+    borderColor: '#20232a',
+    borderWidth: 1,
+  },
+  freightInfoContainer: {
     flex: 1,
+    flexDirection: 'row',
+    paddingVertical: 20,
+    alignItems: 'flex-start',
+    borderColor: '#20232a',
+    borderWidth: 1,
+  },
+  freightInfoHalfContainer: {
+    flex: 1,
+  },
+  infoTitle: {
+    paddingVertical: 2,
+    paddingHorizontal: 60,
+    fontSize: 18,
     fontWeight: 'bold',
     fontStyle: 'normal',
-    alignItems: 'center',
+  },
+  totalInfoContainer: {
+    paddingVertical: 20,
+    flex: 0.8,
+    borderColor: '#20232a',
+    borderWidth: 2,
+  },
+  totalInfoText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontStyle: 'normal',
   },
 });
