@@ -6,6 +6,7 @@ import {
   StyleSheet,
   View,
   Linking,
+  SafeAreaView,
 } from 'react-native';
 import {
   Input,
@@ -26,7 +27,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
     .then(value => {
       if (value) {
         console.log("Login check Succeess");
-        props.navigation.navigate(AppRoute.SIGN_IN);
+        props.navigation.navigate(AppRoute.HOME);
       } else {
         console.log("Login check Failed");
         props.navigation.navigate(AppRoute.SIGN_IN);
@@ -38,9 +39,10 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
   
   return (
     <React.Fragment>
+      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <ImageBackground style={styles.appBar} source={require('../../assets/image-background.jpeg')}>
         <View style={styles.viewForm}>
-          <Text>로그인 확인중입니다...</Text>
+          <Text style={styles.TextStyle}>로딩중...</Text>
         </View>
       </ImageBackground>
     </React.Fragment>
@@ -61,5 +63,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: '#F8E71C',
     borderColor: '#F8E71C',
+  },
+  TextStyle: {
+
   },
 });

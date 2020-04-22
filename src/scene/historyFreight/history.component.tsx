@@ -1,32 +1,30 @@
 import React, {useState} from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
   StyleSheet,
   View,
   Linking,
+  Platform,
   SafeAreaView,
 } from 'react-native';
 import {
   LayoutElement,
 } from '@ui-kitten/components';
-import { CheckScreenProps } from '../../navigation/check.navigator';
+import { HistoryScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 
-export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
+export const HistoryScreen = (props: HistoryScreenProps): LayoutElement => {
     return (
         <React.Fragment>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <View style={styles.viewForm}>
-            <Text>화물 확인화면입니다</Text>
-          </View>
+          <Text>
+            화물 히스토리 화면입니다
+          </Text>
         </React.Fragment>
     );
 };
 
 const styles = StyleSheet.create({
-    viewForm: {
-      flex: 4,
-      justifyContent: "center",
-      alignItems: "center",
-    },
+
 });

@@ -13,4 +13,8 @@ export enum AppRoute {
     SEARCH_MAIN = 'Search_Main',
     CHECK = 'Check',
     CHECK_MAIN = 'Check_Main',
+    HISTORY = 'Histroy',
+    HISTORY_MAIN ='History_Main',
+    APPLY = 'Apply',
+    APPLY_MAIN = 'Apply_Main',
 }
