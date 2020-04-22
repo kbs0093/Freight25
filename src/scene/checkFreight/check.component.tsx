@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
+
 import {
   LayoutElement,
   TopNavigationAction,
@@ -59,7 +61,11 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </OverflowMenu>
   );
 
-  const infoText = {};
+  const infoText = () => {
+    <View style={styles.freightContainer}>
+      <Text style={styles.Subtitle}>나의 배차</Text>
+    </View>;
+  };
 
   return (
     <React.Fragment>
@@ -80,10 +86,7 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
           <Text style={styles.infoTitle}>상차지 주소</Text>
         </View>
         <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>KM / 가격</Text>
-          <Text style={styles.infoTitle}>남은 시각</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
+          <Text style={estyles.sample}>운행 거리</Text>
         </View>
       </View>
       <View style={styles.freightContainer}>
@@ -110,6 +113,17 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </React.Fragment>
   );
 };
+
+const estyles = StyleSheet.create({
+  sample: {
+    paddingVertical: 2,
+    paddingHorizontal: 60,
+    fontSize: RFPercentage(2),
+    //fontSize: 18,
+    fontWeight: 'bold',
+    fontStyle: 'normal',
+  },
+});
 
 const styles = StyleSheet.create({
   viewForm: {
@@ -150,7 +164,8 @@ const styles = StyleSheet.create({
   infoTitle: {
     paddingVertical: 2,
     paddingHorizontal: 60,
-    fontSize: 18,
+    fontSize: RFPercentage(2),
+    //fontSize: 18,
     fontWeight: 'bold',
     fontStyle: 'normal',
   },
