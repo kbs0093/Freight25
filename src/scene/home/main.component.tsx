@@ -104,13 +104,13 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
 
     return (
         <React.Fragment>
-          <ScrollView>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
           <TopNavigation
             title='   화물 25'
             titleStyle={styles.titleStyles}
             rightControls={renderMenuAction()}
           />
+          <ScrollView>
           <View style={styles.viewForm}>
             <TouchableOpacity onPress={clickButtonType}>
               <Image style={styles.Button} source={ButtonType}/>

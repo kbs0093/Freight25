@@ -27,6 +27,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
     .then(value => {
       if (value) {
         console.log("Login check Succeess");
+        AsyncStorage.setItem("userType", "driver"); {/*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/}
         props.navigation.navigate(AppRoute.HOME);
       } else {
         console.log("Login check Failed");
@@ -42,7 +43,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <ImageBackground style={styles.appBar} source={require('../../assets/image-background.jpeg')}>
         <View style={styles.viewForm}>
-          <Text style={styles.TextStyle}>로딩중...</Text>
+          <Text style={styles.TextStyle}></Text>
         </View>
       </ImageBackground>
     </React.Fragment>

@@ -84,4 +84,9 @@ export const NOTEIcon = (style): IconElement => (
   <Icon {...style} name='file-text-outline'/>
 );
 
+export const FORWARDIcon = (style): IconElement => (
+  <Icon {...style} name='arrow-forward-outline'/>
+);
+
+
 

@@ -57,7 +57,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         );
         AsyncStorage.setItem("email", JSON.stringify(result.email)); 
         AsyncStorage.setItem("nickname", JSON.stringify(result.nickname));
-        AsyncStorage.setItem("userType", "owner"); {/*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/}
+        AsyncStorage.setItem("userType", "driver"); {/*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/}
       })
       .catch(err => {
         logCallback(
@@ -103,13 +103,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         <View style={styles.empty1} />
          <Button style={styles.btnKakaoLogin} status='basic' onPress={kakaoLogin}>
             카카오톡 로그인
-         </Button> 
-         <Button style={styles.btnSignup} status='basic' onPress={kakaoLogin}>
-            화주 회원가입
-         </Button>
-         <Button style={styles.btnSignup} status='basic' onPress={kakaoLogin}>
-            기사 회원가입
-         </Button>         
+         </Button>                 
         </View>
       </ImageBackground>
     </React.Fragment>
@@ -134,10 +128,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8E71C',
     borderColor: '#F8E71C',
   },
-  btnSignup: {
-    width: 280,
-    marginVertical: 10,
-    backgroundColor: '#BBDAFE',
-    borderColor: '#BBDAFE',
-  }
 });
