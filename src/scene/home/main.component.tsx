@@ -23,6 +23,7 @@ import { MainScreenProps } from '../../navigation/home.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { BackIcon, MenuIcon, InfoIcon, LogoutIcon, MAPIcon, PHONEIcon, NOTEIcon} from '../../assets/icons'
 import auth from '@react-native-firebase/auth'
+import KakaoLogins from '@react-native-seoul/kakao-login';
 
 let email;
 let nickname;
@@ -33,8 +34,6 @@ AsyncStorage.getItem('nickname', (err, result) => { nickname = result });
 AsyncStorage.getItem('userType', (err, result) => { userType = result });
 
 {/*위 명령어를 통해 닉네임, 유저타입, 이메일 주소를 가져옵니다 "" 가 추가되어있으므로 파싱해야 합니다*/}
-
-
 
 
 export const MainScreen = (props: MainScreenProps): LayoutElement => {
@@ -58,6 +57,19 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
     },
   ];
 
+  const kakaoLogout = () => {
+    console.log('Logout Start');
+    KakaoLogins.logout()
+      .then(result => {
+        console.log(`Logout Finished:${result}`);
+      })
+      .catch(err => {
+        console.log(
+          `Logout Failed:${err.code} ${err.message}`
+        );
+      });
+  };
+
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
@@ -67,6 +79,7 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
     console.log(index);
     if(index == 2){   {/*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/}
       AsyncStorage.clear();
+      kakaoLogout();
       auth().signOut;
       
       props.navigation.navigate(AppRoute.AUTH);

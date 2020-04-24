@@ -57,7 +57,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         setProfile(result);
         logCallback(
           `Get Profile Finished`,
-          setProfileLoading(false),
+          setProfileLoading(true),
         );
         AsyncStorage.setItem("email", JSON.stringify(result.email)); 
         AsyncStorage.setItem("nickname", JSON.stringify(result.nickname));
@@ -69,6 +69,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
           setProfileLoading(false),
         );
       });
+      
   };
   
   const kakaoLogin = () => {
@@ -82,22 +83,19 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         axios.post(verifyUrl,{token: JSON.stringify(result.accessToken)})
         .then((response) => {
           let firebaseToken = JSON.stringify(response.data.firebase_token);
-          try {
-            auth().signInWithCustomToken(firebaseToken);
-            logCallback(
-              `Login Finished:${data}`,
-              setLoginLoading(false),
-            );
-            AsyncStorage.setItem("token", data);
-            getProfile();
-            props.navigation.navigate(AppRoute.HOME);
-          } catch (error) {
-            console.log(error);
-          }
+          auth().signInWithCustomToken(firebaseToken);
+          logCallback(
+            `Login Finished:${data}`,
+            setLoginLoading(false),
+          );
+          AsyncStorage.setItem("token", JSON.stringify(result.accessToken));
+          getProfile();
+          props.navigation.navigate(AppRoute.HOME);
         })
         .catch((error) => {
           console.log(error);
         });
+        
       })
       .catch(err => {
         if (err.code === 'E_CANCELLED_OPERATION') {
