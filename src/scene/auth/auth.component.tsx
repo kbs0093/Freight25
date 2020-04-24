@@ -20,6 +20,8 @@ import {
 import { AuthScreenProps } from '../../navigation/auth.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import KakaoLogins from '@react-native-seoul/kakao-login';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth'
 
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
@@ -79,6 +81,19 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         );
         AsyncStorage.setItem("token", data);
         getProfile();
+
+        //firebase jwt
+        const Url = "http://49.50.162.128:8000/verifyToken";  
+        axios.post(Url,{token: JSON.stringify(result.accessToken)})
+        .then((response) => {
+          let firebaseToken = JSON.stringify(response.data.firebase_token)
+           
+          console.log("resToken: "+firebaseToken);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+        //
         props.navigation.navigate(AppRoute.HOME);
       })
       .catch(err => {
@@ -92,8 +107,6 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         }
       });
   };
-
-
 
   return (
     <React.Fragment>
