@@ -8,13 +8,12 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
-
 import {
   LayoutElement,
   TopNavigationAction,
   TopNavigation,
   OverflowMenu,
+  Button,
 } from '@ui-kitten/components';
 import {CheckScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
@@ -28,6 +27,7 @@ import {
   PHONEIcon,
   NOTEIcon,
 } from '../../assets/icons';
+import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
 export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
   const [menuVisible, setMenuVisible] = React.useState(false);
@@ -61,11 +61,11 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </OverflowMenu>
   );
 
-  const infoText = () => {
-    <View style={styles.freightContainer}>
-      <Text style={styles.Subtitle}>나의 배차</Text>
-    </View>;
-  };
+  const renderBadge = () => (
+    <Button style={styles.Badge} textStyle={styles.badgeText}>
+      배송중
+    </Button>
+  );
 
   return (
     <React.Fragment>
@@ -77,6 +77,9 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
       />
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>나의 배차</Text>
+        <Button style={styles.Badge} textStyle={styles.badgeText}>
+          배송중
+        </Button>
       </View>
       <View style={styles.freightInfoContainer}>
         <View style={styles.freightInfoHalfContainer}>
@@ -86,7 +89,7 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
           <Text style={styles.infoTitle}>상차지 주소</Text>
         </View>
         <View style={styles.freightInfoHalfContainer}>
-          <Text style={estyles.sample}>운행 거리</Text>
+          <Text style={styles.infoTitle}>운행 거리</Text>
         </View>
       </View>
       <View style={styles.freightContainer}>
@@ -101,49 +104,43 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
         </View>
         <View style={styles.freightInfoHalfContainer}>
           <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>KM / 가격</Text>
-          <Text style={styles.infoTitle}>남은 시각</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
         </View>
       </View>
       <View style={styles.totalInfoContainer}>
         <Text style={styles.infoTitle}>총 운행 거리</Text>
-        <Text style={styles.infoTitle}>총 운행 거리</Text>
+        <Text style={styles.infoTitle}>총 운행 운임</Text>
       </View>
     </React.Fragment>
   );
 };
 
-const estyles = StyleSheet.create({
-  sample: {
-    paddingVertical: 2,
-    paddingHorizontal: 60,
-    fontSize: RFPercentage(2),
-    //fontSize: 18,
-    fontWeight: 'bold',
-    fontStyle: 'normal',
-  },
-});
-
 const styles = StyleSheet.create({
   viewForm: {
-    fontSize: 30,
+    fontSize: RFPercentage(2),
     flex: 10,
     justifyContent: 'center',
     alignItems: 'center',
     fontWeight: 'bold',
   },
+  Badge: {
+    width: 80,
+    height: 10,
+    borderRadius: 5,
+  },
+  badgeText: {
+    fontSize: RFPercentage(1.8),
+  },
   titleStyles: {
     paddingHorizontal: 20,
-    fontSize: 20,
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
   },
   Subtitle: {
-    fontSize: 20,
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
   },
   freightContainer: {
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
     paddingVertical: 10,
     flex: 1.5,
     alignItems: 'flex-start',
@@ -165,7 +162,6 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 60,
     fontSize: RFPercentage(2),
-    //fontSize: 18,
     fontWeight: 'bold',
     fontStyle: 'normal',
   },
@@ -176,7 +172,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   totalInfoText: {
-    fontSize: 20,
+    fontSize: RFPercentage(2),
     fontWeight: 'bold',
     fontStyle: 'normal',
   },
