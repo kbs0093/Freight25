@@ -21,11 +21,13 @@ import { AuthScreenProps } from '../../navigation/auth.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import axios from 'axios';
-import auth from '@react-native-firebase/auth'
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
 }
+const verifyUrl = "http://49.50.162.128:8000/verifyToken";
 
 const logCallback = (log, callback) => {
   console.log(log);
@@ -68,33 +70,34 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         );
       });
   };
-
+  
   const kakaoLogin = () => {
     logCallback('Login Start', setLoginLoading(true));
 
     KakaoLogins.login()
       .then(result => {
         let data = JSON.stringify(result);
-        logCallback(
-          `Login Finished:${data}`,
-          setLoginLoading(false),
-        );
-        AsyncStorage.setItem("token", data);
-        getProfile();
-
-        //firebase jwt
-        const Url = "http://49.50.162.128:8000/verifyToken";  
-        axios.post(Url,{token: JSON.stringify(result.accessToken)})
+        
+        //firebase jwt  
+        axios.post(verifyUrl,{token: JSON.stringify(result.accessToken)})
         .then((response) => {
-          let firebaseToken = JSON.stringify(response.data.firebase_token)
-           
-          console.log("resToken: "+firebaseToken);
+          let firebaseToken = JSON.stringify(response.data.firebase_token);
+          try {
+            auth().signInWithCustomToken(firebaseToken);
+            logCallback(
+              `Login Finished:${data}`,
+              setLoginLoading(false),
+            );
+            AsyncStorage.setItem("token", data);
+            getProfile();
+            props.navigation.navigate(AppRoute.HOME);
+          } catch (error) {
+            console.log(error);
+          }
         })
         .catch((error) => {
           console.log(error);
         });
-        //
-        props.navigation.navigate(AppRoute.HOME);
       })
       .catch(err => {
         if (err.code === 'E_CANCELLED_OPERATION') {

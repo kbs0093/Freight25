@@ -22,6 +22,7 @@ import {
 import { MainScreenProps } from '../../navigation/home.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { BackIcon, MenuIcon, InfoIcon, LogoutIcon, MAPIcon, PHONEIcon, NOTEIcon} from '../../assets/icons'
+import auth from '@react-native-firebase/auth'
 
 let email;
 let nickname;
@@ -66,6 +67,8 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
     console.log(index);
     if(index == 2){   {/*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/}
       AsyncStorage.clear();
+      auth().signOut;
+      
       props.navigation.navigate(AppRoute.AUTH);
       console.log("Logout Success");
     }
