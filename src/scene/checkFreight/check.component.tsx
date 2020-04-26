@@ -14,6 +14,8 @@ import {
   TopNavigation,
   OverflowMenu,
   Button,
+  styled,
+  Icon,
 } from '@ui-kitten/components';
 import {CheckScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
@@ -38,6 +40,10 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
       icon: InfoIcon,
     },
     {
+      title: '개인 정보 수정',
+      icon: InfoIcon,
+    },
+    {
       title: '로그아웃',
       icon: LogoutIcon,
     },
@@ -49,6 +55,14 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
 
   const onMenuItemSelect = (index) => {
     setMenuVisible(false);
+    if (index == 1) {
+      {
+        /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
+      }
+      //auth().signOut;
+      props.navigation.navigate(AppRoute.PROFILE);
+      console.log('Logout Success');
+    }
   };
 
   const renderMenuAction = () => (
@@ -67,6 +81,24 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </Button>
   );
 
+  // _renderFrieght = ({item}) => (
+  //   <View style={styles.geoContainer}>
+  //     <View style={styles.geoText}>
+  //       <Text style={styles.geoText}>대전 서구</Text>
+  //     </View>
+  //     <View style={styles.geoText}>
+  //       <Icon
+  //         style={styles.iconSize}
+  //         fill="#8F9BB3"
+  //         name="arrow-forward-outline"
+  //       />
+  //     </View>
+  //     <View style={styles.geoText}>
+  //       <Text style={styles.geoText}>서울 성북</Text>
+  //     </View>
+  //   </View>
+  // );
+
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -81,6 +113,23 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
           배송중
         </Button>
       </View>
+      <View style={styles.geoContainer}>
+        <View style={styles.geoInfoContainer}>
+          <Text style={styles.geoText}>대전 서구</Text>
+          <Text style={styles.geoSubText}>당착</Text>
+        </View>
+        <View style={styles.geoInfoContainer}>
+          <Icon
+            style={styles.iconSize}
+            fill="#8F9BB3"
+            name="arrow-forward-outline"
+          />
+        </View>
+        <View style={styles.geoInfoContainer}>
+          <Text style={styles.geoText}>대전 서구</Text>
+          <Text style={styles.geoSubText}>당착</Text>
+        </View>
+      </View>
       <View style={styles.freightInfoContainer}>
         <View style={styles.freightInfoHalfContainer}>
           <Text style={styles.infoTitle}>운행 거리</Text>
@@ -92,8 +141,29 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
           <Text style={styles.infoTitle}>운행 거리</Text>
         </View>
       </View>
+      <View style={styles.lineStyle} />
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>경유지 화물</Text>
+        <Button style={styles.Badge} textStyle={styles.badgeText}>
+          배송중
+        </Button>
+      </View>
+      <View style={styles.geoContainer}>
+        <View style={styles.geoInfoContainer}>
+          <Text style={styles.geoText}>대전 서구</Text>
+          <Text style={styles.geoSubText}>당착</Text>
+        </View>
+        <View style={styles.geoInfoContainer}>
+          <Icon
+            style={styles.iconSize}
+            fill="#8F9BB3"
+            name="arrow-forward-outline"
+          />
+        </View>
+        <View style={styles.geoInfoContainer}>
+          <Text style={styles.geoText}>대전 서구</Text>
+          <Text style={styles.geoSubText}>당착</Text>
+        </View>
       </View>
       <View style={styles.freightInfoContainer}>
         <View style={styles.freightInfoHalfContainer}>
@@ -106,6 +176,7 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
           <Text style={styles.infoTitle}>운행 거리</Text>
         </View>
       </View>
+      <View style={styles.lineStyle} />
       <View style={styles.totalInfoContainer}>
         <Text style={styles.infoTitle}>총 운행 거리</Text>
         <Text style={styles.infoTitle}>총 운행 운임</Text>
@@ -123,9 +194,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   Badge: {
-    width: 80,
-    height: 10,
-    borderRadius: 5,
+    width: RFPercentage(10),
+    height: RFPercentage(0.5),
+    borderRadius: 8,
   },
   badgeText: {
     fontSize: RFPercentage(1.8),
@@ -141,19 +212,20 @@ const styles = StyleSheet.create({
   },
   freightContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
-    flex: 1.5,
+    paddingVertical: 8,
+    flex: 0.2,
+    flexDirection: 'row',
     alignItems: 'flex-start',
+    justifyContent: 'space-between',
     borderColor: '#20232a',
-    borderWidth: 1,
   },
   freightInfoContainer: {
-    flex: 1,
+    flex: 0.5,
     flexDirection: 'row',
     paddingVertical: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
-    borderWidth: 1,
+    //borderWidth: 1,
   },
   freightInfoHalfContainer: {
     flex: 1,
@@ -163,17 +235,47 @@ const styles = StyleSheet.create({
     paddingHorizontal: 60,
     fontSize: RFPercentage(2),
     fontWeight: 'bold',
-    fontStyle: 'normal',
+  },
+  geoContainer: {
+    paddingVertical: 20,
+    flex: 0.5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  geoInfoContainer: {
+    flex: 0.5,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    //borderWidth: 1,
+  },
+  geoText: {
+    fontSize: RFPercentage(3),
+    fontWeight: 'bold',
+  },
+  geoSubText: {
+    fontSize: RFPercentage(2),
+    fontWeight: 'bold',
   },
   totalInfoContainer: {
     paddingVertical: 20,
     flex: 0.8,
     borderColor: '#20232a',
-    borderWidth: 2,
+    //borderWidth: 1,
   },
   totalInfoText: {
     fontSize: RFPercentage(2),
     fontWeight: 'bold',
     fontStyle: 'normal',
+  },
+  iconSize: {
+    width: 32,
+    height: 32,
+  },
+  lineStyle: {
+    borderWidth: 0.5,
+    borderColor: 'black',
+    margin: 10,
   },
 });
