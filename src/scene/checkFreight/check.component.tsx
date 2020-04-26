@@ -40,6 +40,10 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
       icon: InfoIcon,
     },
     {
+      title: '개인 정보 수정',
+      icon: InfoIcon,
+    },
+    {
       title: '로그아웃',
       icon: LogoutIcon,
     },
@@ -51,6 +55,14 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
 
   const onMenuItemSelect = (index) => {
     setMenuVisible(false);
+    if (index == 1) {
+      {
+        /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
+      }
+      //auth().signOut;
+      props.navigation.navigate(AppRoute.PROFILE);
+      console.log('Logout Success');
+    }
   };
 
   const renderMenuAction = () => (
@@ -69,23 +81,23 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </Button>
   );
 
-  _renderFrieght = ({item}) => (
-    <View style={styles.geoContainer}>
-      <View style={styles.geoText}>
-        <Text style={styles.geoText}>대전 서구</Text>
-      </View>
-      <View style={styles.geoText}>
-        <Icon
-          style={styles.iconSize}
-          fill="#8F9BB3"
-          name="arrow-forward-outline"
-        />
-      </View>
-      <View style={styles.geoText}>
-        <Text style={styles.geoText}>서울 성북</Text>
-      </View>
-    </View>
-  );
+  // _renderFrieght = ({item}) => (
+  //   <View style={styles.geoContainer}>
+  //     <View style={styles.geoText}>
+  //       <Text style={styles.geoText}>대전 서구</Text>
+  //     </View>
+  //     <View style={styles.geoText}>
+  //       <Icon
+  //         style={styles.iconSize}
+  //         fill="#8F9BB3"
+  //         name="arrow-forward-outline"
+  //       />
+  //     </View>
+  //     <View style={styles.geoText}>
+  //       <Text style={styles.geoText}>서울 성북</Text>
+  //     </View>
+  //   </View>
+  // );
 
   return (
     <React.Fragment>
