@@ -19,6 +19,7 @@ import {
   LayoutElement,
   Icon, Text, TopNavigation, TopNavigationAction, OverflowMenu
 } from '@ui-kitten/components';
+import { CommonActions, NavigationContainer } from '@react-navigation/native';
 import { MainScreenProps } from '../../navigation/home.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { BackIcon, MenuIcon, InfoIcon, LogoutIcon, MAPIcon, PHONEIcon, NOTEIcon} from '../../assets/icons'
@@ -80,9 +81,9 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
     if(index == 2){   {/*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/}
       AsyncStorage.clear();
       kakaoLogout();
-      auth().signOut;
-      
-      props.navigation.navigate(AppRoute.AUTH);
+      auth().signOut;  
+   
+      props.navigation.push(AppRoute.AUTH);
       console.log("Logout Success");
     }
   };

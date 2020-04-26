@@ -9,11 +9,13 @@ import {
   FlatListProps,
   ListRenderItemInfo,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import {
   LayoutElement, Icon,
 } from '@ui-kitten/components';
+import Geolocation from '@react-native-community/geolocation';
 import { FORWARDIcon } from '../../assets/icons'
 import { AppRoute } from '../../navigation/app-routes';
 
@@ -22,9 +24,26 @@ const isAndroid = Platform.OS==='android'
 
 {/*<WebView source={{uri:isAndroid?'file:///android_asset/tmap.html':'./tmap.html'}}></WebView>*/}
 
+
 export class SearchScreen extends Component {
+  
   state = {
+    latitude: 'unknown',
+    longitude: 'unknown',
     data: [1, 2, 3]
+  };
+
+  componentDidMount() {
+    Geolocation.getCurrentPosition(
+      position => {
+        const latitude = JSON.stringify(position.coords.latitude);
+        const longitude = JSON.stringify(position.coords.longitude);
+        this.setState({latitude});
+        this.setState({longitude});
+      },
+      error => Alert.alert('Error', JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );   
   }
 
   _renderItem = ({item}) => (
@@ -57,6 +76,9 @@ export class SearchScreen extends Component {
       </View>                          
     </View>
   );
+
+
+  
 
   render(){
     return (
