@@ -10,19 +10,30 @@ import {
   ListRenderItemInfo,
   SafeAreaView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import {
-  LayoutElement, Icon,
+  LayoutElement, 
+  Icon,
+  Divider,
+  Button,
+  TopNavigation, 
+  TopNavigationAction,
 } from '@ui-kitten/components';
 import Geolocation from '@react-native-community/geolocation';
 import { FORWARDIcon } from '../../assets/icons'
 import { AppRoute } from '../../navigation/app-routes';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
 
 const myHtmlFile = require('../../component/tmap.html');
 const isAndroid = Platform.OS==='android'
+const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 
 {/*<WebView source={{uri:isAndroid?'file:///android_asset/tmap.html':'./tmap.html'}}></WebView>*/}
+
+
 
 
 export class SearchScreen extends Component {
@@ -30,8 +41,15 @@ export class SearchScreen extends Component {
   state = {
     latitude: 'unknown',
     longitude: 'unknown',
-    data: [1, 2, 3]
+    city: 'unknown',
+    gu: 'unknown',
+    myeon: 'unknown',
+    dong: 'unknown',
+    data: [1, 2, 3],
+    lastRefresh: "null"
   };
+
+   
 
   componentDidMount() {
     Geolocation.getCurrentPosition(
@@ -40,13 +58,31 @@ export class SearchScreen extends Component {
         const longitude = JSON.stringify(position.coords.longitude);
         this.setState({latitude});
         this.setState({longitude});
+        
+        fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+        .then(response => response.json())
+        .then(response => {
+          const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
+          const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
+          const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
+          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
+
+          this.setState({city});
+          this.setState({gu});
+          this.setState({myeon});
+          this.setState({dong});          
+        })   
+        .catch(err => console.log(err));
       },
       error => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-    );   
+    );        
   }
 
+  
+
   _renderItem = ({item}) => (
+    <TouchableOpacity>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
         <View style={styles.geoInfo1}>
@@ -75,19 +111,38 @@ export class SearchScreen extends Component {
         </View>
       </View>                          
     </View>
+    </TouchableOpacity>
   );
-
-
   
 
   render(){
     return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <FlatList 
-        data={this.state.data}
-        renderItem={this._renderItem}
-      />
+      <View style={{height: "8%", flexDirection: "row"}}>
+        <View style={{flex: 3, justifyContent: 'center'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+            검색 위치 : {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
+          </Text>
+        </View>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Button 
+            style={{margin: 5}} 
+            size='small'
+            onPress={this.refreshScreen}
+          >
+            새로고침
+          </Button>
+        </View>      
+      </View>     
+      <Divider style={{backgroundColor: 'black'}}/>
+     
+        <FlatList 
+          data={this.state.data}
+          renderItem={this._renderItem}
+        />
+      
+      
                         
     </React.Fragment>
     );
