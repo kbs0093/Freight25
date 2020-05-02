@@ -7,12 +7,16 @@ import { SearchNavigator } from './search.navigator';
 import { HistoryNavigator } from './history.navigator';
 import { ApplyNavigator } from './apply.navigator';
 import { AppRoute } from './app-routes';
+import { SignupDriverNavigator } from './signupDriver.navigator';
+import { SignupOwnerNavigator } from './signupOwner.navigator';
 
 const Stack = createStackNavigator();
 
 export const AppNavigator = (props): React.ReactElement => (
   <Stack.Navigator {...props} headerMode='none'>
     <Stack.Screen name={AppRoute.AUTH} component={AuthNavigator}/>
+    <Stack.Screen name={AppRoute.SIGNUP_DRIVER} component={SignupDriverNavigator}/>
+    <Stack.Screen name={AppRoute.SIGNUP_OWNER} component={SignupOwnerNavigator}/>
     <Stack.Screen name={AppRoute.HOME} component={HomeNavigator}/>
     <Stack.Screen name={AppRoute.SEARCH} component={SearchNavigator}/>
     <Stack.Screen name={AppRoute.CHECK} component={CheckNavigator}/>

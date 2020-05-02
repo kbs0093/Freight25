@@ -117,7 +117,23 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         <View style={styles.empty1} />
          <Button style={styles.btnKakaoLogin} status='basic' onPress={kakaoLogin}>
             카카오톡 로그인
-         </Button>                 
+         </Button>
+         <Button
+            appearance='ghost'
+            status='basic'
+            onPress={() => {
+              props.navigation.navigate(AppRoute.SIGNUP_DRIVER);
+            }}>
+            화물차 기사 회원가입
+          </Button>
+          <Button
+            appearance='ghost'
+            status='basic'
+            onPress={() => {
+              props.navigation.navigate(AppRoute.SIGNUP_OWNER);
+            }}>
+            화주 회원가입
+          </Button>               
         </View>
       </ImageBackground>
     </React.Fragment>

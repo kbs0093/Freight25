@@ -25,6 +25,9 @@ import Geolocation from '@react-native-community/geolocation';
 import { FORWARDIcon } from '../../assets/icons'
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-community/async-storage';
+import { withNavigation } from 'react-navigation';
+import { SearchScreenProps } from'../../navigation/search.navigator'
 
 
 const myHtmlFile = require('../../component/tmap.html');
@@ -34,22 +37,19 @@ const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&
 {/*<WebView source={{uri:isAndroid?'file:///android_asset/tmap.html':'./tmap.html'}}></WebView>*/}
 
 
-
-
-export class SearchScreen extends Component {
-  
+export class SearchScreen extends React.Component<SearchScreenProps> {
   state = {
     latitude: 'unknown',
     longitude: 'unknown',
-    city: 'unknown',
-    gu: 'unknown',
-    myeon: 'unknown',
-    dong: 'unknown',
+    city: '',
+    gu: '',
+    myeon: '',
+    dong: '',
     data: [1, 2, 3],
     lastRefresh: "null"
   };
 
-   
+  
 
   componentDidMount() {
     Geolocation.getCurrentPosition(
@@ -79,10 +79,14 @@ export class SearchScreen extends Component {
     );        
   }
 
-  
+  ClickList = index => () => {
+    console.log(index);
+    //AsyncStorage.setItem('Freight', index);
+    this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
+  }
 
   _renderItem = ({item}) => (
-    <TouchableOpacity>    
+    <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
         <View style={styles.geoInfo1}>
@@ -119,7 +123,7 @@ export class SearchScreen extends Component {
     return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <View style={{height: "8%", flexDirection: "row"}}>
+      <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
         <View style={{flex: 3, justifyContent: 'center'}}>
           <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
             검색 위치 : {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
@@ -129,7 +133,6 @@ export class SearchScreen extends Component {
           <Button 
             style={{margin: 5}} 
             size='small'
-            onPress={this.refreshScreen}
           >
             새로고침
           </Button>
@@ -138,6 +141,7 @@ export class SearchScreen extends Component {
       <Divider style={{backgroundColor: 'black'}}/>
      
         <FlatList 
+          style={{backgroundColor : 'white'}}
           data={this.state.data}
           renderItem={this._renderItem}
         />
@@ -145,9 +149,12 @@ export class SearchScreen extends Component {
       
                         
     </React.Fragment>
+    
     );
   }
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
