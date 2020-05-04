@@ -81,24 +81,6 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     </Button>
   );
 
-  // _renderFrieght = ({item}) => (
-  //   <View style={styles.geoContainer}>
-  //     <View style={styles.geoText}>
-  //       <Text style={styles.geoText}>대전 서구</Text>
-  //     </View>
-  //     <View style={styles.geoText}>
-  //       <Icon
-  //         style={styles.iconSize}
-  //         fill="#8F9BB3"
-  //         name="arrow-forward-outline"
-  //       />
-  //     </View>
-  //     <View style={styles.geoText}>
-  //       <Text style={styles.geoText}>서울 성북</Text>
-  //     </View>
-  //   </View>
-  // );
-
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
