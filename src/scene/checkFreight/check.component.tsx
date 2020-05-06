@@ -30,51 +30,9 @@ import {
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
 export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
-  const [menuVisible, setMenuVisible] = React.useState(false);
-
-  const menuData = [
-    {
-      title: '버전 정보 확인',
-      icon: InfoIcon,
-    },
-    {
-      title: '로그아웃',
-      icon: LogoutIcon,
-    },
-  ];
-
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
-
-  const onMenuItemSelect = (index) => {
-    setMenuVisible(false);
-  };
-
-  const renderMenuAction = () => (
-    <OverflowMenu
-      visible={menuVisible}
-      data={menuData}
-      onSelect={onMenuItemSelect}
-      onBackdropPress={toggleMenu}>
-      <TopNavigationAction icon={MenuIcon} onPress={toggleMenu} />
-    </OverflowMenu>
-  );
-
-  const renderBadge = () => (
-    <Button style={styles.Badge} textStyle={styles.badgeText}>
-      배송중
-    </Button>
-  );
-
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <TopNavigation
-        title="화물 25"
-        titleStyle={styles.titleStyles}
-        rightControls={renderMenuAction()}
-      />
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>나의 배차</Text>
         <Button size="small" style={styles.Badge} textStyle={styles.badgeText}>

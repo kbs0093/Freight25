@@ -76,6 +76,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
   const selectedCarSize = useSelectState();
   const selectedCarType = useSelectState();
   const selectedDrive = useSelectState();
+  const selectedFreightType = useSelectState();
 
   const carWeight = useInputState();
   const carVolume = useInputState();
@@ -86,60 +87,17 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
   const manNumInput = useInputState();
   const accountNumInput = useInputState();
 
-  const menuData = [
-    {
-      title: '버전 정보 확인',
-      icon: InfoIcon,
-    },
-    {
-      title: '개인 정보 수정',
-      icon: InfoIcon,
-    },
-    {
-      title: '로그아웃',
-      icon: LogoutIcon,
-    },
-  ];
-
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
-
-  const onMenuItemSelect = (index) => {
-    setMenuVisible(false);
-    if (index == 1) {
-      {
-        /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
-      }
-      //auth().signOut;
-      props.navigation.navigate(AppRoute.PROFILE);
-      console.log('Logout Success');
-    }
-  };
-
-  const renderMenuAction = () => (
-    <OverflowMenu
-      visible={menuVisible}
-      data={menuData}
-      onSelect={onMenuItemSelect}
-      onBackdropPress={toggleMenu}>
-      <TopNavigationAction icon={MenuIcon} onPress={toggleMenu} />
-    </OverflowMenu>
-  );
-
   if (userType == 'owner') {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <TopNavigation
-          title="화물 25"
-          titleStyle={styles.titleStyles}
-          rightControls={renderMenuAction()}
-        />
         <View style={styles.titleContainer}>
           <Text style={styles.Subtitle}>화주 정보 수정</Text>
           <Button
             size="small"
+            onPress={() => {
+              console.log(carNumInput);
+            }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
             수정
@@ -193,14 +151,15 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <TopNavigation
-          title="화물 25"
-          titleStyle={styles.titleStyles}
-          rightControls={renderMenuAction()}
-        />
         <View style={styles.titleContainer}>
           <Text style={styles.Subtitle}>화물차 기사 정보 수정</Text>
-          <Button style={styles.Button} textStyle={styles.ButtonText}>
+          <Button
+            onPress={() => {
+              console.log(carNumInput);
+              console.log(selectedFreightType);
+            }}
+            style={styles.Button}
+            textStyle={styles.ButtonText}>
             수정
           </Button>
         </View>
@@ -231,9 +190,9 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 크기 : </Text>
-            <Input placeholder="00" />
+            <Input placeholder="00" {...carVolume} />
             <Layout style={styles.selectContainer}>
-              <Select data={freightType} {...carVolume} />
+              <Select data={freightType} {...selectedFreightType} />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
