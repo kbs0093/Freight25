@@ -21,13 +21,11 @@ import {AuthScreenProps} from '../../navigation/auth.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import axios from 'axios';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
 }
-const verifyUrl = 'http://49.50.162.128:8000/verifyToken';
+const serverUrl = 'http://49.50.162.128:8000/';
 
 const logCallback = (log, callback) => {
   console.log(log);
@@ -49,45 +47,35 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
 
-  const getProfile = () => {
-    logCallback('Get Profile Start', setProfileLoading(true));
-
-    KakaoLogins.getProfile()
-      .then((result) => {
-        setProfile(result);
-        logCallback(`Get Profile Finished`, setProfileLoading(true));
-        AsyncStorage.setItem('email', JSON.stringify(result.email));
-        AsyncStorage.setItem('nickname', JSON.stringify(result.nickname));
-        AsyncStorage.setItem('userType', 'driver');
-        {
-          /*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/
-        }
-      })
-      .catch((err) => {
-        logCallback(
-          `Get Profile Failed:${err.code} ${err.message}`,
-          setProfileLoading(false),
-        );
-      });
-  };
-
   const kakaoLogin = () => {
     logCallback('Login Start', setLoginLoading(true));
 
     KakaoLogins.login()
       .then((result) => {
         let data = JSON.stringify(result);
-
-        //firebase jwt
+        //uid 존재하는지 확인
         axios
-          .post(verifyUrl, {token: JSON.stringify(result.accessToken)})
+          .post(serverUrl+"confirmUid", {token: JSON.stringify(result.accessToken)})
           .then((response) => {
-            let firebaseToken = JSON.stringify(response.data.firebase_token);
-            auth().signInWithCustomToken(firebaseToken);
-            logCallback(`Login Finished:${data}`, setLoginLoading(false));
-            getProfile();
-            AsyncStorage.setItem('token', JSON.stringify(firebaseToken));
-            props.navigation.navigate(AppRoute.HOME);
+            let uidRegistered = JSON.stringify(response.data.register);
+            console.log("uidRegistered: "+uidRegistered);
+             //등록 (true)
+            if(uidRegistered == 'true'){
+              //현재 인증된 auth() 갱신 필요
+
+              //auth().onAuthStateChanged();
+              //getProfile();
+              //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+              props.navigation.navigate(AppRoute.HOME);
+            }
+             //미등록 (false)
+            else if(uidRegistered == 'false'){
+              console.log(JSON.stringify(result.accessToken));
+              //분기화면이 없어서 일단 드라이버 화면으로 가도록 해놓음
+              //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
+              AsyncStorage.setItem('accessToken', JSON.stringify(result.accessToken));
+              props.navigation.navigate(AppRoute.SIGNUP_DRIVER);
+            }
           })
           .catch((error) => {
             console.log(error);

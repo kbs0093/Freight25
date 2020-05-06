@@ -16,6 +16,16 @@ import {
 } from '@ui-kitten/components';
 import { SignupDriverScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+const serverUrl = 'http://49.50.162.128:8000/';
+
+const logCallback = (log, callback) => {
+  console.log(log);
+  callback;
+};
 
 const useInputState = (initialValue = '') => {
   const [value, setValue] = React.useState(initialValue);
@@ -56,7 +66,63 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
   const [selectedOption1, setSelectedOption1] = React.useState(null);
   const [selectedOption2, setSelectedOption2] = React.useState(null);
   const [selectedOption3, setSelectedOption3] = React.useState(null);
+  
+  const getProfile = () => {
+    logCallback('Get Profile Start', setProfileLoading(true));
 
+    KakaoLogins.getProfile()
+      .then((result) => {
+        setProfile(result);
+        logCallback(`Get Profile Finished`, setProfileLoading(true));
+        AsyncStorage.setItem('email', JSON.stringify(result.email));
+        AsyncStorage.setItem('nickname', JSON.stringify(result.nickname));
+        AsyncStorage.setItem('userType', 'driver');
+        {
+          /*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/
+        }
+      })
+      .catch((err) => {
+        logCallback(
+          `Get Profile Failed:${err.code} ${err.message}`,
+          setProfileLoading(false),
+        );
+      });
+  };
+
+  const regDriver = () => {
+    // 분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
+    //firebase jwt
+    var accessToken;
+    AsyncStorage.getItem('accessToken', (error,result)=>{
+      if(error){
+        console.log(error);
+      }
+      else{
+        accessToken = result;
+        axios
+          .post(serverUrl+"verifyToken", {token: accessToken})
+          .then((response) => {
+            let firebaseToken = JSON.stringify(response.data.firebase_token);
+            auth().signInWithCustomToken(firebaseToken);
+            
+            //getProfile이 아닌 fb auth로부터 정보갱신하는게 나을지
+            //서버 users 저장 or 수정?
+            //getProfile();
+            AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+            //uid를 이용한 db 저장 부분
+            var ref = firestore().collection('drivers').doc(auth().currentUser?.uid);
+            var user = auth().currentUser;
+            if(user != null)
+              console.log("uid: "+auth().currentUser?.uid);
+            ref.set({carNum: carNumInput, manNum:manNumInput, accountNum: accountNumInput, phoneNum:phoneNumInput});
+            props.navigation.navigate(AppRoute.HOME);
+          })
+          .catch((error) => {
+            console.log(error);
+          });  
+      }
+    });      
+  };
     return (
         <React.Fragment>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -190,7 +256,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
           
           <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>            
               <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
-              <Button style={{margin: 30}} status='primary' size='large'>회원가입</Button>
+              <Button style={{margin: 30}} status='primary' size='large' onPress={regDriver}>회원가입</Button>
           </View>
           </ScrollView>
 
