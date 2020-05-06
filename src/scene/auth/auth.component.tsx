@@ -85,8 +85,8 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
             let firebaseToken = JSON.stringify(response.data.firebase_token);
             auth().signInWithCustomToken(firebaseToken);
             logCallback(`Login Finished:${data}`, setLoginLoading(false));
-            AsyncStorage.setItem('token', JSON.stringify(result.accessToken));
             getProfile();
+            AsyncStorage.setItem('token', JSON.stringify(firebaseToken));
             props.navigation.navigate(AppRoute.HOME);
           })
           .catch((error) => {
