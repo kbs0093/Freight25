@@ -91,7 +91,7 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
       />
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>나의 배차</Text>
-        <Button style={styles.Badge} textStyle={styles.badgeText}>
+        <Button size="small" style={styles.Badge} textStyle={styles.badgeText}>
           배송중
         </Button>
       </View>
@@ -126,7 +126,7 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
       <View style={styles.lineStyle} />
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>경유지 화물</Text>
-        <Button style={styles.Badge} textStyle={styles.badgeText}>
+        <Button size="small" style={styles.Badge} textStyle={styles.badgeText}>
           배송중
         </Button>
       </View>

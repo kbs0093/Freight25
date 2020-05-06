@@ -54,6 +54,11 @@ const useInputState = (initialValue = '') => {
   return {value, onChangeText: setValue};
 };
 
+const useSelectState = (initialValue = '') => {
+  const [value, setValue] = React.useState(initialValue);
+  return {value, onSelect: setValue, selectedOption: value};
+};
+
 const carSize = [
   {text: '1톤'},
   {text: '2.5톤'},
@@ -68,21 +73,14 @@ const freightType = [{text: '파레트'}];
 export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
   const [menuVisible, setMenuVisible] = React.useState(false);
 
-  const [selectedCarSizeOption, setSelectedCarSizeOption] = React.useState(
-    null,
-  );
-  const [selectedCarTypeOption, setSelectedCarTypeOption] = React.useState(
-    null,
-  );
-  const [selectedDriveOption, setSelectedDriveOption] = React.useState(null);
-  const [weightValue, setWeightValue] = React.useState('');
-  const [volumeValue, setVolumeValue] = React.useState('');
-  const [
-    selectedFreightTypeOption,
-    setSelectedFreightTypeOption,
-  ] = React.useState(null);
-  const [freightLoadTypeValue, setFreightLoadTypeValue] = React.useState('');
-  const [descValue, setDescValue] = React.useState('');
+  const selectedCarSize = useSelectState();
+  const selectedCarType = useSelectState();
+  const selectedDrive = useSelectState();
+
+  const carWeight = useInputState();
+  const carVolume = useInputState();
+  const freightLoadType = useInputState();
+  const freightDesc = useInputState();
 
   const carNumInput = useInputState();
   const manNumInput = useInputState();
@@ -138,9 +136,56 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           titleStyle={styles.titleStyles}
           rightControls={renderMenuAction()}
         />
-        <Text>화주 개인정보 수정 화면</Text>
         <View style={styles.titleContainer}>
-          <Text style={styles.Subtitle}>개인정보 설정 및 수정</Text>
+          <Text style={styles.Subtitle}>화주 정보 수정</Text>
+          <Button
+            size="small"
+            style={styles.Button}
+            textStyle={styles.ButtonText}>
+            수정
+          </Button>
+        </View>
+
+        <View style={styles.infoContainer}>
+          <Text style={styles.Subtitle}>기본 주소 정보</Text>
+          <View style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>기본 상차지: </Text>
+            <Button
+              size="small"
+              style={styles.Button}
+              textStyle={styles.ButtonText}>
+              주소검색
+            </Button>
+          </View>
+          <View style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>기본 하차지 : </Text>
+            <Button
+              size="small"
+              style={styles.Button}
+              textStyle={styles.ButtonText}>
+              주소검색
+            </Button>
+          </View>
+        </View>
+
+        <View style={styles.lineStyle} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.Subtitle}>개인 정보</Text>
+          <View style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>사업자등록번호: </Text>
+            <Layout style={styles.selectContainer}>
+              <Input
+                placeholder="사업자등록번호를 입력하세요"
+                {...manNumInput}
+              />
+            </Layout>
+          </View>
+          <View style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>계좌번호: </Text>
+            <Layout style={styles.selectContainer}>
+              <Input placeholder="계좌번호를 입력하세요" {...accountNumInput} />
+            </Layout>
+          </View>
         </View>
       </React.Fragment>
     );
@@ -155,6 +200,9 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
         />
         <View style={styles.titleContainer}>
           <Text style={styles.Subtitle}>화물차 기사 정보 수정</Text>
+          <Button style={styles.Button} textStyle={styles.ButtonText}>
+            수정
+          </Button>
         </View>
 
         <View style={styles.infoContainer}>
@@ -162,54 +210,30 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 정보 : </Text>
             <Layout style={styles.selectContainer}>
-              <Select
-                data={carSize}
-                selectedOption={selectedCarSizeOption}
-                onSelect={setSelectedCarSizeOption}
-              />
+              <Select data={carSize} {...selectedCarSize} />
             </Layout>
             <Layout style={styles.selectContainer}>
-              <Select
-                data={carType}
-                selectedOption={selectedCarTypeOption}
-                onSelect={setSelectedCarTypeOption}
-              />
+              <Select data={carType} {...selectedCarType} />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>운행 방식 : </Text>
             <Layout style={styles.selectContainer}>
-              <Select
-                data={driveType}
-                selectedOption={selectedDriveOption}
-                onSelect={setSelectedDriveOption}
-              />
+              <Select data={driveType} {...selectedDrive} />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 무게 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="화물 무게를 입력하세요"
-                value={weightValue}
-                onChangeText={(nextValue) => setWeightValue(nextValue)}
-              />
+              <Input placeholder="00" {...carWeight} />
             </Layout>
             <Text style={styles.infoTitle}> 톤</Text>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 크기 : </Text>
-            <Input
-              placeholder=""
-              value={volumeValue}
-              onChangeText={(nextValue) => setVolumeValue(nextValue)}
-            />
+            <Input placeholder="00" />
             <Layout style={styles.selectContainer}>
-              <Select
-                data={freightType}
-                selectedOption={selectedFreightTypeOption}
-                onSelect={setSelectedFreightTypeOption}
-              />
+              <Select data={freightType} {...carVolume} />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
@@ -217,19 +241,14 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
             <Layout style={styles.selectContainer}>
               <Input
                 placeholder="ex) 지게차 / 기사 인력 필요"
-                value={freightLoadTypeValue}
-                onChangeText={(nextValue) => setFreightLoadTypeValue(nextValue)}
+                {...freightLoadType}
               />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 설명 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="화물 설명을 입력하세요"
-                value={descValue}
-                onChangeText={(nextValue) => setDescValue(nextValue)}
-              />
+              <Input placeholder="화물 설명을 입력하세요" {...freightDesc} />
             </Layout>
           </View>
         </View>
