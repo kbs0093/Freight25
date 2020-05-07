@@ -59,6 +59,7 @@ const bankData = [
 
 export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElement => {
    
+   
   const [nameInput, name] = React.useState('');
   const [accountOwnerInput, accountOwner] = React.useState('');
   const [carNumInput, carNum] = React.useState('');
