@@ -90,7 +90,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
   };
 
   const regDriver = () => {
-    // 분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
+    //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
     //firebase jwt
     var accessToken;
     AsyncStorage.getItem('accessToken', (error,result)=>{
@@ -104,7 +104,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
           .then((response) => {
             let firebaseToken = JSON.stringify(response.data.firebase_token);
             auth().signInWithCustomToken(firebaseToken);
-            //getProfile이 아닌 fb auth로부터 정보갱신하는게 나을지
+            //getProfile이 아닌 fb auth로부터 정보갱신해야할 것 같은데 논의가 필요합니다.
             //getProfile();
             //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
             console.log("currentAuth uid: "+auth().currentUser?.uid);
@@ -114,8 +114,6 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               if(user){
                 //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
                 var ref = firestore().collection('drivers').doc(user.uid);
-                //var ref = firestore().collection('drivers').doc('1338327542');
-                
                 if(user != null){
                   console.log("firestore target uid: "+auth().currentUser?.uid);
                   try {
