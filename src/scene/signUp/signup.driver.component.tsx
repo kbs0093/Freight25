@@ -44,6 +44,8 @@ const bankData = [
 
 export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElement => {
    
+  const [nameInput, name] = React.useState('');
+  const [accountOwnerInput, accountOwner] = React.useState('');
   const [carNumInput, carNum] = React.useState('');
   const [manNumInput, manNum] = React.useState('');
   const [accountNumInput, accountNum] = React.useState('');
@@ -52,6 +54,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
   const [TonValue, setTonValue] = React.useState('');
   const [TypeValue, setTypeValue] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
+  
 
 
     return (
@@ -62,6 +65,54 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
           <ScrollView>
+          <View> 
+            <Text style={styles.textStyle}>개인 정보</Text>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>성 명 :</Text>
+              </View>
+              <View style={{flex: 3}}>
+                <Input
+                  style={styles.input}
+                  placeholder='성명을 적어주세요'
+                  size='small'
+                  value={nameInput}
+                  onChangeText={name}
+                />
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>전화 번호 :</Text>
+              </View>
+              <View style={{flex: 3 }}>
+                <Input
+                  style={styles.input}
+                  placeholder='-를 빼고 입력하세요'
+                  size='small'
+                  value={phoneNumInput}
+                  onChangeText={phoneNum}
+                />
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>사업자 등록번호 :</Text>
+              </View>
+              <View style={{flex: 3}}>
+                <Input
+                  style={styles.input}
+                  placeholder='사업자 등록번호를 입력하세요'
+                  size='small'
+                  value={manNumInput}
+                  onChangeText={manNum}
+                />
+              </View>
+            </View>
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>
+
+
           <View> 
             <Text style={styles.textStyle}>차량 정보</Text>
             <View style={{flexDirection: 'row'}}>
@@ -115,21 +166,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
           </View>
 
           <View style={{flex: 3}}> 
-            <Text style={styles.textStyle}>개인 정보</Text>
-            <View style={{flexDirection: 'row'}}>
-              <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>사업자 등록번호 :</Text>
-              </View>
-              <View style={{flex: 3}}>
-                <Input
-                  style={styles.input}
-                  placeholder='사업자 등록번호를 입력하세요'
-                  size='small'
-                  value={manNumInput}
-                  onChangeText={manNum}
-                />
-              </View>
-            </View>
+            <Text style={styles.textStyle}>계좌 정보</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
                 <Text style={styles.textStyle}>거래 은행 :</Text>
@@ -163,15 +200,15 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>전화 번호 :</Text>
+                <Text style={styles.textStyle}>예금주 :</Text>
               </View>
               <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder='-를 빼고 입력하세요'
+                  placeholder='예금주를 입력하세요'
                   size='small'
-                  value={phoneNumInput}
-                  onChangeText={phoneNum}
+                  value={accountOwnerInput}
+                  onChangeText={accountOwner}
                 />
               </View>
             </View>

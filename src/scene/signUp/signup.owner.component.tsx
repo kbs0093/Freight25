@@ -20,8 +20,11 @@ import { AppRoute } from '../../navigation/app-routes';
 
 
 export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement => {
+  const [nameInput, name] = React.useState('');
+  const [accountOwnerInput, accountOwner] = React.useState('');
   
   const [manNumInput, manNum] = React.useState('');
+  const [companyNameInput, companyName] = React.useState('');
   const [accountNumInput, accountNum] = React.useState('');
   const [phoneNumInput, phoneNum] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
@@ -35,40 +38,24 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
           </View>
           <ScrollView>
           <View> 
-            <Text style={styles.textStyle}>회사 정보</Text>
+            <Text style={styles.textStyle}>개인 정보</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>회사 주소 :</Text>
+                <Text style={styles.textStyle}>성 명 :</Text>
               </View>
               <View style={{flex: 3}}>
-
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>상차지 주소 :</Text>
-              </View>
-              <View style={{flex: 3}}>
-
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>사업자 등록번호 :</Text>
-              </View>
-              <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder='사업자 등록번호를 입력하세요'
+                  placeholder='성명을 적어주세요'
                   size='small'
-                  value={manNumInput}
-                  onChangeText={manNum}
+                  value={nameInput}
+                  onChangeText={name}
                 />
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>전화번호 :</Text>
+                <Text style={styles.textStyle}>전화 번호 :</Text>
               </View>
               <View style={{flex: 3 }}>
                 <Input
@@ -80,11 +67,52 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                 />
               </View>
             </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>사업자 등록번호 :</Text>
+              </View>
+              <View style={{flex: 3}}>
+                <Input
+                  style={styles.input}
+                  placeholder='사업자 등록번호를 입력하세요'
+                  size='small'
+                  value={manNumInput}
+                  onChangeText={manNum}
+                />
+              </View>
+            </View>
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>
+
+          <View> 
+            <Text style={styles.textStyle}>상 하차지 정보</Text>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>자주 쓰는 주소 :</Text>
+              </View>
+              <View style={{flex: 3}}>
+                <Text style={styles.textStyle}>API 선생님 도와주세요</Text>
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>업체명 :</Text>
+              </View>
+              <View style={{flex: 3}}>
+                <Input
+                  style={styles.input}
+                  placeholder='업체명을 적어주세요'
+                  size='small'
+                  value={companyNameInput}
+                  onChangeText={companyName}
+                />
+              </View>
+            </View>            
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
 
           <View style={{flex: 3}}> 
-            <Text style={styles.textStyle}>금융 정보</Text>
+            <Text style={styles.textStyle}>계좌 정보</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
                 <Text style={styles.textStyle}>거래 은행 :</Text>
@@ -113,6 +141,20 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                   size='small'
                   value={accountNumInput}
                   onChangeText={accountNum}
+                />
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>예금주 :</Text>
+              </View>
+              <View style={{flex: 3 }}>
+                <Input
+                  style={styles.input}
+                  placeholder='예금주를 입력하세요'
+                  size='small'
+                  value={accountOwnerInput}
+                  onChangeText={accountOwner}
                 />
               </View>
             </View>
