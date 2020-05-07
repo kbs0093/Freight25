@@ -82,6 +82,17 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       });
   };
 
+  //logout시 auth계정 초기화를 위한 fbLogout
+  const fbLogout = () => {
+    auth().signOut()
+    .then((result) => {
+      console.log('fbLogtout Finished');
+    })
+    .catch((error) => {
+      console.log(`fbLogtout Failed:${error}`);
+    });
+  }
+
   const onMenuItemSelect = (index) => {
     setMenuVisible(false);
     console.log(index);
@@ -93,8 +104,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       }
       AsyncStorage.clear();
       kakaoLogout();
-      auth().signOut;
-      //auth().currentUser?.delete();
+      fbLogout();
 
       props.navigation.push(AppRoute.AUTH);
       console.log('Logout Success');

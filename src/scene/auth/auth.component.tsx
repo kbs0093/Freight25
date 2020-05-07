@@ -61,9 +61,9 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
           .post(serverUrl+"confirmUid", {token: JSON.stringify(result.accessToken)})
           .then((response) => {
             let uidRegistered = JSON.stringify(response.data.register);
-            console.log("uidRegistered: "+uidRegistered);
              //등록된 uid인 경우 (true)
             if(uidRegistered == 'true'){
+              console.log("uidRegistered: "+uidRegistered);
               //현재 인증된 uid로 발행된 fbToken 이용하여 auth() 갱신
               let firebaseToken = JSON.stringify(response.data.firebase_token);
               auth().signInWithCustomToken(firebaseToken);
@@ -74,6 +74,9 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
             }
              //미등록된 uid인 경우 (false)
             else if(uidRegistered == 'false'){
+              console.log("uidRegistered: "+uidRegistered);
+              const user = auth().currentUser;
+              console.log(user?.uid);
               console.log(JSON.stringify(result.accessToken));
               //분기화면이 없어서 일단 드라이버 화면으로 가도록 해놓음
               //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
