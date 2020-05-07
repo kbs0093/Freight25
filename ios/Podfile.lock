@@ -528,6 +528,8 @@ PODS:
     - React-cxxreact (= 0.62.1)
     - React-jsi (= 0.62.1)
   - React-jsinspector (0.62.1)
+  - react-native-geolocation (2.0.2):
+    - React
   - react-native-get-random-values (1.4.0):
     - React
   - react-native-safe-area-context (0.7.3):
@@ -647,6 +649,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -740,6 +743,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-safe-area-context:
@@ -836,6 +841,7 @@ SPEC CHECKSUMS:
   React-jsi: 600d8e42510c3254fd2abd702f4b9d3f598d8f52
   React-jsiexecutor: e9698dee4fd43ceb44832baf15d5745f455b0157
   React-jsinspector: f74a62727e5604119abd4a1eda52c0a12144bcd5
+  react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
   react-native-get-random-values: 2b7500cdb68066aba87cdccd97067c29e16ffe95
   react-native-safe-area-context: 8260e5157617df4b72865f44006797f895b2ada7
   react-native-webview: bdde2a3c4cbdc0122bc2bfba13603db193f0cc5c
