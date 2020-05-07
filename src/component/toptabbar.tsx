@@ -94,6 +94,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       AsyncStorage.clear();
       kakaoLogout();
       auth().signOut;
+      //auth().currentUser?.delete();
 
       props.navigation.push(AppRoute.AUTH);
       console.log('Logout Success');
