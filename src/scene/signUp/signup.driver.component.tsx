@@ -104,7 +104,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
       else{
         accessToken = result;
         axios
-          .post(serverUrl+"verifyToken", {token: accessToken})
+          .post(serverUrl+"verifyToken", {token: accessToken, type: "drivers"})
           .then((response) => {
             let firebaseToken = JSON.stringify(response.data.firebase_token);
             auth().signInWithCustomToken(firebaseToken);
@@ -121,10 +121,14 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                 if(user != null){
                   console.log("firestore target uid: "+auth().currentUser?.uid);
                   try {
-                    ref.update({carNum: carNumInput.value, 
-                      manNum:manNumInput.value, 
-                      accountNum: accountNumInput.value, 
-                      phoneNum:phoneNumInput.value,
+                    ref.update({
+                      carNum: carNumInput, 
+                      manNum: manNumInput, 
+                      accountNum: accountNumInput, 
+                      phoneNum: phoneNumInput,
+                      TonValue: TonValue,
+                      TypeValue: TypeValue,
+                      BankValue: BankValue
                       });
                     props.navigation.navigate(AppRoute.HOME);
                   } catch (error) {

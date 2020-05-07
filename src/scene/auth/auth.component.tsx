@@ -78,7 +78,6 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
               const user = auth().currentUser;
               console.log(user?.uid);
               console.log(JSON.stringify(result.accessToken));
-              //분기화면이 없어서 일단 드라이버 화면으로 가도록 해놓음
               //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
               //분기에 대한 변수도 같이 주고 서버에서 기사와 화주 collection을 구분하여 만들도록 함 
               AsyncStorage.setItem('accessToken', JSON.stringify(result.accessToken));
