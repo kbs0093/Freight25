@@ -104,20 +104,37 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
           .then((response) => {
             let firebaseToken = JSON.stringify(response.data.firebase_token);
             auth().signInWithCustomToken(firebaseToken);
-            
             //getProfile이 아닌 fb auth로부터 정보갱신하는게 나을지
-            //서버 users 저장 or 수정?
             //getProfile();
-            AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
-            //uid를 이용한 db 저장 부분
-            var ref = firestore().collection('drivers').doc(auth().currentUser?.uid);
-            var user = auth().currentUser;
-            if(user != null)
-              console.log("uid: "+auth().currentUser?.uid);
-            ref.set({carNum: carNumInput, manNum:manNumInput, accountNum: accountNumInput, phoneNum:phoneNumInput});
-            props.navigation.navigate(AppRoute.HOME);
+            //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+            console.log("currentAuth uid: "+auth().currentUser?.uid);
+
+            //auth리스너와 uid를 이용한 db 저장 부분
+            auth().onAuthStateChanged(function(user){
+              if(user){
+                //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+                var ref = firestore().collection('drivers').doc(user.uid);
+                //var ref = firestore().collection('drivers').doc('1338327542');
+                
+                if(user != null){
+                  console.log("firestore target uid: "+auth().currentUser?.uid);
+                  try {
+                    ref.update({carNum: carNumInput.value, 
+                      manNum:manNumInput.value, 
+                      accountNum: accountNumInput.value, 
+                      phoneNum:phoneNumInput.value,
+                      });
+                    props.navigation.navigate(AppRoute.HOME);
+                  } catch (error) {
+                    //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
+                    console.log(error);
+                  }
+                }
+              }
+            });
           })
           .catch((error) => {
+            //verifyToken Request가 실패하는 경우
             console.log(error);
           });  
       }
