@@ -87,6 +87,10 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
             logCallback(`Login Finished:${data}`, setLoginLoading(false));
             getProfile();
             AsyncStorage.setItem('token', JSON.stringify(firebaseToken));
+            //여기서 분기가 발생해야 합니다
+            /*firebaseToken == 'owner'
+            ? props.navigation.navigate(AppRoute.SIGNUP)
+            : props.navigation.navigate(AppRoute.HOME);*/
             props.navigation.navigate(AppRoute.HOME);
           })
           .catch((error) => {
@@ -123,17 +127,9 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
             appearance="ghost"
             status="basic"
             onPress={() => {
-              props.navigation.navigate(AppRoute.SIGNUP_DRIVER);
+              props.navigation.navigate(AppRoute.SIGNUP);
             }}>
-            화물차 기사 회원가입
-          </Button>
-          <Button
-            appearance="ghost"
-            status="basic"
-            onPress={() => {
-              props.navigation.navigate(AppRoute.SIGNUP_OWNER);
-            }}>
-            화주 회원가입
+            회원가입
           </Button>
         </View>
       </ImageBackground>

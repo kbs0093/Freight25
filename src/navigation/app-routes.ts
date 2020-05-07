@@ -20,6 +20,8 @@ export enum AppRoute {
   APPLY = 'Apply',
   APPLY_MAIN = 'Apply_Main',
   TAB_BAR = 'Tab_bar',
+  SIGNUP = 'Signup',
+  SIGNUP_MAIN = 'Signup_Main',
   SIGNUP_DRIVER = 'Signup_Driver',
   SIGNUP_OWNER = 'Signup_Owner',
   SIGNUP_OWNER_MAIN = 'Signup_Owner_Main',

@@ -6,6 +6,7 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  Picker
 } from 'react-native';
 import {
   LayoutElement, 
@@ -17,17 +18,12 @@ import {
 import { SignupDriverScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 
-const useInputState = (initialValue = '') => {
-  const [value, setValue] = React.useState(initialValue);
-  return { value, onChangeText: setValue };
-};
-
 const weightData = [
-  { text: '1 톤' },
+  { text: '1 톤'},
   { text: '1.4 톤' },
   { text: '2.5 톤' },
   { text: '5 톤' },
-  { text: '11 - 15 톤' },
+  { text: '11-15 톤' },
   { text: '18 톤' },
   { text: '25 톤' },
 ];
@@ -46,16 +42,17 @@ const bankData = [
   { text: '농협' },
 ];
 
-
 export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElement => {
-  const carNumInput = useInputState();
-  const manNumInput = useInputState();
-  const accountNumInput = useInputState();
-  const phoneNumInput = useInputState();
+   
+  const [carNumInput, carNum] = React.useState('');
+  const [manNumInput, manNum] = React.useState('');
+  const [accountNumInput, accountNum] = React.useState('');
+  const [phoneNumInput, phoneNum] = React.useState('');
 
-  const [selectedOption1, setSelectedOption1] = React.useState(null);
-  const [selectedOption2, setSelectedOption2] = React.useState(null);
-  const [selectedOption3, setSelectedOption3] = React.useState(null);
+  const [TonValue, setTonValue] = React.useState('');
+  const [TypeValue, setTypeValue] = React.useState('');
+  const [BankValue, setBankValue] = React.useState('');
+
 
     return (
         <React.Fragment>
@@ -76,7 +73,8 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                   style={styles.input}
                   placeholder='차량 번호판 번호를 적어주세요'
                   size='small'
-                  {...carNumInput}
+                  value={carNumInput}
+                  onChangeText={carNum}
                 />
               </View>
             </View>
@@ -85,14 +83,16 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                 <Text style={styles.textStyle}>차량 톤수 :</Text>
               </View>
               <View style={{flex: 3}}>
-                <Select
-                  style={styles.input}
-                  data={weightData}
-                  size='small'
-                  placeholder='차량 톤수를 선택하세요'
-                  selectedOption={selectedOption1}
-                  onSelect={setSelectedOption1}
-                />
+                <Picker
+                  selectedValue={TonValue}
+                  onValueChange={(itemValue, itemIndex) => setTonValue(itemValue)}
+                >
+                  <Picker.Item label="1 톤" value="1"/>
+                  <Picker.Item label="2.5 톤" value="2.5"/>
+                  <Picker.Item label="5 톤" value="5"/>
+                  <Picker.Item label="11-15 톤" value="15"/>
+                  <Picker.Item label="25 톤" value="25"/>
+                </Picker>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -100,22 +100,15 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                 <Text style={styles.textStyle}>차량 유형 :</Text>
               </View>
               <View style={{flex: 3 }}>
-                <Select
-                    style={styles.input}
-                    data={typeData}
-                    size='small'
-                    placeholder='카고 / 탑차 등 유형을 선택'
-                    selectedOption={selectedOption2}
-                    onSelect={setSelectedOption2}
-                  />
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>차량 등록증 :</Text>
-              </View>
-              <View style={{flex: 3 }}>
-                <Text style={styles.textStyle}>세부 사항</Text>
+                <Picker
+                  selectedValue={TypeValue}
+                  onValueChange={(itemValue, itemIndex) => setTypeValue(itemValue)}
+                >
+                  <Picker.Item label="카고" value="cargo"/>
+                  <Picker.Item label="윙카" value="wing"/>
+                  <Picker.Item label="냉동" value="ice"/>
+                  <Picker.Item label="냉장" value="superice"/>
+                </Picker>
               </View>
             </View>
             <Divider style={{backgroundColor: 'black'}}/>
@@ -130,18 +123,11 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               <View style={{flex: 3}}>
                 <Input
                   style={styles.input}
-                  placeholder=''
+                  placeholder='사업자 등록번호를 입력하세요'
                   size='small'
-                  {...manNumInput}
+                  value={manNumInput}
+                  onChangeText={manNum}
                 />
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>사업자등록증 :</Text>
-              </View>
-              <View style={{flex: 3}}>
-               
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -149,14 +135,16 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                 <Text style={styles.textStyle}>거래 은행 :</Text>
               </View>
               <View style={{flex: 3 }}>
-                <Select
-                  style={styles.input}
-                  data={bankData}
-                  size='small'
-                  placeholder='은행을 선택하세요'
-                  selectedOption={selectedOption3}
-                  onSelect={setSelectedOption3}
-                />
+                <Picker
+                  selectedValue={BankValue}
+                  onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
+                >
+                  <Picker.Item label="국민" value="kukmin"/>
+                  <Picker.Item label="신한" value="shinhan"/>
+                  <Picker.Item label="농협" value="nonghyeob"/>
+                  <Picker.Item label="SC제일" value="SC"/>
+                  <Picker.Item label="하나" value="hana"/>
+                </Picker>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -166,9 +154,10 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder=''
+                  placeholder='-를 빼고 입력하세요'
                   size='small'
-                  {...accountNumInput}
+                  value={accountNumInput}
+                  onChangeText={accountNum}
                 />
               </View>
             </View>
@@ -179,16 +168,18 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder=''
+                  placeholder='-를 빼고 입력하세요'
                   size='small'
-                  {...phoneNumInput}
+                  value={phoneNumInput}
+                  onChangeText={phoneNum}
                 />
               </View>
             </View>
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
           
-          <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>            
+          <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+              <Text>{carNum}</Text>  
               <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
               <Button style={{margin: 30}} status='primary' size='large'>회원가입</Button>
           </View>

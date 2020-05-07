@@ -11,16 +11,20 @@ import {
 import {
   LayoutElement,
 } from '@ui-kitten/components';
+import { WebView } from 'react-native-webview';
 import { DetailScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
+
+const myHtmlFile = require('../../component/tmap.html');
+const isAndroid = Platform.OS ==='android'
 
 export const DetailScreen = (props: DetailScreenProps): LayoutElement => {
     return (
         <React.Fragment>
-          <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <Text>
-            디테일 화면입니다
-          </Text>
+          <WebView 
+            source={{uri:isAndroid?'file:///android_asset/tmap.html':'./external/tmap.html'}}
+            
+          />
         </React.Fragment>
     );
 };
