@@ -82,7 +82,8 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
               //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
               //분기에 대한 변수도 같이 주고 서버에서 기사와 화주 collection을 구분하여 만들도록 함 
               AsyncStorage.setItem('accessToken', JSON.stringify(result.accessToken));
-              props.navigation.navigate(AppRoute.SIGNUP_DRIVER);
+              //여기서 분기가 발생해야 합니다
+              props.navigation.navigate(AppRoute.SIGNUP);
             }
           })
           .catch((error) => {
