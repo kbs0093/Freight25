@@ -12,7 +12,6 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
-import { WebView } from 'react-native-webview';
 import {
   LayoutElement, 
   Icon,
@@ -90,7 +89,7 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
     <View style={styles.container}>
       <View style={styles.geoInfo}>
         <View style={styles.geoInfo1}>
-          <View style={styles.geoInfo11}><Text style={styles.geoText}>대전 서구</Text></View>
+          <View style={styles.geoInfo11}><Text style={styles.geoText}>`대전 서구{this.state.data}`</Text></View>
           <View style={styles.geoInfo12}><Icon style={styles.icon} fill='#8F9BB3' name='arrow-forward-outline'/></View>
           <View style={styles.geoInfo11}><Text style={styles.geoText}>서울 성북</Text></View>
         </View>

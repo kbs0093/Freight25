@@ -6,6 +6,7 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  Picker
 } from 'react-native';
 import {
   LayoutElement, 
@@ -17,28 +18,13 @@ import {
 import { SignupOwnerScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 
-const useInputState = (initialValue = '') => {
-  const [value, setValue] = React.useState(initialValue);
-  return { value, onChangeText: setValue };
-};
-
-const bankData = [
-  { text: '국민은행' },
-  { text: 'SC제일은행' },
-  { text: '하나은행' },
-  { text: '농협' },
-];
-
 
 export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement => {
-
-  const manNumInput = useInputState();
-  const accountNumInput = useInputState();
-  const phoneNumInput = useInputState();
-
-  const [selectedOption1, setSelectedOption1] = React.useState(null);
-  const [selectedOption2, setSelectedOption2] = React.useState(null);
-  const [selectedOption3, setSelectedOption3] = React.useState(null);
+  
+  const [manNumInput, manNum] = React.useState('');
+  const [accountNumInput, accountNum] = React.useState('');
+  const [phoneNumInput, phoneNum] = React.useState('');
+  const [BankValue, setBankValue] = React.useState('');
 
     return (
         <React.Fragment>
@@ -73,18 +59,11 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder='사업자 등록번호를 적으세요'
+                  placeholder='사업자 등록번호를 입력하세요'
                   size='small'
-                  {...manNumInput}
+                  value={manNumInput}
+                  onChangeText={manNum}
                 />
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>사업자 등록증 :</Text>
-              </View>
-              <View style={{flex: 3 }}>
-                <Text style={styles.textStyle}>세부 사항</Text>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -94,9 +73,10 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder='핸드폰 전화번호를 적어주세요'
+                  placeholder='-를 빼고 입력하세요'
                   size='small'
-                  {...phoneNumInput}
+                  value={phoneNumInput}
+                  onChangeText={phoneNum}
                 />
               </View>
             </View>
@@ -110,14 +90,16 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                 <Text style={styles.textStyle}>거래 은행 :</Text>
               </View>
               <View style={{flex: 3 }}>
-                <Select
-                  style={styles.input}
-                  data={bankData}
-                  size='small'
-                  placeholder='은행을 선택하세요'
-                  selectedOption={selectedOption3}
-                  onSelect={setSelectedOption3}
-                />
+                <Picker
+                  selectedValue={BankValue}
+                  onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
+                >
+                  <Picker.Item label="국민" value="kukmin"/>
+                  <Picker.Item label="신한" value="shinhan"/>
+                  <Picker.Item label="농협" value="nonghyeob"/>
+                  <Picker.Item label="SC제일" value="SC"/>
+                  <Picker.Item label="하나" value="hana"/>
+                </Picker>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -127,9 +109,10 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               <View style={{flex: 3 }}>
                 <Input
                   style={styles.input}
-                  placeholder=''
+                  placeholder='-를 빼고 입력하세요'
                   size='small'
-                  {...accountNumInput}
+                  value={accountNumInput}
+                  onChangeText={accountNum}
                 />
               </View>
             </View>
