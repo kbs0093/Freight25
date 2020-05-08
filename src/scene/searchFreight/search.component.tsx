@@ -33,9 +33,6 @@ const myHtmlFile = require('../../component/tmap.html');
 const isAndroid = Platform.OS==='android'
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 
-{/*<WebView source={{uri:isAndroid?'file:///android_asset/tmap.html':'./tmap.html'}}></WebView>*/}
-
-
 export class SearchScreen extends React.Component<SearchScreenProps> {
   state = {
     latitude: 'unknown',
@@ -44,31 +41,30 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
     gu: '',
     myeon: '',
     dong: '',
-    data: [1, 2, 3],
-    lastRefresh: "null"
+    distance: '',
+    lastRefresh: "null",
+    list: [
+      {
+        key:      'A1234567',
+        startAddress:   '대전 서구',
+        startX:         '127.370187',
+        startY:         '36.334634',
+        endAddress:     '서울 성북',
+        startType:      '당상',
+        endType:        '당착',
+        Type:           '혼적',
+        carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+        distanceX:      '',  //빈 칸으로 남겨둬라
+        distanceY:      '189km',
+        time:           '3시간 20분',
+        smart:          '80%',
+        money:          '200,000원',
+        
+      },  
+    ]
   };
 
-  list = [
-    {
-      key:      'A1234567',
-      startAddress:   '대전 서구',
-      startX:         '127.370187',
-      startY:         '36.334634',
-      endAddress:     '서울 성북',
-      startType:      '당상',
-      endType:        '당착',
-      Type:           '혼적',
-      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-      distanceX:      '',  //빈 칸으로 남겨둬라
-      distanceY:      '189km',
-      time:           '3시간 20분',
-      smart:          '80%',
-      money:          '200,000원',
-      
-    },
-
-
-  ];
+  
 
   componentDidMount() {
     Geolocation.getCurrentPosition(
@@ -93,7 +89,8 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
         })   
         .catch(err => console.log(err));
 
-        for(let i=0; i<this.list.length; i++){  
+        for(let i=0; i<this.state.list.length; i++){
+
           fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
             method: 'POST',
             headers:{
@@ -102,8 +99,8 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
             body: JSON.stringify({
               "startX" : this.state.longitude,
               "startY" : this.state.latitude,
-              "endX" : this.list[i].startX,
-              "endY" : this.list[i].startY,
+              "endX" : this.state.list[i].startX,
+              "endY" : this.state.list[i].startY,
               "reqCoordType" : "WGS84GEO",
               "resCoordType" : "WGS84GEO",
               "searchOption" : '0',
@@ -112,16 +109,20 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
             })})
           .then(response => response.json())
           .then(response =>{
-            this.list[i].distanceX = (response.features[0].properties.totalDistance/1000) + "";
+            this.state.list[i].distanceX = (response.features[0].properties.totalDistance/1000) + "";
+   
           })
           .catch(err => console.log(err));
-        }
+          console.log(this.state.list[i].distanceX);
+       }
 
 
       },
       error => Alert.alert('Error', JSON.stringify(error)),
-      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
     );  
+
+
     
   };
 
@@ -146,8 +147,11 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
           <View style={styles.geoInfo12}></View>
           <View style={styles.geoInfo21}><Text style={styles.endType}>{item.endType}</Text></View>
         </View>
-          <View style={styles.geoInfo3}><Text style={styles.Type}>     {item.Type} / 상차지 까지 {item.distanceX} Km</Text></View>
-          <View style={styles.geoInfo3}><Text style={styles.timeText}>    {item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
+          <View style={styles.geoInfo3}>
+            <View style={{flex:1, alignItems: 'center'}}><Text style={styles.Type}>{item.Type}</Text></View>
+            <View style={{flex:2}}><Text style={styles.distance}> 상차지 까지 {item.distanceX} Km</Text></View>            
+          </View>
+          <View style={styles.geoInfo3}><Text style={styles.timeText}>{item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
         </View>
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
@@ -188,7 +192,7 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
       <Divider style={{backgroundColor: 'black'}}/>     
         <FlatList 
           style={{backgroundColor : 'white'}}
-          data={this.list}
+          data={this.state.list}
           renderItem={this._renderItem}
         />                             
     </React.Fragment>
@@ -253,7 +257,7 @@ const styles = StyleSheet.create({
   },
   geoInfo3: {
     justifyContent: 'center',
-
+    flexDirection: 'row',
     flex : 1,
   },
   geoInfo2: {
@@ -283,4 +287,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
   },
+  distance: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#E5E5E5',
+  }
 });
