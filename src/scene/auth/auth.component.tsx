@@ -22,12 +22,11 @@ import {AppRoute} from '../../navigation/app-routes';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
 }
-const verifyUrl = 'http://49.50.162.128:8000/verifyToken';
+const serverUrl = 'http://49.50.162.128:8000/';
 
 const logCallback = (log, callback) => {
   console.log(log);
@@ -49,49 +48,42 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
 
-  const getProfile = () => {
-    logCallback('Get Profile Start', setProfileLoading(true));
-
-    KakaoLogins.getProfile()
-      .then((result) => {
-        setProfile(result);
-        logCallback(`Get Profile Finished`, setProfileLoading(true));
-        AsyncStorage.setItem('email', JSON.stringify(result.email));
-        AsyncStorage.setItem('nickname', JSON.stringify(result.nickname));
-        AsyncStorage.setItem('userType', 'driver');
-        {
-          /*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/
-        }
-      })
-      .catch((err) => {
-        logCallback(
-          `Get Profile Failed:${err.code} ${err.message}`,
-          setProfileLoading(false),
-        );
-      });
-  };
-
   const kakaoLogin = () => {
     logCallback('Login Start', setLoginLoading(true));
 
     KakaoLogins.login()
       .then((result) => {
         let data = JSON.stringify(result);
-
-        //firebase jwt
+        /** 
+         * uid 존재하는지 확인하는 부분
+         **/
         axios
-          .post(verifyUrl, {token: JSON.stringify(result.accessToken)})
+          .post(serverUrl+"confirmUid", {token: JSON.stringify(result.accessToken)})
           .then((response) => {
-            let firebaseToken = JSON.stringify(response.data.firebase_token);
-            auth().signInWithCustomToken(firebaseToken);
-            logCallback(`Login Finished:${data}`, setLoginLoading(false));
-            getProfile();
-            AsyncStorage.setItem('token', JSON.stringify(firebaseToken));
-            //여기서 분기가 발생해야 합니다
-            /*firebaseToken == 'owner'
-            ? props.navigation.navigate(AppRoute.SIGNUP)
-            : props.navigation.navigate(AppRoute.HOME);*/
-            props.navigation.navigate(AppRoute.HOME);
+            let uidRegistered = JSON.stringify(response.data.register);
+             //등록된 uid인 경우 (true)
+            if(uidRegistered == 'true'){
+              console.log("uidRegistered: "+uidRegistered);
+              //현재 인증된 uid로 발행된 fbToken 이용하여 auth() 갱신
+              let firebaseToken = JSON.stringify(response.data.firebase_token);
+              auth().signInWithCustomToken(firebaseToken);
+              //getProfile이 아닌 fb auth로부터 정보갱신하는게 나을지
+              //getProfile();
+              //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+              props.navigation.navigate(AppRoute.HOME);
+            }
+             //미등록된 uid인 경우 (false)
+            else if(uidRegistered == 'false'){
+              console.log("uidRegistered: "+uidRegistered);
+              const user = auth().currentUser;
+              console.log(user?.uid);
+              console.log(JSON.stringify(result.accessToken));
+              //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
+              //분기에 대한 변수도 같이 주고 서버에서 기사와 화주 collection을 구분하여 만들도록 함 
+              AsyncStorage.setItem('accessToken', JSON.stringify(result.accessToken));
+              //여기서 분기가 발생해야 합니다
+              props.navigation.navigate(AppRoute.SIGNUP);
+            }
           })
           .catch((error) => {
             console.log(error);
