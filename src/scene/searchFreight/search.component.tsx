@@ -48,7 +48,27 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
     lastRefresh: "null"
   };
 
-  
+  list = [
+    {
+      key:      'A1234567',
+      startAddress:   '대전 서구',
+      startX:         '127.370187',
+      startY:         '36.334634',
+      endAddress:     '서울 성북',
+      startType:      '당상',
+      endType:        '당착',
+      Type:           '혼적',
+      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+      distanceX:      '',  //빈 칸으로 남겨둬라
+      distanceY:      '189km',
+      time:           '3시간 20분',
+      smart:          '80%',
+      money:          '200,000원',
+      
+    },
+
+
+  ];
 
   componentDidMount() {
     Geolocation.getCurrentPosition(
@@ -72,45 +92,73 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
           this.setState({dong});          
         })   
         .catch(err => console.log(err));
+
+        for(let i=0; i<this.list.length; i++){  
+          fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
+            method: 'POST',
+            headers:{
+              "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+            },
+            body: JSON.stringify({
+              "startX" : this.state.longitude,
+              "startY" : this.state.latitude,
+              "endX" : this.list[i].startX,
+              "endY" : this.list[i].startY,
+              "reqCoordType" : "WGS84GEO",
+              "resCoordType" : "WGS84GEO",
+              "searchOption" : '0',
+              "totalValue" : '2',
+              "trafficInfo" : 'N'
+            })})
+          .then(response => response.json())
+          .then(response =>{
+            this.list[i].distanceX = (response.features[0].properties.totalDistance/1000) + "";
+          })
+          .catch(err => console.log(err));
+        }
+
+
       },
       error => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-    );        
-  }
+    );  
+    
+  };
 
   ClickList = index => () => {
-    console.log(index);
     //AsyncStorage.setItem('Freight', index);
     this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
-  }
+  };
+
+  
 
   _renderItem = ({item}) => (
     <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
         <View style={styles.geoInfo1}>
-          <View style={styles.geoInfo11}><Text style={styles.geoText}>`대전 서구{this.state.data}`</Text></View>
+          <View style={styles.geoInfo11}><Text style={styles.geoText}>{item.startAddress}</Text></View>
           <View style={styles.geoInfo12}><Icon style={styles.icon} fill='#8F9BB3' name='arrow-forward-outline'/></View>
-          <View style={styles.geoInfo11}><Text style={styles.geoText}>서울 성북</Text></View>
+          <View style={styles.geoInfo11}><Text style={styles.geoText}>{item.endAddress}</Text></View>
         </View>
         <View style={styles.geoInfo2}> 
-          <View style={styles.geoInfo21}><Text style={styles.timeText}>당상 10:00</Text></View>
+          <View style={styles.geoInfo21}><Text style={styles.startType}>{item.startType}</Text></View>
           <View style={styles.geoInfo12}></View>
-          <View style={styles.geoInfo21}><Text style={styles.timeText}>당착 16:00</Text></View>
+          <View style={styles.geoInfo21}><Text style={styles.endType}>{item.endType}</Text></View>
         </View>
-        <View style={styles.geoInfo3}><Text style={styles.timeText}>    혼적</Text></View>
-        <View style={styles.geoInfo3}><Text style={styles.timeText}>    5톤 / 탑차 / 6파렛 / 4500k / 수작업</Text></View>
-      </View>
+          <View style={styles.geoInfo3}><Text style={styles.Type}>     {item.Type} / 상차지 까지 {item.distanceX} Km</Text></View>
+          <View style={styles.geoInfo3}><Text style={styles.timeText}>    {item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
+        </View>
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
           <Text style={styles.driveText}></Text>
-          <Text style={styles.driveText}>189Km</Text>
-          <Text style={styles.timeText}>3시간 20분</Text>
-          <Text style={styles.timeText}>스마트 확률 : 80%</Text>
+          <Text style={styles.driveText}>{item.distanceY}</Text>
+          <Text style={styles.timeText}>{item.time}</Text>
+          <Text style={styles.timeText}>스마트 확률 : {item.smart}</Text>
           <Text style={styles.timeText}></Text>
         </View>
         <View style={styles.moneyInfo}>
-          <Text style={styles.driveText}>200,000원</Text>
+          <Text style={styles.driveText}>{item.money}</Text>
         </View>
       </View>                          
     </View>
@@ -137,16 +185,12 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
           </Button>
         </View>      
       </View>     
-      <Divider style={{backgroundColor: 'black'}}/>
-     
+      <Divider style={{backgroundColor: 'black'}}/>     
         <FlatList 
           style={{backgroundColor : 'white'}}
-          data={this.state.data}
+          data={this.list}
           renderItem={this._renderItem}
-        />
-      
-      
-                        
+        />                             
     </React.Fragment>
     
     );
@@ -156,6 +200,21 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
 
 
 const styles = StyleSheet.create({
+  startType: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#2F80ED'
+  },
+  endType: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#EB5757'
+  },
+  Type: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#9B51E0',
+  },
   container: {
     flex : 1,
     flexDirection: 'row',
