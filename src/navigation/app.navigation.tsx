@@ -8,7 +8,9 @@ import {HistoryNavigator} from './history.navigator';
 import {ApplyNavigator} from './apply.navigator';
 import {AppRoute} from './app-routes';
 import {ProfileNavigator} from './profile.navigator';
-import {SignupNavigator} from './signup.navigator'
+import {SignupNavigator} from './signup.navigator';
+import {SignupDNavigator} from './signupD.navigator';
+import {SignupONavigator} from './signupO.navigator';
 
 const Stack = createStackNavigator();
 

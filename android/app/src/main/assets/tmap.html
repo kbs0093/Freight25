@@ -24,12 +24,21 @@
 
 	var defaultRouteResult;
 
+    var startX = 37.52751472590552;
+    var startY = 126.9470910317561;
+    var stopover1X = 127.370187;
+    var stopover1Y = 36.334634;
+    var stopover2X
+    var stopover2Y
+    var finishX
+    var finishY
+
 	function initTmap() {
 		// 1. 지도 띄우기
 		map = new Tmapv2.Map("map_div", {
-			center : new Tmapv2.LatLng(37.52751472590552, 126.9470910317561),
+			center : new Tmapv2.LatLng(startX, startY),
 			width : "100%",
-			height : "400px",
+			height : "250px",
 			zoom : 14,
 			zoomControl : true,
 			scrollwheel : true
@@ -60,109 +69,7 @@
 				.click(
 						function() {
 							var searchOption = $("#selectLevel").val();
-							
-							$
-									.ajax({
-										method : "POST",
-										url : "https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=result",//
-										async : false,
-										data : {
-											"appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-											"startX" : "126.958973",
-											"startY" : "37.534066",
-											"endX" : "126.932661",
-											"endY" : "37.520287",
-											"reqCoordType" : "WGS84GEO",
-											"resCoordType" : "EPSG3857",
-											"searchOption" : "0",
-											"trafficInfo" : "N"
-
-										},
-
-										success : function(response) {
-											// 결과 출력
-											var resultData = response.features;
-
-											var tDistance = "총 거리 : "
-													+ (resultData[0].properties.totalDistance / 1000)
-															.toFixed(1) + "km,";
-											var tTime = " 총 시간 : "
-													+ (resultData[0].properties.totalTime / 60)
-															.toFixed(0) + "분,";
-											var tFare = " 총 요금 : "
-													+ resultData[0].properties.totalFare
-													+ "원,";
-											var taxiFare = " 예상 택시 요금 : "
-													+ resultData[0].properties.taxiFare
-													+ "원";
-
-											defaultRouteResult = "한강교랑(5개소) 천호대교,영동대교,원효대교,잠수교,성산대교 는  총 중량 32톤을 초과하는 화물차가 이용할 수 없습니다.</br>"
-													+ "자동차 경로안내 결과 : "
-													+ tDistance
-													+ tTime
-													+ tFare
-													+ taxiFare
-													+ "화물차 경로안내 결과 : ";
-
-											$("#result").html(
-													defaultRouteResult);
-
-											//지도 라인 초기화
-											if (resultInfoArr1.length > 0) {
-												for (var i = 0; i < resultInfoArr1.length; i++) {
-													resultInfoArr1[i]
-															.setMap(null);
-												}
-												resultInfoArr1 = [];
-											}
-
-											for ( var i in resultData) { //for문 [S]
-												var geometry = resultData[i].geometry;
-												var properties = resultData[i].properties;
-												var polyline_;
-
-												drawInfoArr = [];
-
-												if (geometry.type == "LineString") {
-													for ( var j in geometry.coordinates) {
-														// 경로들의 결과값(구간)들을 포인트 객체로 변환 
-														var latlng = new Tmapv2.Point(
-																geometry.coordinates[j][0],
-																geometry.coordinates[j][1]);
-														// 포인트 객체를 받아 좌표값으로 변환
-														var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(
-																latlng);
-														// 포인트객체의 정보로 좌표값 변환 객체로 저장
-														var convertChange = new Tmapv2.LatLng(
-																convertPoint._lat,
-																convertPoint._lng);
-														// 배열에 담기
-														drawInfoArr
-																.push(convertChange);
-													}
-
-													polyline_ = new Tmapv2.Polyline(
-															{
-																path : drawInfoArr,
-																strokeColor : "#0000FF", //BLUE
-																strokeWeight : 6,
-																map : map
-															});
-													resultInfoArr1
-															.push(polyline_);
-
-												}
-											}//for문 [E]
-
-										},
-										error : function(request, status, error) {
-											console.log("code:"
-													+ request.status + "\n"
-													+ "message:"
-													+ request.responseText
-													+ "\n" + "error:" + error);
-										}
-									});
+																	
 
 							setTimeout(
 									function() {
@@ -173,8 +80,8 @@
 													async : false,
 													data : {
 														"appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-														"startX" : "126.958973",
-														"startY" : "37.534066",
+														"startX" : stopover1X,
+														"startY" : stopover1Y,
 														"endX" : "126.932661",
 														"endY" : "37.520287",
 														"reqCoordType" : "WGS84GEO",
@@ -290,19 +197,7 @@
 <body onload="initTmap();">
 	<div class="ft_area" style="width: 940px;">
 		<div class="ft_select_wrap">
-			<div class="ft_select">
-				<select id="selectLevel">
-					<option value="0" selected="selected">교통최적+추천</option>
-					<option value="1">교통최적+무료우선</option>
-					<option value="2">교통최적+최소시간</option>
-					<option value="3">교통최적+초보</option>
-					<option value="4">교통최적+고속도로우선</option>
-					<option value="10">최단거리+유/무료</option>
-					<option value="12">이륜차도로우선</option>
-				</select>
-				<button id="btn_select">적용하기</button>
-			</div>
-
+            <button id="btn_select">적용하기</button>
 		</div>
 
 		<div class="map_act_btn_wrap clear_box">

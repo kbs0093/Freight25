@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AppRoute } from './app-routes';
-import { SignupDriverScreen, SignupOwnerScreen, SplitScreen } from '../scene/signUp';
+import { SplitScreen, SignupDriverScreen, SignupOwnerScreen } from '../scene/signUp';
 
 const Stack = createStackNavigator();
 

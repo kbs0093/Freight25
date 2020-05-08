@@ -20,6 +20,7 @@ import { AppRoute } from '../../navigation/app-routes';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 const serverUrl = 'http://49.50.162.128:8000/';
 
@@ -37,6 +38,13 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
   const [accountNumInput, accountNum] = React.useState('');
   const [phoneNumInput, phoneNum] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
+
+  const resetAction = StackActions.reset({
+    index: 0,
+    actions: [NavigationActions.navigate({
+      routeName: AppRoute.HOME
+    })]
+  });
 
   const regOwner = () => {
     //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
@@ -72,7 +80,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                       phoneNum: phoneNumInput,
                       bankVal: BankValue
                       });
-                    props.navigation.navigate(AppRoute.HOME);
+                    props.navigation.dispatch(resetAction);
                   } catch (error) {
                     //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
                     console.log(error);

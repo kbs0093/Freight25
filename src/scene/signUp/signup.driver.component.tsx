@@ -20,6 +20,7 @@ import { AppRoute } from '../../navigation/app-routes';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 const serverUrl = 'http://49.50.162.128:8000/';
 
@@ -70,6 +71,13 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
   const [TonValue, setTonValue] = React.useState('');
   const [TypeValue, setTypeValue] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');  
+
+  const resetAction = StackActions.reset({
+    index: 0,
+    actions: [NavigationActions.navigate({
+      routeName: AppRoute.HOME
+    })]
+  });
   
   const getProfile = () => {
     logCallback('Get Profile Start', setProfileLoading(true));
@@ -131,7 +139,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                       TypeValue: TypeValue,
                       BankValue: BankValue
                       });
-                    props.navigation.navigate(AppRoute.HOME);
+                    props.navigation.dispatch(resetAction);
                   } catch (error) {
                     //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
                     console.log(error);
