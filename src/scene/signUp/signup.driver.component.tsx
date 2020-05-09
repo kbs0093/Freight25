@@ -21,6 +21,7 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { StackActions, NavigationActions } from 'react-navigation';
+import { CommonActions } from '@react-navigation/native';
 
 const serverUrl = 'http://49.50.162.128:8000/';
 
@@ -72,12 +73,11 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
   const [TypeValue, setTypeValue] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');  
 
-  const resetAction = StackActions.reset({
+  const resetAction = CommonActions.reset({
     index: 0,
-    actions: [NavigationActions.navigate({
-      routeName: AppRoute.HOME
-    })]
+    routes: [{name: AppRoute.HOME}]
   });
+
   
   const getProfile = () => {
     logCallback('Get Profile Start', setProfileLoading(true));
