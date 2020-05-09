@@ -38,30 +38,6 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 
-const weightData = [
-  {text: '1 톤'},
-  {text: '1.4 톤'},
-  {text: '2.5 톤'},
-  {text: '5 톤'},
-  {text: '11-15 톤'},
-  {text: '18 톤'},
-  {text: '25 톤'},
-];
-
-const typeData = [
-  {text: '카고'},
-  {text: '탑차'},
-  {text: '냉동'},
-  {text: '냉장'},
-];
-
-const bankData = [
-  {text: '국민은행'},
-  {text: 'SC제일은행'},
-  {text: '하나은행'},
-  {text: '농협'},
-];
-
 let email;
 let nickname;
 let userType;
@@ -98,20 +74,9 @@ const driveType = [{text: '독차'}, {text: '혼적'}];
 const freightType = [{text: '파레트'}];
 
 export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
-  const [menuVisible, setMenuVisible] = React.useState(false);
-
   const [BankValue, setBankValue] = React.useState('');
-
-  const selectedCarSize = useSelectState();
-  const selectedCarType = useSelectState();
-  const selectedDrive = useSelectState();
-  const selectedFreightType = useSelectState();
-
-  const carWeight = useInputState();
-  const carNum = useInputState();
-  const carVolume = useInputState();
-  const freightLoadType = useInputState();
-  const freightDesc = useInputState();
+  const [TonValue, setTonValue] = React.useState('');
+  const [TypeValue, setTypeValue] = React.useState('');
 
   const nameInput = useInputState();
   const phoneNumInput = useInputState();
@@ -181,23 +146,19 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <Text style={styles.Subtitle}>계좌 정보</Text>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>거래 은행: </Text>
-            <Layout style={styles.selectContainer}>
-              <RNPickerSelect
-                onValueChange={(itemValue, itemIndex) =>
-                  setBankValue(itemValue)
-                }
-                placeholder={{
-                  label: '은행을 선택하세요',
-                  value: null,
-                }}
-                useNativeAndroidPickerStyle={false}
-                items={[
-                  {label: '국민', value: 'kukmin'},
-                  {label: '신한', value: 'shinhan'},
-                  {label: '농협', value: 'nognhyeob'},
-                ]}
-              />
-            </Layout>
+            <RNPickerSelect
+              onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
+              placeholder={{
+                label: '은행을 선택하세요',
+                value: null,
+              }}
+              useNativeAndroidPickerStyle={false}
+              items={[
+                {label: '국민', value: 'kukmin'},
+                {label: '신한', value: 'shinhan'},
+                {label: '농협', value: 'nognhyeob'},
+              ]}
+            />
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>계좌 번호 : </Text>
@@ -266,7 +227,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 톤수 : </Text>
             <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
+              onValueChange={(itemValue, itemIndex) => setTonValue(itemValue)}
               placeholder={{
                 label: '차량 톤수를 선택하세요',
                 value: null,
@@ -284,7 +245,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 유형 : </Text>
             <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
+              onValueChange={(itemValue, itemIndex) => setTypeValue(itemValue)}
               placeholder={{
                 label: '차량 유형을 선택하세요',
                 value: null,
