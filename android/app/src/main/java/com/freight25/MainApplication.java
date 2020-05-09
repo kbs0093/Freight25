@@ -19,6 +19,8 @@ import android.util.Log;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.webkit.WebView;
+
 public class MainApplication extends Application implements ReactApplication {
 
   private void getHashKey(){
@@ -75,6 +77,7 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    WebView.setWebContentsDebuggingEnabled(true);
   }
 
   /**

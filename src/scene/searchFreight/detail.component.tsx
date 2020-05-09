@@ -15,22 +15,58 @@ import {
   LayoutElement,
   Icon,
   Divider,
-  Button
+  Button,
 } from '@ui-kitten/components';
 import { WebView } from 'react-native-webview';
 import { DetailScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
 
 const myHtmlFile = require('../../component/tmap.html');
-const isAndroid = Platform.OS ==='android'
+const isAndroid = Platform.OS ==='android';
+
 
 export class DetailScreen extends React.Component <DetailScreenProps> {
+
+  WebViewRef;
   state = {
-    data: [1,2,3]
+    index: 0,
+    data: [
+      {
+        id: '1',
+        startX: '127.370187',
+        startY: '36.334634',
+        finishX: '127.043625',
+        finishY: '37.280209',
+      },
+      {
+        id: '2',
+        startX: '127.370187',
+        startY: '36.334634',
+        finishX: '127.043625',
+        finishY: '37.280209',
+      },
+      {
+        id: '3',
+        startX: '127.370187',
+        startY: '36.334634',
+        finishX: '127.043625',
+        finishY: '37.280209',
+      }
+    ]
   };
 
-  _renderItem = ({item}) => (
+  reload(){
+    this.WebViewRef && this.WebViewRef.reload();
+  };
+
+  componentDidMount() {
+    this.reload();
+  };
+
+
+  
+  renderItem = ({item}) => (
     <TouchableOpacity>
       <View style={{height: 25, flexDirection: 'row'}}>
       <View style={{flex:3, flexDirection: 'row'}}>
@@ -52,35 +88,42 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
   render(){
     return (
       <React.Fragment>
-        <View style={{height: 100, backgroundColor: 'white'}}>
+        <View style={{height: 80, backgroundColor: 'white'}}>
           <Text style={styles.Title}>  배차 정보</Text>
           <View style={styles.MainInfo}>
-            <View style={styles.MainInfoGeo}><Text style={styles.geoText}>대전 서구</Text></View>
-            <View style={styles.MainInfoIcon}><Icon style={styles.icon} fill='black' name='arrow-forward-outline'/></View>
-            <View style={styles.MainInfoGeo}><Text style={styles.geoText}>서울 성북</Text></View>
-          </View>
-          <View style={styles.MainInfo}>
-            <View style={styles.MainInfoType}><Text style={styles.startType}>당상</Text></View>
-            <View style={styles.MainInfoType2}><Text style={styles.Type}>혼적</Text></View>
-            <View style={styles.MainInfoType}><Text style={styles.endType}>당착</Text></View>
+            <View style={styles.MainInfoGeo}>
+              <Text style={styles.geoText}>대전 서구</Text>
+              <Text style={styles.startType}>  당상</Text>
+            </View>
+            <View style={styles.MainInfoIcon}>
+              <Icon style={styles.icon} fill='black' name='arrow-forward-outline'/>
+              <Text style={styles.Type}>혼적</Text>
+            </View>            
+            <View style={styles.MainInfoGeo2}>
+              <Text style={styles.endType}>당착  </Text>
+              <Text style={styles.geoText}>서울 성북</Text>              
+            </View>
           </View>
           <Divider style={{backgroundColor: 'black'}}/>
         </View> 
 
-
         <ScrollView>
           <View style={{height: 230, backgroundColor: 'white'}}>
             <Text style={styles.Title}>  배차 정보 (Tmap)</Text>
-            <WebView automaticallyAdjustContentInsets={false} source={{uri:isAndroid?'file:///android_asset/tmap.html':'./external/tmap.html'}}/>
+            <WebView
+              ref={WEBVIEW_REF => (this.WebViewRef = WEBVIEW_REF)}
+              source={{uri:isAndroid?'file:///android_asset/tmap.html':'./external/tmap.html'}}
+              startInLoadingState={true}
+            />
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
                 
           <View style={{backgroundColor: 'white'}}>          
             <Text style={styles.Title}>  경유지 정보</Text>
             <FlatList 
-              style={{backgroundColor : 'white'}}
+              style={{backgroundColor : 'white'}}              
               data={this.state.data}
-              renderItem={this._renderItem}
+              renderItem={this.renderItem}
             />
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
@@ -114,34 +157,28 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         <Divider style={{backgroundColor: 'black'}}/>
         <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
           <View style={{flex:3}}>
-            <Text style={{fontWeight: 'bold', fontSize: 16}}>  스마트 확률</Text>
-            <View style={{alignItems: 'flex-end'}}>
-              <Text style={{fontSize: 14, fontWeight: 'bold', color: '#BDBDBD'}}>   하차지 서울 성북에서 화물이 있을 확률 </Text>
+            <Text style={{fontWeight: 'bold', fontSize: 16, margin: 5}}>  스마트 확률</Text>
+            <View style={{alignItems: 'flex-end', justifyContent: 'flex-start'}}>
+              <Text style={{margin:2, fontSize: 14, fontWeight: 'bold', color: '#BDBDBD'}}>   하차지 서울 성북에서 화물이 있을 확률 </Text>
             </View>            
           </View>       
-          <View style={{flex:1, alignItems:'center', justifyContent:'center'}}><Text style={{fontSize: 20, fontWeight: 'bold'}}>87%</Text></View>
+          <View style={{flex:1, alignItems:'center', justifyContent:'flex-end'}}><Text style={{fontSize: 26, fontWeight: 'bold'}}>87%</Text></View>
           <Divider style={{backgroundColor: 'black'}}/>
         </View>
 
         <Divider style={{backgroundColor: 'black'}}/>
         <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
-          <View style={{flex:5}}>
+          <View style={{flex:5, justifyContent: 'center'}}>
             <Text style={styles.freightTitle}>      총 운행거리 : 250km </Text>
             <Text style={styles.freightTitle}>      총 운행운임 : 200,000원 </Text>
           </View>
           <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
             <Button style={styles.button} status='success'>수 락</Button>
           </View>
-
-        </View>
-
-
-        
-        
-       
-      </React.Fragment>
+        </View>      
+      </React.Fragment>      
     );
-  };    
+  };  
 };
 
 const styles = StyleSheet.create({
@@ -158,6 +195,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     flex : 2,
+    flexDirection: 'row'
+  },
+  MainInfoGeo2: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flex : 2,
+    flexDirection: 'row'
   },
   MainInfoType: {
     justifyContent: 'center',
@@ -165,7 +209,7 @@ const styles = StyleSheet.create({
     flex : 2,
   },
   MainInfoIcon: {
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     flex : 1,    
   },
@@ -180,9 +224,8 @@ const styles = StyleSheet.create({
     fontSize: 24,    
   },
   icon: {
-    width: 40,
-    height: 40,
-    color: 'black'
+    width: 32,
+    height: 24,
   },
   icon2:{
     justifyContent: 'center',

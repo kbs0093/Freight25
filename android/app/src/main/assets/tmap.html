@@ -21,25 +21,28 @@
 	var drawInfoArr = [];
 	var resultInfoArr1 = [];
 	var resultInfoArr2 = [];
+	var resultInfoArr3 = [];
 
 	var defaultRouteResult;
 
-    var startX = 37.52751472590552;
-    var startY = 126.9470910317561;
-    var stopover1X = 127.370187;
-    var stopover1Y = 36.334634;
-    var stopover2X
-    var stopover2Y
-    var finishX
-    var finishY
+    var startX = '127.370187';
+    var startY = '36.334634';
+    var stopover1X = '127.147333';
+    var stopover1Y = '36.809299';
+    var stopover2X = null;
+    var stopover2Y = '37.145916';
+    var finishX = '127.043625';
+    var finishY = '37.280209';
+
+	stopover2X = '127.066912';
 
 	function initTmap() {
 		// 1. 지도 띄우기
 		map = new Tmapv2.Map("map_div", {
-			center : new Tmapv2.LatLng(startX, startY),
+			center : new Tmapv2.LatLng(startY, startX),
 			width : "100%",
-			height : "250px",
-			zoom : 14,
+			height : "400px",
+			zoom : 11,
 			zoomControl : true,
 			scrollwheel : true
 
@@ -49,140 +52,345 @@
 		// 시작
 		marker_s = new Tmapv2.Marker(
 				{
-					position : new Tmapv2.LatLng(37.534066, 126.958973),
+					position : new Tmapv2.LatLng(127.370187, 36.334634),
 					icon : "http://tmapapis.sktelecom.com/upload/tmap/marker/pin_r_m_s.png",
-					iconSize : new Tmapv2.Size(24, 38),
+					iconSize : new Tmapv2.Size(48, 72),
 					map : map
 				});
 
 		// 도착
 		marker_e = new Tmapv2.Marker(
 				{
-					position : new Tmapv2.LatLng(37.520287, 126.932661),
+					position : new Tmapv2.LatLng(stopover1X, stopover1Y),
 					icon : "http://tmapapis.sktelecom.com/upload/tmap/marker/pin_r_m_e.png",
 					iconSize : new Tmapv2.Size(24, 38),
 					map : map
 				});
 
-		// 3. 경로탐색 API 사용요청
-		$("#btn_select")
-				.click(
-						function() {
-							var searchOption = $("#selectLevel").val();
-																	
+		$(function(){
+			var searchOption = $("#selectLevel").val();																	
+					$
+								.ajax({
+									method : "POST",
+									url : "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result",//
+									async : false,
+									data : {
+										"appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+										"startX" : startX,
+										"startY" : startY,
+										"endX" : stopover1X,
+										"endY" : stopover1Y,
+										"reqCoordType" : "WGS84GEO",
+										"resCoordType" : "EPSG3857",
+										"angle" : "172",
+										"searchOption" : searchOption,
+										"trafficInfo" : "Y",
+										"truckType" : "1",
+										"truckWidth" : "100",
+										"truckHeight" : "100",
+										"truckWeight" : "35000",
+										"truckTotalWeight" : "35000",
+										"truckLength" : "200"
+									},
+									success : function(response) {
+										// 결과 출력
+										var resultData = response.features;
 
-							setTimeout(
-									function() {
-										$
-												.ajax({
-													method : "POST",
-													url : "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result",//
-													async : false,
-													data : {
-														"appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-														"startX" : stopover1X,
-														"startY" : stopover1Y,
-														"endX" : "126.932661",
-														"endY" : "37.520287",
-														"reqCoordType" : "WGS84GEO",
-														"resCoordType" : "EPSG3857",
-														"angle" : "172",
-														"searchOption" : searchOption,
-														"trafficInfo" : "Y",
-														"truckType" : "1",
-														"truckWidth" : "100",
-														"truckHeight" : "100",
-														"truckWeight" : "35000",
-														"truckTotalWeight" : "35000",
-														"truckLength" : "200"
-													},
-													success : function(response) {
-														// 결과 출력
-														var resultData = response.features;
+										var tDistance = "총 거리 : "
+												+ (resultData[0].properties.totalDistance / 1000)
+														.toFixed(1)
+												+ "km,";
+										var tTime = " 총 시간 : "
+												+ (resultData[0].properties.totalTime / 60)
+														.toFixed(0)
+												+ "분,";
+										var tFare = " 총 요금 : "
+												+ resultData[0].properties.totalFare
+												+ "원,";
+										var taxiFare = " 예상 택시 요금 : "
+												+ resultData[0].properties.taxiFare
+												+ "원";
 
-														var tDistance = "총 거리 : "
-																+ (resultData[0].properties.totalDistance / 1000)
-																		.toFixed(1)
-																+ "km,";
-														var tTime = " 총 시간 : "
-																+ (resultData[0].properties.totalTime / 60)
-																		.toFixed(0)
-																+ "분,";
-														var tFare = " 총 요금 : "
-																+ resultData[0].properties.totalFare
-																+ "원,";
-														var taxiFare = " 예상 택시 요금 : "
-																+ resultData[0].properties.taxiFare
-																+ "원";
+										$("#result")
+												.html();
 
-														$("#result")
-																.html(
-																		defaultRouteResult
-																				+ tDistance
-																				+ tTime
-																				+ tFare
-																				+ taxiFare);
+										if (resultInfoArr1.length > 0) {
+											for (var k = 0; k < resultInfoArr1.length; k++) {
+												resultInfoArr1[k]
+														.setMap(null);
+											}
+										}
+										resultInfoArr1 = [];
 
-														if (resultInfoArr2.length > 0) {
-															for (var k = 0; k < resultInfoArr2.length; k++) {
-																resultInfoArr2[k]
-																		.setMap(null);
-															}
-														}
-														resultInfoArr2 = [];
+										for ( var i in resultData) { //for문 [S]
+											var geometry = resultData[i].geometry;
+											var properties = resultData[i].properties;
+											var polyline_;
 
-														for ( var i in resultData) { //for문 [S]
-															var geometry = resultData[i].geometry;
-															var properties = resultData[i].properties;
-															var polyline_;
+											drawInfoArr = [];
 
-															drawInfoArr = [];
+											if (geometry.type == "LineString") {
+												for ( var j in geometry.coordinates) {
+													// 경로들의 결과값(구간)들을 포인트 객체로 변환 
+													var latlng = new Tmapv2.Point(
+															geometry.coordinates[j][0],
+															geometry.coordinates[j][1]);
+													// 포인트 객체를 받아 좌표값으로 변환
+													var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(
+															latlng);
+													// 포인트객체의 정보로 좌표값 변환 객체로 저장
+													var convertChange = new Tmapv2.LatLng(
+															convertPoint._lat,
+															convertPoint._lng);
+													// 배열에 담기
+													drawInfoArr
+															.push(convertChange);
+												}
 
-															if (geometry.type == "LineString") {
-																for ( var j in geometry.coordinates) {
-																	// 경로들의 결과값(구간)들을 포인트 객체로 변환 
-																	var latlng = new Tmapv2.Point(
-																			geometry.coordinates[j][0],
-																			geometry.coordinates[j][1]);
-																	// 포인트 객체를 받아 좌표값으로 변환
-																	var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(
-																			latlng);
-																	// 포인트객체의 정보로 좌표값 변환 객체로 저장
-																	var convertChange = new Tmapv2.LatLng(
-																			convertPoint._lat,
-																			convertPoint._lng);
-																	// 배열에 담기
-																	drawInfoArr
-																			.push(convertChange);
-																}
+												polyline_ = new Tmapv2.Polyline(
+														{
+															path : drawInfoArr,
+															strokeColor : "#FF0000", //RED
+															strokeWeight : 6,
+															map : map
+														});
+												resultInfoArr1
+														.push(polyline_);
+											}
+										}//for문 [E]
+									},
+									error : function(request,
+											status, error) {
+										console
+												.log("code:"
+														+ request.status
+														+ "\n"
+														+ "message:"
+														+ request.responseText
+														+ "\n"
+														+ "error:"
+														+ error);
+									}
+								});
+		});
 
-																polyline_ = new Tmapv2.Polyline(
-																		{
-																			path : drawInfoArr,
-																			strokeColor : "#FF0000", //RED
-																			strokeWeight : 6,
-																			map : map
-																		});
-																resultInfoArr2
-																		.push(polyline_);
-															}
-														}//for문 [E]
-													},
-													error : function(request,
-															status, error) {
-														console
-																.log("code:"
-																		+ request.status
-																		+ "\n"
-																		+ "message:"
-																		+ request.responseText
-																		+ "\n"
-																		+ "error:"
-																		+ error);
-													}
-												});
-									}, 1000);
-						});
+
+		$(function(){
+			var searchOption = $("#selectLevel").val();
+			$
+				.ajax({
+					method : "POST",
+					url : "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result",//
+					async : false,
+					data : {
+						"appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+						"startX" : stopover1X,
+						"startY" : stopover1Y,
+						"endX" : stopover2X,
+						"endY" : stopover2Y,
+						"reqCoordType" : "WGS84GEO",
+						"resCoordType" : "EPSG3857",
+						"angle" : "172",
+						"searchOption" : searchOption,
+						"trafficInfo" : "Y",
+						"truckType" : "1",
+						"truckWidth" : "100",
+						"truckHeight" : "100",
+						"truckWeight" : "35000",
+						"truckTotalWeight" : "35000",
+						"truckLength" : "200"
+					},
+					success : function(response) {
+						// 결과 출력
+						var resultData = response.features;
+
+						var tDistance = "총 거리 : "
+								+ (resultData[0].properties.totalDistance / 1000)
+										.toFixed(1)
+								+ "km,";
+						var tTime = " 총 시간 : "
+								+ (resultData[0].properties.totalTime / 60)
+										.toFixed(0)
+								+ "분,";
+						var tFare = " 총 요금 : "
+								+ resultData[0].properties.totalFare
+								+ "원,";
+						var taxiFare = " 예상 택시 요금 : "
+								+ resultData[0].properties.taxiFare
+								+ "원";
+
+						$("#result")
+								.html();
+
+						if (resultInfoArr2.length > 0) {
+							for (var k = 0; k < resultInfoArr2.length; k++) {
+								resultInfoArr2[k]
+										.setMap(null);
+							}
+						}
+						resultInfoArr2 = [];
+
+						for ( var i in resultData) { //for문 [S]
+							var geometry = resultData[i].geometry;
+							var properties = resultData[i].properties;
+							var polyline_;
+
+							drawInfoArr = [];
+
+							if (geometry.type == "LineString") {
+								for ( var j in geometry.coordinates) {
+									// 경로들의 결과값(구간)들을 포인트 객체로 변환 
+									var latlng = new Tmapv2.Point(
+											geometry.coordinates[j][0],
+											geometry.coordinates[j][1]);
+									// 포인트 객체를 받아 좌표값으로 변환
+									var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(
+											latlng);
+									// 포인트객체의 정보로 좌표값 변환 객체로 저장
+									var convertChange = new Tmapv2.LatLng(
+											convertPoint._lat,
+											convertPoint._lng);
+									// 배열에 담기
+									drawInfoArr
+											.push(convertChange);
+								}
+
+								polyline_ = new Tmapv2.Polyline(
+										{
+											path : drawInfoArr,
+											strokeColor : "#0000FF",
+											strokeWeight : 6,
+											map : map
+										});
+								resultInfoArr2
+										.push(polyline_);
+							}
+						}//for문 [E]
+					},
+					error : function(request,
+							status, error) {
+						console
+								.log("code:"
+										+ request.status
+										+ "\n"
+										+ "message:"
+										+ request.responseText
+										+ "\n"
+										+ "error:"
+										+ error);
+					}
+				});
+		});
+
+		$(function(){
+			var searchOption = $("#selectLevel").val();
+			if(stopover2X != null){
+				$
+					.ajax({
+						method : "POST",
+						url : "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result",//
+						async : false,
+						data : {
+							"appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+							"startX" : stopover2X,
+							"startY" : stopover2Y,
+							"endX" : finishX,
+							"endY" : finishY,
+							"reqCoordType" : "WGS84GEO",
+							"resCoordType" : "EPSG3857",
+							"angle" : "172",
+							"searchOption" : searchOption,
+							"trafficInfo" : "Y",
+							"truckType" : "1",
+							"truckWidth" : "100",
+							"truckHeight" : "100",
+							"truckWeight" : "35000",
+							"truckTotalWeight" : "35000",
+							"truckLength" : "200"
+						},
+						success : function(response) {
+							// 결과 출력
+							var resultData = response.features;
+
+							var tDistance = "총 거리 : "
+									+ (resultData[0].properties.totalDistance / 1000)
+											.toFixed(1)
+									+ "km,";
+							var tTime = " 총 시간 : "
+									+ (resultData[0].properties.totalTime / 60)
+											.toFixed(0)
+									+ "분,";
+							var tFare = " 총 요금 : "
+									+ resultData[0].properties.totalFare
+									+ "원,";
+							var taxiFare = " 예상 택시 요금 : "
+									+ resultData[0].properties.taxiFare
+									+ "원";
+
+							$("#result")
+									.html();
+
+							if (resultInfoArr3.length > 0) {
+								for (var k = 0; k < resultInfoArr3.length; k++) {
+									resultInfoArr2[k]
+											.setMap(null);
+								}
+							}
+							resultInfoArr3 = [];
+
+							for ( var i in resultData) { //for문 [S]
+								var geometry = resultData[i].geometry;
+								var properties = resultData[i].properties;
+								var polyline_;
+
+								drawInfoArr = [];
+
+								if (geometry.type == "LineString") {
+									for ( var j in geometry.coordinates) {
+										// 경로들의 결과값(구간)들을 포인트 객체로 변환 
+										var latlng = new Tmapv2.Point(
+												geometry.coordinates[j][0],
+												geometry.coordinates[j][1]);
+										// 포인트 객체를 받아 좌표값으로 변환
+										var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(
+												latlng);
+										// 포인트객체의 정보로 좌표값 변환 객체로 저장
+										var convertChange = new Tmapv2.LatLng(
+												convertPoint._lat,
+												convertPoint._lng);
+										// 배열에 담기
+										drawInfoArr
+												.push(convertChange);
+									}
+
+									polyline_ = new Tmapv2.Polyline(
+											{
+												path : drawInfoArr,
+												strokeColor : "#FF0000",
+												strokeWeight : 6,
+												map : map
+											});
+									resultInfoArr2
+											.push(polyline_);
+								}
+							}//for문 [E]
+						},
+						error : function(request,
+								status, error) {
+							console
+									.log("code:"
+											+ request.status
+											+ "\n"
+											+ "message:"
+											+ request.responseText
+											+ "\n"
+											+ "error:"
+											+ error);
+						}
+					});
+			};		
+		})
+							
 		//맵 중심영역 재설정
 		var mapBoundInfo = map.getBounds();
 		map.fitBounds(mapBoundInfo, 50);
@@ -196,15 +404,6 @@
 </head>
 <body onload="initTmap();">
 	<div class="ft_area" style="width: 940px;">
-		<div class="ft_select_wrap">
-            <button id="btn_select">적용하기</button>
-		</div>
-
-		<div class="map_act_btn_wrap clear_box">
-			<!-- <button onClick="trafficInfo()" style="margin-left:15px;margin-top:8px;">교통정보 표출</button> -->
-			<!-- <p style="margin-left:15px;margin-top:8px; margin:left;">교통정보 표출</p> -->
-		</div>
-		<div class="clear"></div>
 	</div>
 
 	<div id="map_wrap" class="map_wrap">
