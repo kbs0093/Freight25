@@ -3,18 +3,11 @@ import {
   Text,
   StyleSheet,
   View,
-  StatusBar,
-  Linking,
   TouchableOpacity,
   SafeAreaView,
+  FlatList,
 } from 'react-native';
-import {
-  LayoutElement,
-  TopNavigationAction,
-  TopNavigation,
-  OverflowMenu,
-  Button,
-} from '@ui-kitten/components';
+import {Icon, LayoutElement, Divider, Button} from '@ui-kitten/components';
 import {CheckScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -29,57 +22,104 @@ import {
 } from '../../assets/icons';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
-export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
-  return (
-    <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>나의 배차</Text>
-        <Button size="small" style={styles.Badge} textStyle={styles.badgeText}>
-          배송중
-        </Button>
-      </View>
-      <View style={styles.freightInfoContainer}>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>KM / 가격</Text>
-          <Text style={styles.infoTitle}>남은 시각</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
+export class CheckScreen extends React.Component<CheckScreenProps> {
+  state = [
+    {
+      key: 'A1234567', // Freight key?
+      lastState: '배송전', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+      latitude: 'unknown',
+      longitude: 'unknown',
+      startAddress: '경기 군포',
+      endAddress: '제주 서귀포',
+      distance: '',
+      lastRefresh: 'null',
+
+      start_month: '5', // 배송 출발 날짜
+      start_day: '8',
+      start_hour: '13',
+      start_min: '10',
+      end_month: '5',
+      end_day: '9',
+      end_hour: '10',
+      end_minutes: '10',
+    },
+    {
+      key: 'A1234569', // Freight key?
+      lastState: '완료', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+      latitude: 'unknown',
+      longitude: 'unknown',
+      startAddress: '평양 주석궁',
+      endAddress: '아오지 탄광',
+      distance: '',
+      lastRefresh: 'null',
+
+      start_month: '5', // 배송 출발 날짜
+      start_day: '8',
+      start_hour: '13',
+      start_min: '10',
+      end_month: '5',
+      end_day: '9',
+      end_hour: '10',
+      end_minutes: '10',
+    },
+  ];
+
+  ClickList = (index) => () => {
+    //AsyncStorage.setItem('Freight', index);
+    this.props.navigation.navigate(AppRoute.CHECK_DETAIL);
+  };
+
+  _renderItem = ({item}) => (
+    <TouchableOpacity onPress={this.ClickList(item)}>
+      <View style={styles.container}>
+        <View style={styles.geoContainer}>
+          <View style={styles.geoInfo1}>
+            <View style={styles.geoInfo11}>
+              <Text style={styles.geoText}>{item.startAddress}</Text>
+            </View>
+            <View style={styles.geoInfo12}>
+              <Icon
+                style={styles.icon}
+                fill="#8F9BB3"
+                name="arrow-forward-outline"
+              />
+            </View>
+            <View style={styles.geoInfo11}>
+              <Text style={styles.geoText}>{item.endAddress}</Text>
+            </View>
+          </View>
+          <View style={styles.geoInfo1}>
+            <Text style={styles.timeText}>
+              출발 {item.start_month} 월 {item.start_day} 일 - 도착{' '}
+              {item.end_month} 월 {item.end_day} 일
+            </Text>
+          </View>
         </View>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
+        <View style={styles.statusInfo}>
+          <Button style={styles.Badge} textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
         </View>
       </View>
-      <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>경유지 화물</Text>
-      </View>
-      <View style={styles.freightInfoContainer}>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>KM / 가격</Text>
-          <Text style={styles.infoTitle}>남은 시각</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
-        </View>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-        </View>
-      </View>
-      <View style={styles.totalInfoContainer}>
-        <Text style={styles.infoTitle}>총 운행 거리</Text>
-        <Text style={styles.infoTitle}>총 운행 운임</Text>
-      </View>
-    </React.Fragment>
+    </TouchableOpacity>
   );
-};
+
+  render() {
+    return (
+      <React.Fragment>
+        <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+        <FlatList
+          style={{backgroundColor: 'white'}}
+          data={this.state}
+          renderItem={this._renderItem}
+          keyExtractor={(item) => item.key}
+        />
+      </React.Fragment>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
-  viewForm: {
-    fontSize: RFPercentage(2),
-    flex: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontWeight: 'bold',
-  },
   Badge: {
     width: 80,
     height: 10,
@@ -88,50 +128,49 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: RFPercentage(1.8),
   },
-  titleStyles: {
-    paddingHorizontal: 20,
-    fontSize: RFPercentage(2.5),
-    fontWeight: 'bold',
-  },
-  Subtitle: {
-    fontSize: RFPercentage(2.5),
-    fontWeight: 'bold',
-  },
-  freightContainer: {
-    paddingHorizontal: 20,
+  container: {
     paddingVertical: 10,
-    flex: 1.5,
-    alignItems: 'flex-start',
-    borderColor: '#20232a',
-    borderWidth: 1,
-  },
-  freightInfoContainer: {
     flex: 1,
     flexDirection: 'row',
-    paddingVertical: 20,
-    alignItems: 'flex-start',
-    borderColor: '#20232a',
-    borderWidth: 1,
   },
-  freightInfoHalfContainer: {
+  geoContainer: {
+    flex: 4,
+    flexDirection: 'column',
+  },
+  geoInfo1: {
+    paddingVertical: 3,
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  geoText: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: RFPercentage(3),
+  },
+  timeText: {
+    fontWeight: 'bold',
+    fontSize: RFPercentage(2.5),
+  },
+  geoInfo11: {
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flex: 2,
+  },
+  geoInfo12: {
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     flex: 1,
   },
-  infoTitle: {
-    paddingVertical: 2,
-    paddingHorizontal: 60,
-    fontSize: RFPercentage(2),
-    fontWeight: 'bold',
-    fontStyle: 'normal',
+  statusInfo: {
+    paddingVertical: 15,
+    flex: 1,
+    alignItems: 'center',
+    height: '20%',
   },
-  totalInfoContainer: {
-    paddingVertical: 20,
-    flex: 0.8,
-    borderColor: '#20232a',
-    borderWidth: 2,
-  },
-  totalInfoText: {
-    fontSize: RFPercentage(2),
-    fontWeight: 'bold',
-    fontStyle: 'normal',
+  icon: {
+    width: 32,
+    height: 32,
   },
 });

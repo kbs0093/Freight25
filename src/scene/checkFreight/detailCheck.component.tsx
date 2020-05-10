@@ -13,6 +13,7 @@ import {
   TopNavigationAction,
   TopNavigation,
   OverflowMenu,
+  Icon,
   Button,
 } from '@ui-kitten/components';
 import {DetailCheckScreenProps} from '../../navigation/check.navigator';
@@ -29,50 +30,90 @@ import {
 } from '../../assets/icons';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
-export const DetailCheckScreen = (
-  props: DetailCheckScreenProps,
-): LayoutElement => {
-  return (
-    <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>나의 배차</Text>
-        <Button size="small" style={styles.Badge} textStyle={styles.badgeText}>
-          배송중
-        </Button>
-      </View>
-      <View style={styles.freightInfoContainer}>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>KM / 가격</Text>
-          <Text style={styles.infoTitle}>남은 시각</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
+export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
+  render() {
+    return (
+      <React.Fragment>
+        <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+
+        <View style={styles.freightContainer}>
+          <Text style={styles.Subtitle}>나의 배차</Text>
+          <Button style={styles.Badge} textStyle={styles.badgeText}>
+            배송중
+          </Button>
         </View>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
+        <View style={styles.geoContainer}>
+          <View style={styles.geoInfoContainer}>
+            <Text style={styles.geoText}>대전 서구</Text>
+            <Text style={styles.geoSubText}>당착</Text>
+          </View>
+          <View style={styles.geoInfoContainer}>
+            <Icon
+              style={styles.iconSize}
+              fill="#8F9BB3"
+              name="arrow-forward-outline"
+            />
+          </View>
+          <View style={styles.geoInfoContainer}>
+            <Text style={styles.geoText}>대전 서구</Text>
+            <Text style={styles.geoSubText}>당착</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>경유지 화물</Text>
-      </View>
-      <View style={styles.freightInfoContainer}>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>KM / 가격</Text>
-          <Text style={styles.infoTitle}>남은 시각</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
+        <View style={styles.freightInfoContainer}>
+          <View style={styles.freightInfoHalfContainer}>
+            <Text style={styles.infoTitle}>운행 거리</Text>
+            <Text style={styles.infoTitle}>KM / 가격</Text>
+            <Text style={styles.infoTitle}>남은 시각</Text>
+            <Text style={styles.infoTitle}>상차지 주소</Text>
+          </View>
+          <View style={styles.freightInfoHalfContainer}>
+            <Text style={styles.infoTitle}>운행 거리</Text>
+          </View>
         </View>
-        <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>운행 거리</Text>
+        <View style={styles.lineStyle} />
+        <View style={styles.freightContainer}>
+          <Text style={styles.Subtitle}>경유지 화물</Text>
+          <Button style={styles.Badge} textStyle={styles.badgeText}>
+            배송중
+          </Button>
         </View>
-      </View>
-      <View style={styles.totalInfoContainer}>
-        <Text style={styles.infoTitle}>총 운행 거리</Text>
-        <Text style={styles.infoTitle}>총 운행 운임</Text>
-      </View>
-    </React.Fragment>
-  );
-};
+        <View style={styles.geoContainer}>
+          <View style={styles.geoInfoContainer}>
+            <Text style={styles.geoText}>대전 서구</Text>
+            <Text style={styles.geoSubText}>당착</Text>
+          </View>
+          <View style={styles.geoInfoContainer}>
+            <Icon
+              style={styles.iconSize}
+              fill="#8F9BB3"
+              name="arrow-forward-outline"
+            />
+          </View>
+          <View style={styles.geoInfoContainer}>
+            <Text style={styles.geoText}>대전 서구</Text>
+            <Text style={styles.geoSubText}>당착</Text>
+          </View>
+        </View>
+        <View style={styles.freightInfoContainer}>
+          <View style={styles.freightInfoHalfContainer}>
+            <Text style={styles.infoTitle}>운행 거리</Text>
+            <Text style={styles.infoTitle}>KM / 가격</Text>
+            <Text style={styles.infoTitle}>남은 시각</Text>
+            <Text style={styles.infoTitle}>상차지 주소</Text>
+          </View>
+          <View style={styles.freightInfoHalfContainer}>
+            <Text style={styles.infoTitle}>운행 거리</Text>
+          </View>
+        </View>
+        <View style={styles.lineStyle} />
+        <View style={styles.totalInfoContainer}>
+          <Text style={styles.infoTitle}>총 운행 거리</Text>
+          <Text style={styles.infoTitle}>총 운행 운임</Text>
+        </View>
+      </React.Fragment>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   viewForm: {
@@ -83,9 +124,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   Badge: {
-    width: 80,
-    height: 10,
-    borderRadius: 5,
+    width: RFPercentage(10),
+    height: RFPercentage(0.5),
+    borderRadius: 8,
   },
   badgeText: {
     fontSize: RFPercentage(1.8),
@@ -101,11 +142,12 @@ const styles = StyleSheet.create({
   },
   freightContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
-    flex: 1.5,
     alignItems: 'flex-start',
     borderColor: '#20232a',
-    borderWidth: 1,
+    paddingVertical: 8,
+    flex: 0.2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   freightInfoContainer: {
     flex: 1,
@@ -113,10 +155,31 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
-    borderWidth: 1,
   },
   freightInfoHalfContainer: {
     flex: 1,
+  },
+  geoContainer: {
+    paddingVertical: 20,
+    flex: 0.5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  geoInfoContainer: {
+    flex: 0.5,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    //borderWidth: 1,
+  },
+  geoText: {
+    fontSize: RFPercentage(3),
+    fontWeight: 'bold',
+  },
+  geoSubText: {
+    fontSize: RFPercentage(2),
+    fontWeight: 'bold',
   },
   infoTitle: {
     paddingVertical: 2,
@@ -129,11 +192,19 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     flex: 0.8,
     borderColor: '#20232a',
-    borderWidth: 2,
   },
   totalInfoText: {
     fontSize: RFPercentage(2),
     fontWeight: 'bold',
     fontStyle: 'normal',
+  },
+  iconSize: {
+    width: 32,
+    height: 32,
+  },
+  lineStyle: {
+    borderWidth: 0.5,
+    borderColor: 'black',
+    margin: 10,
   },
 });
