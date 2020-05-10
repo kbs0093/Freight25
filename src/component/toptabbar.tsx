@@ -32,6 +32,8 @@ import {AppRoute} from '../navigation/app-routes';
 import {TopTapBarProps} from '../navigation/TopTabBarNavigator';
 import auth from '@react-native-firebase/auth';
 import KakaoLogins from '@react-native-seoul/kakao-login';
+import {NavigationActions} from 'react-navigation';
+import {useRoute} from '@react-navigation/native';
 
 let email;
 let nickname = 'unknown';
@@ -84,14 +86,15 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
 
   //logout시 auth계정 초기화를 위한 fbLogout
   const fbLogout = () => {
-    auth().signOut()
-    .then((result) => {
-      console.log('fbLogtout Finished');
-    })
-    .catch((error) => {
-      console.log(`fbLogtout Failed:${error}`);
-    });
-  }
+    auth()
+      .signOut()
+      .then((result) => {
+        console.log('fbLogtout Finished');
+      })
+      .catch((error) => {
+        console.log(`fbLogtout Failed:${error}`);
+      });
+  };
 
   const onMenuItemSelect = (index) => {
     setMenuVisible(false);
@@ -121,12 +124,25 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
     </OverflowMenu>
   );
 
+  // Name for route screen
+  const routeName = useRoute().name;
+
+  // Action for navigate back routes except for home screen.
+  const navigateBack = () => {
+    if (routeName != 'Home') props.navigation.goBack();
+  };
+
+  const BackAction = () => (
+    <TopNavigationAction icon={BackIcon} onPress={navigateBack} />
+  );
+
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <TopNavigation
         title="   화물 25"
         titleStyle={styles.titleStyles}
+        leftControl={BackAction()}
         rightControls={renderMenuAction()}
       />
       <Divider style={{backgroundColor: 'black'}} />
