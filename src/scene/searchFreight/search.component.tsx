@@ -28,12 +28,12 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { withNavigation } from 'react-navigation';
 import { SearchScreenProps } from'../../navigation/search.navigator'
 
+import RNPickerSelect from 'react-native-picker-select';
 
-const myHtmlFile = require('../../component/tmap.html');
-const isAndroid = Platform.OS==='android'
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
+const isAndroid = Platform.OS ==='android';
 
-export class SearchScreen extends React.Component<SearchScreenProps> {
+export class SearchScreen extends React.Component <SearchScreenProps> {
   state = {
     latitude: 'unknown',
     longitude: 'unknown',
@@ -41,32 +41,79 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
     gu: '',
     myeon: '',
     dong: '',
-    distance: '',
-    lastRefresh: "null",
-    list: [
-      {
-        key:      'A1234567',
-        startAddress:   '대전 서구',
-        startX:         '127.370187',
-        startY:         '36.334634',
-        endAddress:     '서울 성북',
-        startType:      '당상',
-        endType:        '당착',
-        Type:           '혼적',
-        carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-        distanceX:      '',  //빈 칸으로 남겨둬라
-        distanceY:      '189km',
-        time:           '3시간 20분',
-        smart:          '80%',
-        money:          '200,000원',
-        
-      },  
-    ]
+    value: '1'
   };
 
-  
+  list = [
+    {
+      id:      'A1234567',
+      startAddress:   '대전 서구',
+      startX:         '127.370187',
+      startY:         '36.334634',
+      endAddress:     '서울 성북',
+      startType:      '당상',
+      endType:        '당착',
+      Type:           '혼적',
+      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+      distanceX:      '',  //빈 칸으로 남겨둬라
+      distanceY:      190,
+      time:           '3시간 20분',
+      smart:          90,
+      money:          200000,
+      
+    },
+    {
+      id:      'A1234568',
+      startAddress:   '대전 유성',
+      startX:         '127.370187',
+      startY:         '36.334634',
+      endAddress:     '수원 영통',
+      startType:      '당상',
+      endType:        '당착',
+      Type:           '혼적',
+      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+      distanceX:      '',  //빈 칸으로 남겨둬라
+      distanceY:      120,
+      time:           '3시간 20분',
+      smart:          60,
+      money:          190000,
+      
+    },  
+    {
+      id:      'A1234569',
+      startAddress:   '대전 대덕',
+      startX:         '127.370187',
+      startY:         '36.334634',
+      endAddress:     '분당 정자',
+      startType:      '당상',
+      endType:        '내일착',
+      Type:           '독차',
+      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+      distanceX:      '',  //빈 칸으로 남겨둬라
+      distanceY:      170,
+      time:           '3시간 20분',
+      smart:          70,
+      money:          180000,
+      
+    },  
+  ];
 
   componentDidMount() {
+
+    if(this.state.value == '1'){
+      this.list.sort(this.smartSort);
+      console.log(this.list);
+    }
+    else if(this.state.value == '2'){
+      this.list.sort(this.moneySort);
+      console.log(this.list);
+    }
+    else{
+      this.list.sort(this.distanceSort);
+      console.log(this.list);
+    }
+    
+
     Geolocation.getCurrentPosition(
       position => {
         const latitude = JSON.stringify(position.coords.latitude);
@@ -89,7 +136,7 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
         })   
         .catch(err => console.log(err));
 
-        for(let i=0; i<this.state.list.length; i++){
+        for(let i=0; i<this.list.length; i++){
 
           fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
             method: 'POST',
@@ -99,8 +146,8 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
             body: JSON.stringify({
               "startX" : this.state.longitude,
               "startY" : this.state.latitude,
-              "endX" : this.state.list[i].startX,
-              "endY" : this.state.list[i].startY,
+              "endX" : this.list[i].startX,
+              "endY" : this.list[i].startY,
               "reqCoordType" : "WGS84GEO",
               "resCoordType" : "WGS84GEO",
               "searchOption" : '0',
@@ -109,11 +156,11 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
             })})
           .then(response => response.json())
           .then(response =>{
-            this.state.list[i].distanceX = (response.features[0].properties.totalDistance/1000) + "";
+            this.list[i].distanceX = (response.features[0].properties.totalDistance/1000) + "";
    
           })
           .catch(err => console.log(err));
-          console.log(this.state.list[i].distanceX);
+          console.log(this.list[i].distanceX);
        }
 
 
@@ -121,7 +168,7 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
       error => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
     );  
-
+    
 
     
   };
@@ -131,6 +178,17 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
     this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
 
+  moneySort(a, b) {
+    if(a.money == b.money){ return 0} return a.money < b.money ? 1 : -1;
+  };
+
+  distanceSort(a, b) {
+    if(a.distanceY == b.distanceY){ return 0} return a.distanceY < b.distanceY ? 1 : -1;
+  };
+
+  smartSort(a, b) {
+    if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
+  };
   
 
   _renderItem = ({item}) => (
@@ -156,13 +214,13 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
           <Text style={styles.driveText}></Text>
-          <Text style={styles.driveText}>{item.distanceY}</Text>
+          <Text style={styles.driveText}>{item.distanceY} Km</Text>
           <Text style={styles.timeText}>{item.time}</Text>
-          <Text style={styles.timeText}>스마트 확률 : {item.smart}</Text>
+          <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
           <Text style={styles.timeText}></Text>
         </View>
         <View style={styles.moneyInfo}>
-          <Text style={styles.driveText}>{item.money}</Text>
+          <Text style={styles.driveText}>{item.money} 원</Text>
         </View>
       </View>                          
     </View>
@@ -181,18 +239,39 @@ export class SearchScreen extends React.Component<SearchScreenProps> {
           </Text>
         </View>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Button 
-            style={{margin: 5}} 
-            size='small'
-          >
-            새로고침
-          </Button>
+          
+        </View>      
+      </View>
+      <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+            검색 조건 : 
+          </Text>
+        </View>
+        <View style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+          <RNPickerSelect
+              onValueChange={(value) => {
+                this.setState({value})  
+                console.log(this.state.value)
+              }}
+              placeholder={{
+                label: '정렬 순서',
+                value: null,
+              }}
+              useNativeAndroidPickerStyle={isAndroid? true: false}
+              items={[
+                {label: '운행거리 순', value: '3'},
+                {label: '운임 순', value: '2'},
+                {label: '스마트 확률 순', value: '1'},
+              ]}
+      
+            />
         </View>      
       </View>     
       <Divider style={{backgroundColor: 'black'}}/>     
         <FlatList 
           style={{backgroundColor : 'white'}}
-          data={this.state.list}
+          data={this.state.value? this.list : this.list}
           renderItem={this._renderItem}
         />                             
     </React.Fragment>
