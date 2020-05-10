@@ -6,7 +6,6 @@ import {
   View,
   SafeAreaView,
   ScrollView,
-  Picker
 } from 'react-native';
 import {
   LayoutElement, 
@@ -22,6 +21,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { CommonActions } from '@react-navigation/native';
+import RNPickerSelect from 'react-native-picker-select';
 
 const serverUrl = 'http://49.50.162.128:8000/';
 
@@ -44,6 +44,8 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
     index: 0,
     routes: [{name: AppRoute.HOME}]
   });
+
+  console.log(BankValue);
 
   const regOwner = () => {
     //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
@@ -185,16 +187,19 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                 <Text style={styles.textStyle}>거래 은행 :</Text>
               </View>
               <View style={{flex: 3 }}>
-                <Picker
-                  selectedValue={BankValue}
+                <RNPickerSelect
                   onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
-                >
-                  <Picker.Item label="국민" value="kukmin"/>
-                  <Picker.Item label="신한" value="shinhan"/>
-                  <Picker.Item label="농협" value="nonghyeob"/>
-                  <Picker.Item label="SC제일" value="SC"/>
-                  <Picker.Item label="하나" value="hana"/>
-                </Picker>
+                  placeholder={{
+                    label: '은행을 선택하세요',
+                    value: null,
+                  }}
+                  useNativeAndroidPickerStyle={false}
+                  items={[
+                    {label: '국민', value: 'kukmin'},
+                    {label: '신한', value: 'shinhan'},
+                    {label: '농협', value: 'nognhyeob'},
+                  ]}
+                />
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
