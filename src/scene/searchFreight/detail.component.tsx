@@ -17,51 +17,66 @@ import {
   Divider,
   Button,
 } from '@ui-kitten/components';
-import { WebView } from 'react-native-webview';
+import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import { DetailScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
 
-const myHtmlFile = require('../../component/tmap.html');
 const isAndroid = Platform.OS ==='android';
 
-
 export class DetailScreen extends React.Component <DetailScreenProps> {
-
-  WebViewRef;
-  state = {
-    index: 0,
-    data: [
-      {
-        id: '1',
-        startX: '127.370187',
-        startY: '36.334634',
-        finishX: '127.043625',
-        finishY: '37.280209',
-      },
-      {
-        id: '2',
-        startX: '127.370187',
-        startY: '36.334634',
-        finishX: '127.043625',
-        finishY: '37.280209',
-      },
-      {
-        id: '3',
-        startX: '127.370187',
-        startY: '36.334634',
-        finishX: '127.043625',
-        finishY: '37.280209',
-      }
-    ]
-  };
-
-  reload(){
-    this.WebViewRef && this.WebViewRef.reload();
-  };
+  data = [
+    {
+      id: '1',
+      startX: '127.370187',
+      startY: '36.334634',
+      finishX: '127.043625',
+      finishY: '37.280209',
+    },
+    {
+      id: '2',
+      startX: '127.370187',
+      startY: '36.334634',
+      finishX: '127.043625',
+      finishY: '37.280209',
+    },
+    {
+      id: '3',
+      startX: '127.370187',
+      startY: '36.334634',
+      finishX: '127.043625',
+      finishY: '37.280209',
+    }
+  ];
 
   componentDidMount() {
-    this.reload();
+    fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
+      method: 'POST',
+      headers:{
+        "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+      },
+      body: JSON.stringify({
+        "startX" : "126.958973",
+        "startY" : "37.534066",
+        "endX" : "126.932661",
+        "endY" : "37.520287",
+        "reqCoordType" : "WGS84GEO",
+        "resCoordType" : "EPSG3857",
+        "angle" : "172",
+        "searchOption" : '1',
+        "trafficInfo" : "Y",
+        "truckType" : "1",
+        "truckWidth" : "100",
+        "truckHeight" : "100",
+        "truckWeight" : "35000",
+        "truckTotalWeight" : "35000",
+        "truckLength" : "200"
+      })
+    })
+    .then(response => response.json())
+    .then(response => {
+      console.log(response);
+    })
   };
 
 
@@ -110,10 +125,13 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         <ScrollView>
           <View style={{height: 230, backgroundColor: 'white'}}>
             <Text style={styles.Title}>  배차 정보 (Tmap)</Text>
-            <WebView
-              ref={WEBVIEW_REF => (this.WebViewRef = WEBVIEW_REF)}
-              source={{uri:isAndroid?'file:///android_asset/tmap.html':'./external/tmap.html'}}
-              startInLoadingState={true}
+            <MapView style={{flex: 1}} provider={PROVIDER_GOOGLE}
+              initialRegion={{
+                latitude: 37.52751472590552,
+                longitude: 126.9470910317561,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}              
             />
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
@@ -122,7 +140,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             <Text style={styles.Title}>  경유지 정보</Text>
             <FlatList 
               style={{backgroundColor : 'white'}}              
-              data={this.state.data}
+              data={this.data}
               renderItem={this.renderItem}
             />
             <Divider style={{backgroundColor: 'black'}}/>
