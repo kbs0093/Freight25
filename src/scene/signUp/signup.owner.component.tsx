@@ -78,10 +78,14 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                   console.log("firestore target uid: "+auth().currentUser?.uid);
                   try {
                     ref.update({
-                      manNum: manNumInput, 
-                      accountNum: accountNumInput, 
-                      phoneNum: phoneNumInput,
-                      bankVal: BankValue
+                      name: nameInput,
+                      accountOwner: accountNumInput,
+
+                      companyNumber: manNumInput, 
+                      account: accountNumInput, 
+                      tel: phoneNumInput,
+                      bankName: BankValue,
+                      companyName: companyNameInput
                       });
                     
                     props.navigation.navigate(AppRoute.OWNER);
