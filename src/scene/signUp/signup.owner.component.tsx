@@ -64,7 +64,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             auth().signInWithCustomToken(firebaseToken);
             //getProfile이 아닌 fb auth로부터 정보갱신해야할 것 같은데 논의가 필요합니다.
             //getProfile();
-            //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+            AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
             console.log("currentAuth uid: "+auth().currentUser?.uid);
 
             //auth리스너와 uid를 이용한 db 저장 부분

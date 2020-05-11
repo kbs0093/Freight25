@@ -17,18 +17,33 @@ import {
   Layout,
   LayoutElement,
 } from '@ui-kitten/components';
-import {LoadingScreenProps} from '../../navigation/auth.navigator';
+import {LoadingScreenProps, AuthNavigator} from '../../navigation/auth.navigator';
 import {AppRoute} from '../../navigation/app-routes';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
-  AsyncStorage.getItem('token')
+  AsyncStorage.getItem('fbToken')
     .then((value) => {
       if (value) {
         console.log('Login check Succeess');
-        AsyncStorage.setItem('userType', 'driver');
-        {
-          /*유저타입이 owner일 경우 화주 / driver 일 경우 화물차기사 입니다 테스트 시 사용하세요,  향후 이메일을 서버로 보내고 타입을 받아올 생각입니다*/
-        }
+        auth().onAuthStateChanged(function(user){
+          if(user){
+            //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+            var ref = firestore().collection('drivers').doc(user.uid);
+            ref.get().then(function(doc) {
+              if(doc.exists){
+                AsyncStorage.setItem('userType', 'driver');
+                console.log("loading AsyncStorage Type: driver");
+              }
+
+              else{
+                AsyncStorage.setItem('userType', 'owner');
+                console.log("loading AsyncStorage Type: owner");
+              } 
+            })
+          }
+        })
         props.navigation.navigate(AppRoute.HOME);
       } else {
         console.log('Login check Failed');
