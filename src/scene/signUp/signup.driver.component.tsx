@@ -107,13 +107,15 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                   console.log("firestore target uid: "+auth().currentUser?.uid);
                   try {
                     ref.update({
-                      carNum: carNumInput, 
-                      manNum: manNumInput, 
-                      accountNum: accountNumInput, 
-                      phoneNum: phoneNumInput,
-                      TonValue: TonValue,
-                      TypeValue: TypeValue,
-                      BankValue: BankValue
+                      name: nameInput,
+                      accountOwner: accountOwnerInput,
+                      carNumber: carNumInput, 
+                      companyNumber: manNumInput, 
+                      accountNumber: accountNumInput, 
+                      tel: phoneNumInput,
+                      carTon: TonValue,
+                      caryType: TypeValue,
+                      bankName: BankValue,
                       });
                     props.navigation.dispatch(resetAction);
                   } catch (error) {

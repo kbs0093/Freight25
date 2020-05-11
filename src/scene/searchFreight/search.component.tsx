@@ -98,38 +98,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       
     },  
   ];
-  //화물 db에 등록
-  searchFreight = () => {
-    var user = auth().currentUser;
-      if(user != null){
-        //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
-        var ref = firestore().collection('freights');
-        if(user != null){
-          try {
-            ref.add({
-              ownerId: auth().currentUser?.uid,
-              carType: selectedCarTypeOption,
-              driveOption: selectedDriveOption,
-              weight: weightValue,
-              voluem: volumeValue,
-              freightType: selectedFreightTypeOption,
-              freightLoadType: freightLoadTypeValue,
-              desc: descValue,
-              dist: distValue,
-              expenxe: expenseValue,
-              startDate: selectedStartDateOption,
-              endDate: selectedEndDateOption,
-              timeStamp: Date.now()
-              });
-              props.navigation.navigate(AppRoute.HOME);
-              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
-          } catch (error) {
-            //오류 출력 
-            console.log(error);
-          }
-        }
-      }
-  };
+  
   componentDidMount() {
 
     if(this.state.value == '1'){
