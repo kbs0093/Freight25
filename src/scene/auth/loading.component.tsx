@@ -35,16 +35,18 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
               if(doc.exists){
                 AsyncStorage.setItem('userType', 'driver');
                 console.log("loading AsyncStorage Type: driver");
+                props.navigation.navigate(AppRoute.HOME);
               }
 
               else{
                 AsyncStorage.setItem('userType', 'owner');
                 console.log("loading AsyncStorage Type: owner");
+                props.navigation.navigate(AppRoute.OWNER);
               } 
             })
           }
         })
-        props.navigation.navigate(AppRoute.HOME);
+        
       } else {
         console.log('Login check Failed');
         props.navigation.navigate(AppRoute.SIGN_IN);
