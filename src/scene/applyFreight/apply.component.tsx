@@ -21,6 +21,14 @@ import { AppRoute } from '../../navigation/app-routes';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
+import axios from 'axios';
+
+const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
+const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
+const tmap_URL_rest = '&coordType=WGS84GEO&fullAddr=';
+
+const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_URL_rest;
+
 const carSize = [
   { text: '1톤' },
   { text: '2.5톤' },
@@ -47,7 +55,7 @@ const freightStartDate = [
 
 const freightEndDate = [
   { text: '당일 도착(당착)'},
-  { text: '내일 도착'},
+  { text: '내일 도착(내착)'},
 ]
 export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
@@ -72,6 +80,12 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   //Output을 State로 받아서 화면에 표출하거나 정보 값으로 활용
   const [modalStartAddrOutput, setmodalStartAddrOutput] = useState<string>("주소를 선택/변경해주세요");
   const [modalEndAddrOutput, setmodalEndAddrOutput] = useState<string>("주소를 선택/변경해주세요");
+
+  const [startAddrCord_lat, setStartAddrCord_lat] = useState<string>("");
+  const [startAddrCord_lon, setStartAddrCord_lon] = useState<string>("");
+
+  const [endAddrCord_lat, setEndAddrCord_lat] = useState<string>("");
+  const [endAddrCord_lon, setEndAddrCord_lon] = useState<string>("");
 
   // 당상/당착/내상/내착
   const [selectedStartDateOption, setSelectedStartDateOption] = React.useState(null);
@@ -300,7 +314,33 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               style={{width: 350, height: 600}}
               jsOptions={{ animated: true }}
               onSelected={(startAddrResult) => {
-                setmodalStartAddrOutput(JSON.stringify(startAddrResult.address).replace(/\"/gi, ""))
+                let roadaddr = JSON.stringify(startAddrResult.roadAddress).replace(/\"/gi, "");
+                setmodalStartAddrOutput(roadaddr);
+                axios
+                  .get(tmap_FullTextGeocodingUrl + roadaddr)
+                  .then((responseJSON) => {
+                    let tmapResponse = JSON.stringify(responseJSON.request._response)
+                    tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
+                    tmapResponse = tmapResponse.replace(/\\/gi, "") // '\'문자 replaceall
+                    tmapResponse = JSON.parse(tmapResponse)
+
+                    let coordinate = tmapResponse.coordinateInfo.coordinate[0]
+                    let lat = JSON.stringify(coordinate.newLat).replace(/\"/gi, "") //latitude 위도
+                    let lon = JSON.stringify(coordinate.newLon).replace(/\"/gi, "") //longitude 경도
+
+                    console.log('상차지 주소 :', roadaddr)
+                    console.log('변환된 위도 :', lat);
+                    console.log('변환된 경도 :', lon);
+
+                    setStartAddrCord_lat(lat);
+                    setStartAddrCord_lon(lon);
+
+                    console.log('startAddrCordVal :', lat, lon);
+
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
                 setmodalStartAddrVisible(false)
               }}
             />
@@ -326,7 +366,33 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               style={{width: 350, height: 600}}
               jsOptions={{ animated: true }}
               onSelected={(endAddrResult) => {
-                setmodalEndAddrOutput(JSON.stringify(endAddrResult.address).replace(/\"/gi, ""))
+                let roadaddr = JSON.stringify(endAddrResult.roadAddress).replace(/\"/gi, "");
+                setmodalEndAddrOutput(roadaddr);
+                axios
+                  .get(tmap_FullTextGeocodingUrl + roadaddr)
+                  .then((responseJSON) => {
+                    let tmapResponse = JSON.stringify(responseJSON.request._response)
+                    tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
+                    tmapResponse = tmapResponse.replace(/\\/gi, "") // '\'문자 replaceall
+                    tmapResponse = JSON.parse(tmapResponse)
+
+                    let coordinate = tmapResponse.coordinateInfo.coordinate[0]
+                    let lat = JSON.stringify(coordinate.newLat).replace(/\"/gi, "") //latitude 위도
+                    let lon = JSON.stringify(coordinate.newLon).replace(/\"/gi, "") //longitude 경도
+
+                    console.log('하차지 주소 :', roadaddr)
+                    console.log('변환된 위도 :', lat);
+                    console.log('변환된 경도 :', lon);
+
+                    setEndAddrCord_lat(lat);
+                    setEndAddrCord_lon(lon);
+
+                    console.log('endAddrCordVal :', lat, lon);
+
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
                 setmodalEndAddrVisible(false)
               }}
             />
