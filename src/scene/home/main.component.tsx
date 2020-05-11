@@ -45,6 +45,7 @@ import KakaoLogins from '@react-native-seoul/kakao-login';
 let userType;
 AsyncStorage.getItem('userType', (err, result) => {
   userType = result;
+  console.log("main usertype: "+userType);
 });
 
 {
