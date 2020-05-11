@@ -29,7 +29,8 @@ import { withNavigation } from 'react-navigation';
 import { SearchScreenProps } from'../../navigation/search.navigator'
 
 import RNPickerSelect from 'react-native-picker-select';
-
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS ==='android';
 
@@ -97,7 +98,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       
     },  
   ];
-
+  
   componentDidMount() {
 
     if(this.state.value == '1'){

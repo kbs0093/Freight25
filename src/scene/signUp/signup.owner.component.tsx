@@ -64,7 +64,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             auth().signInWithCustomToken(firebaseToken);
             //getProfile이 아닌 fb auth로부터 정보갱신해야할 것 같은데 논의가 필요합니다.
             //getProfile();
-            //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+            AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
             console.log("currentAuth uid: "+auth().currentUser?.uid);
 
             //auth리스너와 uid를 이용한 db 저장 부분
@@ -76,10 +76,14 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                   console.log("firestore target uid: "+auth().currentUser?.uid);
                   try {
                     ref.update({
-                      manNum: manNumInput, 
-                      accountNum: accountNumInput, 
-                      phoneNum: phoneNumInput,
-                      bankVal: BankValue
+                      name: nameInput,
+                      accountOwner: accountNumInput,
+
+                      companyNumber: manNumInput, 
+                      account: accountNumInput, 
+                      tel: phoneNumInput,
+                      bankName: BankValue,
+                      companyName: companyNameInput
                       });
                     props.navigation.dispatch(resetAction);
                   } catch (error) {

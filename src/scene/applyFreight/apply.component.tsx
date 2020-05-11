@@ -11,13 +11,15 @@ import {
 } from 'react-native';
 import {
   LayoutElement, TopNavigation,
-  Button, Layout, Select, Input,
+  Button, Layout, Select, Input, DateService,
 } from '@ui-kitten/components';
 
 import Modal from 'react-native-modal'
 import Postcode from 'react-native-daum-postcode'
 import { ApplyScreenProps } from '../../navigation/apply.navigator';
 import { AppRoute } from '../../navigation/app-routes';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const carSize = [
   { text: '1톤' },
@@ -74,6 +76,39 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   // 당상/당착/내상/내착
   const [selectedStartDateOption, setSelectedStartDateOption] = React.useState(null);
   const [selectedEndDateOption, setSelectedEndDateOption] = React.useState(null);
+
+  //화물 db에 등록
+  const applyFreightToDb = () => {
+    var user = auth().currentUser;
+      if(user != null){
+        //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
+        var ref = firestore().collection('freights');
+        if(user != null){
+          try {
+            ref.add({
+              ownerId: auth().currentUser?.uid,
+              carType: selectedCarTypeOption,
+              driveOption: selectedDriveOption,
+              weight: weightValue,
+              voluem: volumeValue,
+              freightType: selectedFreightTypeOption,
+              freightLoadType: freightLoadTypeValue,
+              desc: descValue,
+              dist: distValue,
+              expenxe: expenseValue,
+              startDate: selectedStartDateOption,
+              endDate: selectedEndDateOption,
+              timeStamp: Date.now()
+              });
+              props.navigation.navigate(AppRoute.HOME);
+              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
+          } catch (error) {
+            //오류 출력 
+            console.log(error);
+          }
+        }
+      }
+  };
 
   return (
     <React.Fragment>
@@ -247,7 +282,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           
           <View style={styles.buttonsContainer}>
             <Button style={styles.IconButton} status='danger'>취소</Button>
-            <Button style={styles.IconButton} >등록</Button>
+            <Button style={styles.IconButton} onPress={applyFreightToDb} >등록</Button>
           </View>
         </View>
 
