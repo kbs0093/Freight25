@@ -12,6 +12,7 @@
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
 #import <KakaoOpenSDK/KakaoOpenSDK.h>
+#import <GoogleMaps/GoogleMaps.h>
 
 @import Firebase;
 
@@ -30,6 +31,9 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  // Google Maps
+  [GMSServices provideAPIKey:@"AIzaSyB9iMOqpFb_Sl4t9j9M65ftTHG58cKqUCQ"];
+
 #if DEBUG
   InitializeFlipper(application);
 #endif
@@ -49,6 +53,7 @@ static void InitializeFlipper(UIApplication *application) {
 	
   // Firebase
   [FIRApp configure];
+
 
   return YES;
 }
