@@ -11,6 +11,11 @@ const TopTab = createMaterialTopTabNavigator();
 export const SearchNavigator = (): React.ReactElement => (
   <TopTab.Navigator tabBar={props => <TopTapBar {...props} />}>
     <Stack.Screen name={AppRoute.SEARCH_MAIN} component={SearchScreen}/>
+  </TopTab.Navigator>
+);
+
+export const SearchDetailNavigator = (): React.ReactElement => (
+  <TopTab.Navigator tabBar={props => <TopTapBar {...props} />}>
     <Stack.Screen name={AppRoute.SEARCH_DETAIL} component={DetailScreen}/>
   </TopTab.Navigator>
 );

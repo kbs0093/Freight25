@@ -25,6 +25,11 @@ import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handl
 const isAndroid = Platform.OS ==='android';
 
 export class DetailScreen extends React.Component <DetailScreenProps> {
+  state = {
+    stopoverX : '',
+    stopoverY : '',    
+  }
+
   data = [
     {
       id: '1',
@@ -64,13 +69,15 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         "resCoordType" : "EPSG3857",
         "angle" : "172",
         "searchOption" : '1',
+        "passlist" : `${this.state.stopoverY},${this.state.stopoverX}`, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
         "trafficInfo" : "Y",
         "truckType" : "1",
         "truckWidth" : "100",
         "truckHeight" : "100",
-        "truckWeight" : "35000",
-        "truckTotalWeight" : "35000",
-        "truckLength" : "200"
+        "truckWeight" : "35000",  // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+        "truckTotalWeight" : "35000", // 화물 무게도 불러올 것
+        "truckLength" : "200",  // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+        
       })
     })
     .then(response => response.json())
