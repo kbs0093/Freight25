@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import {
   Image,
   StyleSheet,
@@ -29,7 +28,7 @@ import {
   NavigationContainer,
   BaseRouter,
 } from '@react-navigation/native';
-import {MainScreenProps} from '../../navigation/home.navigator';
+import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import {
   BackIcon,
@@ -43,28 +42,23 @@ import {
 import auth from '@react-native-firebase/auth';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 
-
-export class MainScreen extends React.Component <MainScreenProps> {
-
-  componentDidMount() {  
-  }
+export class OwnerScreen extends React.Component <OwnerScreenProps> {
 
   clickButtonType = () => {
-    this.props.navigation.navigate(AppRoute.SEARCH);
+    this.props.navigation.navigate(AppRoute.APPLY)
   };
 
   clickCheck = () => {
     this.props.navigation.navigate(AppRoute.CHECK);
   };
 
-  render(){
-    
+  render(){    
     return (
       <React.Fragment>
         <ScrollView>
           <View style={styles.viewForm}>
             <TouchableOpacity onPress={this.clickButtonType}>
-              <Image style={styles.Button} source={require('../../assets/SearchButton-round.png')} />
+              <Image style={styles.Button} source={require('../../assets/ApplyButton.png')} />
             </TouchableOpacity>
             <TouchableOpacity onPress={this.clickCheck}>
               <Image
