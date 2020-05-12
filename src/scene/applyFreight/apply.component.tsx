@@ -114,7 +114,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               endDate: selectedEndDateOption,
               timeStamp: Date.now()
               });
-              props.navigation.navigate(AppRoute.HOME);
+              props.navigation.navigate(AppRoute.OWNER);
               console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
           } catch (error) {
             //오류 출력 

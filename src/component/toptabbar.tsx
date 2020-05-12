@@ -52,7 +52,7 @@ AsyncStorage.getItem('userType', (err, result) => {
 
 const resetAction = CommonActions.reset({
   index: 0,
-  routes: [{name: AppRoute.HOME}]
+  routes: [{name: AppRoute.AUTH}]
 });
 
 export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
@@ -115,7 +115,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       kakaoLogout();
       fbLogout();
 
-      props.navigation.push(AppRoute.AUTH);  
+      props.navigation.dispatch(resetAction);
       console.log('Logout Success');
     }
   };
