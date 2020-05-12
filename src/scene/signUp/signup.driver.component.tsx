@@ -51,7 +51,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
 
   const resetAction = CommonActions.reset({
     index: 0,
-    routes: [{name: AppRoute.HOME}]
+    routes: [{name: AppRoute.SIGNUP}]
   });
 
   
@@ -117,7 +117,8 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                       caryType: TypeValue,
                       bankName: BankValue,
                       });
-                    props.navigation.dispatch(resetAction);
+                    AsyncStorage.setItem('userType', 'driver');
+                    props.navigation.push(AppRoute.HOME);
                   } catch (error) {
                     //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
                     console.log(error);

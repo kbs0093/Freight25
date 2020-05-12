@@ -30,6 +30,8 @@ const logCallback = (log, callback) => {
   callback;
 };
 
+
+
 export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement => {
   const [nameInput, name] = React.useState('');
   const [accountOwnerInput, accountOwner] = React.useState('');
@@ -42,7 +44,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
 
   const resetAction = CommonActions.reset({
     index: 0,
-    routes: [{name: AppRoute.HOME}]
+    routes: [{name: AppRoute.SIGNUP}]
   });
 
   console.log(BankValue);
@@ -85,7 +87,8 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                       bankName: BankValue,
                       companyName: companyNameInput
                       });
-                    props.navigation.dispatch(resetAction);
+                    
+                    props.navigation.navigate(AppRoute.OWNER);
                   } catch (error) {
                     //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
                     console.log(error);

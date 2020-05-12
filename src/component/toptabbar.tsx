@@ -34,6 +34,7 @@ import auth from '@react-native-firebase/auth';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import {NavigationActions} from 'react-navigation';
 import {useRoute} from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 
 let email;
 let nickname = 'unknown';
@@ -47,6 +48,11 @@ AsyncStorage.getItem('nickname', (err, result) => {
 });
 AsyncStorage.getItem('userType', (err, result) => {
   userType = result;
+});
+
+const resetAction = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.HOME}]
 });
 
 export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
@@ -109,7 +115,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       kakaoLogout();
       fbLogout();
 
-      props.navigation.push(AppRoute.AUTH);
+      props.navigation.push(AppRoute.AUTH);  
       console.log('Logout Success');
     }
   };

@@ -80,18 +80,20 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                       AsyncStorage.setItem('userType', 'driver')
                       .then( ()=>{
                         console.log("auth AsyncStorage Type: driver");
-                      })
+                      });
+                      props.navigation.navigate(AppRoute.HOME);
                     }
                     else{
                       AsyncStorage.setItem('userType', 'owner')
                       .then(()=>{
                         console.log("auth AsyncStorage Type: owner");
                       });
+                      props.navigation.navigate(AppRoute.OWNER);
                     } 
                   })
                 }
               });
-              props.navigation.navigate(AppRoute.HOME);
+              
             }
              //미등록된 uid인 경우 (false)
             else if(uidRegistered == 'false'){
