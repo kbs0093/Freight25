@@ -62,31 +62,19 @@ const useSelectState = (initialValue = '') => {
   return {value, onSelect: setValue, selectedOption: value};
 };
 
-const carSize = [
-  {text: '1톤'},
-  {text: '2.5톤'},
-  {text: '5톤'},
-  {text: '10톤 이상'},
-];
-const carType = [{text: '탑'}, {text: '냉장'}];
-const driveType = [{text: '독차'}, {text: '혼적'}];
-
-const freightType = [{text: '파레트'}];
-
 export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
-  const [BankValue, setBankValue] = React.useState('');
   const [TonValue, setTonValue] = React.useState('');
   const [TypeValue, setTypeValue] = React.useState('');
+  const [BankValue, setBankValue] = React.useState('');
+  const [nameInput, name] = React.useState('');
+  const [phoneNumInput, phoneNum] = React.useState('');
+  const [accountNumInput, accountNum] = React.useState('');
+  const [accountOwnerInput, accountOwner] = React.useState('');
+  const [carNumInput, carNum] = React.useState('');
+  const [manNumInput, manNum] = React.useState('');
+  const [companyNameInput, companyName] = React.useState('');
 
-  const nameInput = useInputState();
-  const phoneNumInput = useInputState();
-  const carNumInput = useInputState();
-  const manNumInput = useInputState();
-  const accountNumInput = useInputState();
-  const companyNameInput = useInputState();
-
-  //if (userType == 'owner') {
-  if (1) {
+  if (userType == 'owner') {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -94,7 +82,8 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <Text style={styles.Subtitle}>화주 정보 수정</Text>
           <Button
             onPress={() => {
-              console.log(carNumInput);
+              console.log(nameInput);
+              console.log(BankValue);
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
@@ -107,13 +96,21 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>성 명: </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="성명을 적어주세요" {...nameInput} />
+              <Input
+                placeholder="성명을 적어주세요"
+                value={nameInput}
+                onChangeText={name}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>전화 번호: </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="-를 빼고 입력하세요" {...phoneNumInput} />
+              <Input
+                placeholder="-를 빼고 입력하세요"
+                value={phoneNumInput}
+                onChangeText={phoneNum}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
@@ -121,7 +118,8 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
             <Layout style={styles.selectContainer}>
               <Input
                 placeholder="사업자 등록번호를 입력하세요"
-                {...manNumInput}
+                value={manNumInput}
+                onChangeText={manNum}
               />
             </Layout>
           </View>
@@ -137,7 +135,11 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>업체명: </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="업체명을 적어주세요" {...companyNameInput} />
+              <Input
+                placeholder="업체명을 적어주세요"
+                value={companyNameInput}
+                onChangeText={companyName}
+              />
             </Layout>
           </View>
         </View>
@@ -163,13 +165,21 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>계좌 번호 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="-를 뺴고 입력하세요" {...accountNumInput} />
+              <Input
+                placeholder="-를 뺴고 입력하세요"
+                value={accountNumInput}
+                onChangeText={accountNum}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>예금주 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="예금주를 적어주세요" {...accountNumInput} />
+              <Input
+                placeholder="예금주를 적어주세요"
+                value={accountOwnerInput}
+                onChangeText={accountOwner}
+              />
             </Layout>
           </View>
         </View>
@@ -185,6 +195,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
             onPress={() => {
               console.log(carNumInput);
               console.log(BankValue);
+              console.log(TonValue);
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
@@ -196,13 +207,21 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>성 명: </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="성명을 적어주세요" {...nameInput} />
+              <Input
+                placeholder="성명을 적어주세요"
+                value={nameInput}
+                onChangeText={name}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>전화 번호: </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="-를 빼고 입력하세요" {...phoneNumInput} />
+              <Input
+                placeholder="-를 빼고 입력하세요"
+                value={phoneNumInput}
+                onChangeText={phoneNum}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
@@ -210,7 +229,8 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
             <Layout style={styles.selectContainer}>
               <Input
                 placeholder="사업자 등록번호를 입력하세요"
-                {...manNumInput}
+                value={manNumInput}
+                onChangeText={manNum}
               />
             </Layout>
           </View>
@@ -221,7 +241,11 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 번호 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="차량 번호를 적어주세요" {...carNumInput} />
+              <Input
+                placeholder="차량 번호를 적어주세요"
+                value={carNumInput}
+                onChangeText={carNum}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
@@ -283,13 +307,21 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>계좌 번호 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="-를 뺴고 입력하세요" {...accountNumInput} />
+              <Input
+                placeholder="-를 뺴고 입력하세요"
+                value={accountNumInput}
+                onChangeText={accountNum}
+              />
             </Layout>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>예금주 : </Text>
             <Layout style={styles.selectContainer}>
-              <Input placeholder="예금주를 적어주세요" {...accountNumInput} />
+              <Input
+                placeholder="예금주를 적어주세요"
+                value={accountOwnerInput}
+                onChangeText={accountOwner}
+              />
             </Layout>
           </View>
         </View>
@@ -298,7 +330,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
   } else {
     return (
       <React.Fragment>
-        <Text>유저 정보를 확인할 수 없습니다 :)</Text>
+        <Text style={styles.Subtitle}>유저 정보를 확인할 수 없습니다 :)</Text>
       </React.Fragment>
     );
   }
