@@ -102,15 +102,15 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
 
     if(this.state.value == '1'){
       this.list.sort(this.smartSort);
-      console.log(this.list);
+
     }
     else if(this.state.value == '2'){
       this.list.sort(this.moneySort);
-      console.log(this.list);
+
     }
     else{
       this.list.sort(this.distanceSort);
-      console.log(this.list);
+
     }
     
 
@@ -160,7 +160,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
    
           })
           .catch(err => console.log(err));
-          console.log(this.list[i].distanceX);
+
        }
 
 
@@ -252,7 +252,6 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
           <RNPickerSelect
               onValueChange={(value) => {
                 this.setState({value})  
-                console.log(this.state.value)
               }}
               placeholder={{
                 label: '정렬 순서',
