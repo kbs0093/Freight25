@@ -8,7 +8,6 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
-  PanResponder,
 } from 'react-native';
 import {
   LayoutElement, TopNavigation,
@@ -87,9 +86,13 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   const [modalStartAddrVisible, setmodalStartAddrVisible] = useState<boolean>(false);
   const [modalEndAddrVisible, setmodalEndAddrVisible] = useState<boolean>(false);
 
-  //Output을 State로 받아서 화면에 표출하거나 정보 값으로 활용
-  const [modalStartAddrOutput, setmodalStartAddrOutput] = useState<string>("주소를 선택/변경해주세요");
-  const [modalEndAddrOutput, setmodalEndAddrOutput] = useState<string>("주소를 선택/변경해주세요");
+  //Address의 간략한 버전 + Modal의 Output
+  const [startAddrCompact, setStartAddrCompact] = useState<string>("주소를 선택/변경해주세요");
+  const [endAddrCompact, setEndAddrCompact] = useState<string>("주소를 선택/변경해주세요");
+
+  //Address의 Full 버젼 (도로명주소로 한다)
+  const [startAddrFull, setStartAddrFull] = useState<string>("");
+  const [endAddrFull, setEndAddrFull] = useState<string>("");
 
   const [startAddr_lat, setStartAddr_lat] = useState<string>("");
   const [startAddr_lon, setStartAddr_lon] = useState<string>("");
@@ -121,11 +124,11 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               desc: descValue,
               dist: distValue,
               expense: expenseValue,
-              startAddr: modalStartAddrOutput,
+              startAddr: startAddrCompact,
               startAddr_lat: startAddr_lat,
               startAddr_lon: startAddr_lon,
               startDate: selectedStartDate,
-              endAddr: modalEndAddrOutput,
+              endAddr: endAddrCompact,
               endAddr_lat: endAddr_lat,
               endAddr_lon: endAddr_lon,
               endDate: selectedEndDate,
@@ -174,7 +177,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         <View style={styles.infoContainer}>
           <Text style={styles.subTitle}>위치 정보</Text>
           <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>상차지 : {modalStartAddrOutput}</Text>
+            <Text style={styles.infoTitle}>상차지 : {startAddrCompact}</Text>
             <Button 
               appearance='outline' 
               size='small'
@@ -200,7 +203,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             </View>
           </View>
           <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>하차지 : {modalEndAddrOutput}</Text>
+            <Text style={styles.infoTitle}>하차지 : {endAddrCompact}</Text>
             <Button 
               appearance='outline'
               size='small'
@@ -382,10 +385,16 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               style={{width: 350, height: 600}}
               jsOptions={{ animated: true }}
               onSelected={(startAddrResult) => {
-                let roadaddr = JSON.stringify(startAddrResult.roadAddress).replace(/\"/gi, "");
-                setmodalStartAddrOutput(roadaddr);
+                let addrFull = JSON.stringify(startAddrResult.jibunAddress).replace(/\"/gi, "");
+                if (addrFull == ''){
+                  addrFull = JSON.stringify(startAddrResult.autoJibunAddress).replace(/\"/gi, "");
+                }
+                setStartAddrFull(addrFull);
+                console.log('addrFull :', addrFull);
+                let addr = addrFull.split(' ', 3).join(' ');
+                setStartAddrCompact(addr);
                 axios
-                  .get(tmap_FullTextGeocodingUrl + roadaddr)
+                  .get(tmap_FullTextGeocodingUrl + addrFull)
                   .then((responseJSON) => {
                     let tmapResponse = JSON.stringify(responseJSON.request._response)
                     tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
@@ -393,18 +402,18 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     tmapResponse = JSON.parse(tmapResponse)
 
                     let coordinate = tmapResponse.coordinateInfo.coordinate[0]
-                    let lat = JSON.stringify(coordinate.newLat).replace(/\"/gi, "") //latitude 위도
-                    let lon = JSON.stringify(coordinate.newLon).replace(/\"/gi, "") //longitude 경도
+                    let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
+                    let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
 
-                    console.log('상차지 주소 :', roadaddr)
+                    console.log('상차지 주소 :', addrFull)
                     console.log('변환된 위도 :', lat);
                     console.log('변환된 경도 :', lon);
 
                     setStartAddr_lat(lat);
                     setStartAddr_lon(lon);
-
+                        
                     console.log('startAddrCordVal :', lat, lon);
-
+                    
                   })
                   .catch((error) => {
                     console.log(error);
@@ -434,10 +443,15 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               style={{width: 350, height: 600}}
               jsOptions={{ animated: true }}
               onSelected={(endAddrResult) => {
-                let roadaddr = JSON.stringify(endAddrResult.roadAddress).replace(/\"/gi, "");
-                setmodalEndAddrOutput(roadaddr);
+                let addrFull = JSON.stringify(endAddrResult.jibunAddress).replace(/\"/gi, "");
+                if (addrFull == ''){
+                  addrFull = JSON.stringify(endAddrResult.autoJibunAddress).replace(/\"/gi, "");
+                }
+                setEndAddrFull(addrFull);
+                let addr = addrFull.split(' ', 3).join(' ');
+                setEndAddrCompact(addr);
                 axios
-                  .get(tmap_FullTextGeocodingUrl + roadaddr)
+                  .get(tmap_FullTextGeocodingUrl + addrFull)
                   .then((responseJSON) => {
                     let tmapResponse = JSON.stringify(responseJSON.request._response)
                     tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
@@ -445,10 +459,10 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     tmapResponse = JSON.parse(tmapResponse)
 
                     let coordinate = tmapResponse.coordinateInfo.coordinate[0]
-                    let lat = JSON.stringify(coordinate.newLat).replace(/\"/gi, "") //latitude 위도
-                    let lon = JSON.stringify(coordinate.newLon).replace(/\"/gi, "") //longitude 경도
+                    let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
+                    let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
 
-                    console.log('하차지 주소 :', roadaddr)
+                    console.log('하차지 주소 :', addrFull)
                     console.log('변환된 위도 :', lat);
                     console.log('변환된 경도 :', lon);
 
@@ -456,7 +470,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     setEndAddr_lon(lon);
 
                     console.log('endAddrCordVal :', lat, lon);
-                    
                   })
                   .catch((error) => {
                     console.log(error);
