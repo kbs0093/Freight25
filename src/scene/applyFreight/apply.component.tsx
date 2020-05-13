@@ -8,6 +8,7 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
+  PanResponder,
 } from 'react-native';
 import {
   LayoutElement, TopNavigation,
@@ -28,6 +29,8 @@ const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/ful
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
 const tmap_URL_rest = '&coordType=WGS84GEO&fullAddr=';
 
+const tmap_distCalcQueryUrl = 'https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response&appKey=';
+const tmap_distCalcUrl = tmap_distCalcQueryUrl + tmap_appKey;
 const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_URL_rest;
 
 const carSize = [
@@ -137,6 +140,28 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         }
       }
   };
+
+  // Calculate distance between startAddr and endAddr
+  const calcDist = () => {
+    let tmap_distCalcUrl_rest = `&startX=${startAddr_lon}&startY=${startAddr_lat}&endX=${endAddr_lon}&endY=${endAddr_lat}&truckType=1&truckWidth=100&truckHeight=100&truckWeight=35000&truckTotalWeight=35000&truckLength=200`
+    axios.post(tmap_distCalcUrl + tmap_distCalcUrl_rest)
+      .then((response) => {
+        let tmapdist_response = JSON.stringify(response.request._response)
+        tmapdist_response = tmapdist_response.substring(1, tmapdist_response.length - 1) // 따옴표 삭제
+        tmapdist_response = tmapdist_response.replace(/\\/gi, "") // '\'문자 replaceall
+        tmapdist_response = JSON.parse(tmapdist_response)
+
+        let tmapprops = tmapdist_response.features[0].properties
+        let tmapdist_km = tmapprops.totalDistance/1000
+        let tmaptime_min = tmapprops.totalTime/60
+        console.log("tmap dist :", tmapdist_km, "Km");
+        console.log("tmap time :", tmaptime_min, "분");
+        setDistValue(tmapdist_km+"")
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 
   return (
     <React.Fragment>
@@ -309,12 +334,13 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             <Text style={styles.infoTitle}>총 운행거리 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
-                placeholder='운행 거리를 입력하세요'
+                placeholder='수동입력'
                 value={distValue}
                 onChangeText={nextValue => setDistValue(nextValue)}
               />
             </Layout>
             <Text style={styles.infoTitle}>km</Text>
+            <Button onPress={calcDist} >자동계산</Button>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>요금 : </Text>
@@ -430,7 +456,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     setEndAddr_lon(lon);
 
                     console.log('endAddrCordVal :', lat, lon);
-
+                    
                   })
                   .catch((error) => {
                     console.log(error);
@@ -523,3 +549,4 @@ const styles = StyleSheet.create({
 
   
 });
+
