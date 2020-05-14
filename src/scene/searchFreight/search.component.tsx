@@ -26,15 +26,48 @@ import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
 import { withNavigation } from 'react-navigation';
-import { SearchScreenProps } from'../../navigation/search.navigator'
-
-import RNPickerSelect from 'react-native-picker-select';
+import { SearchScreenProps } from'../../navigation/search.navigator';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import RNPickerSelect from 'react-native-picker-select';
+
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS ==='android';
+/*
+function distance(startX, startY){
+  Geolocation.getCurrentPosition(
+    position => {
+      const latitude = JSON.stringify(position.coords.latitude);
+      const longitude = JSON.stringify(position.coords.longitude);
+
+      fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
+        method: 'POST',
+        headers:{
+          "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+        },
+        body: JSON.stringify({
+          "startX" : longitude,
+          "startY" : latitude,
+          "endX" : startX,
+          "endY" : startY,
+          "reqCoordType" : "WGS84GEO",
+          "resCoordType" : "WGS84GEO",
+          "searchOption" : '0',
+          "totalValue" : '2',
+          "trafficInfo" : 'N'
+        })})
+      .then(response => response.json())
+      .then(response =>{
+        //console.log(response);
+        return (response.features[0].properties.totalDistance/1000 + "");            
+      })
+    }
+  )
+ 
+}*/
 
 export class SearchScreen extends React.Component <SearchScreenProps> {
+  
   state = {
     latitude: 'unknown',
     longitude: 'unknown',
@@ -42,11 +75,8 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     gu: '',
     myeon: '',
     dong: '',
-    value: '1'
-  };
-
-  list = [
-    {
+    value: '1',
+    data: [{
       id:      'A1234567',
       startAddress:   '대전 서구',
       startX:         '127.370187',
@@ -60,65 +90,61 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       distanceY:      190,
       time:           '3시간 20분',
       smart:          90,
-      money:          200000,
-      
-    },
-    {
-      id:      'A1234568',
-      startAddress:   '대전 유성',
-      startX:         '127.370187',
-      startY:         '36.334634',
-      endAddress:     '수원 영통',
-      startType:      '당상',
-      endType:        '당착',
-      Type:           '혼적',
-      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-      distanceX:      '',  //빈 칸으로 남겨둬라
-      distanceY:      120,
-      time:           '3시간 20분',
-      smart:          60,
-      money:          190000,
-      
-    },  
-    {
-      id:      'A1234569',
-      startAddress:   '대전 대덕',
-      startX:         '127.370187',
-      startY:         '36.334634',
-      endAddress:     '분당 정자',
-      startType:      '당상',
-      endType:        '내일착',
-      Type:           '독차',
-      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-      distanceX:      '',  //빈 칸으로 남겨둬라
-      distanceY:      170,
-      time:           '3시간 20분',
-      smart:          70,
-      money:          180000,
-      
-    },  
-  ];
-  
+      money:          200000,    
+    }],
+  };
+
+  constructor(props) {
+    super(props);       
+    this.state = {
+      latitude: 'unknown',
+      longitude: 'unknown',
+      city: '',
+      gu: '',
+      myeon: '',
+      dong: '',
+      value: '1',
+      data: [{
+        id:      'A1234567',
+        startAddress:   '대전 서구',
+        startX:         '127.370187',
+        startY:         '36.334634',
+        endAddress:     '서울 성북',
+        startType:      '당상',
+        endType:        '당착',
+        Type:           '혼적',
+        carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+        distanceX:      '',  //빈 칸으로 남겨둬라
+        distanceY:      190,
+        time:           '3시간 20분',
+        smart:          90,
+        money:          200000,      
+      },
+    ],
+    }
+  }
+
   componentDidMount() {
+    let latitude;
+    let longitude;
 
     if(this.state.value == '1'){
-      this.list.sort(this.smartSort);
-      console.log(this.list);
+      this.state.data.sort(this.smartSort);
+
     }
     else if(this.state.value == '2'){
-      this.list.sort(this.moneySort);
-      console.log(this.list);
+      this.state.data.sort(this.moneySort);
+
     }
     else{
-      this.list.sort(this.distanceSort);
-      console.log(this.list);
-    }
-    
+      this.state.data.sort(this.distanceSort);
+    }    
 
     Geolocation.getCurrentPosition(
       position => {
-        const latitude = JSON.stringify(position.coords.latitude);
-        const longitude = JSON.stringify(position.coords.longitude);
+        latitude = JSON.stringify(position.coords.latitude);
+        longitude = JSON.stringify(position.coords.longitude);
+
         this.setState({latitude});
         this.setState({longitude});
         
@@ -135,44 +161,52 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
           this.setState({myeon});
           this.setState({dong});          
         })   
-        .catch(err => console.log(err));
-
-        for(let i=0; i<this.list.length; i++){
-
-          fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
-            method: 'POST',
-            headers:{
-              "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-            },
-            body: JSON.stringify({
-              "startX" : this.state.longitude,
-              "startY" : this.state.latitude,
-              "endX" : this.list[i].startX,
-              "endY" : this.list[i].startY,
-              "reqCoordType" : "WGS84GEO",
-              "resCoordType" : "WGS84GEO",
-              "searchOption" : '0',
-              "totalValue" : '2',
-              "trafficInfo" : 'N'
-            })})
-          .then(response => response.json())
-          .then(response =>{
-            this.list[i].distanceX = (response.features[0].properties.totalDistance/1000) + "";
-   
-          })
-          .catch(err => console.log(err));
-          console.log(this.list[i].distanceX);
-       }
-
-
+        .catch(err => console.log(err));     
       },
       error => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
-    );  
-    
+    );
 
-    
-  };
+    var user = auth().currentUser;
+    const that = this;
+    if(user != null){  
+      try {
+        firestore().collection('freights').where("state", "==", 0)
+        .get()
+        .then(function(querySnapshot){
+          var list =[];
+          for(var docCnt in querySnapshot.docs){            
+            const doc = querySnapshot.docs[docCnt].data();
+
+            list.push({
+              id: doc.id,
+              startAddress: doc.startAddr,
+              startX: doc.startAddrLon,
+              startY: doc.startAddrLat,
+              endAddress: doc.endAddr,
+              startType: doc.startDate,
+              endType: doc.endDate,
+              Type: doc.driveOption,
+              carType: doc.carSize,
+              carType2: doc.carType,
+              freightSize: doc.volume,
+              freightWeight: doc.weight,
+              loadType: doc.freightLoadType,
+              distanceX: "",
+              distanceY: doc.dist,
+              time: null,
+              smart: null,
+              money: doc.expense
+            });         
+          }
+          that.setState({data: list});
+        })     
+      } 
+      catch (error) {
+        console.log(error);
+      }
+    }
+  }
 
   ClickList = index => () => {
     //AsyncStorage.setItem('Freight', index);
@@ -191,7 +225,6 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
   };
   
-
   _renderItem = ({item}) => (
     <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
@@ -228,7 +261,6 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     </TouchableOpacity>
   );
   
-
   render(){
     return (
     <React.Fragment>
@@ -253,7 +285,6 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
           <RNPickerSelect
               onValueChange={(value) => {
                 this.setState({value})  
-                console.log(this.state.value)
               }}
               placeholder={{
                 label: '정렬 순서',
@@ -272,7 +303,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       <Divider style={{backgroundColor: 'black'}}/>     
         <FlatList 
           style={{backgroundColor : 'white'}}
-          data={this.state.value? this.list : this.list}
+          data={this.state.value? this.state.data : this.state.data}
           renderItem={this._renderItem}
         />                             
     </React.Fragment>
