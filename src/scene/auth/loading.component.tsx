@@ -27,27 +27,35 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
     .then((value) => {
       if (value) {
         console.log('Login check Succeess');
+        var authFlag = true;
         auth().onAuthStateChanged(function(user){
-          if(user){
-            //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
-            var ref = firestore().collection('drivers').doc(user.uid);
-            ref.get().then(function(doc) {
-              if(doc.exists){
-                AsyncStorage.setItem('userType', 'driver');
-                console.log("loading AsyncStorage Type: driver");
-                props.navigation.navigate(AppRoute.HOME);
-              }
-
-              else{
-                AsyncStorage.setItem('userType', 'owner');
-                console.log("loading AsyncStorage Type: owner");
-                props.navigation.navigate(AppRoute.OWNER);
-              } 
-            })
+          if(authFlag){
+            authFlag = false;
+            if(user){
+              //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+              var ref = firestore().collection('drivers').doc(user.uid);
+              ref.get().then(function(doc) {
+                if(doc.exists){
+                  AsyncStorage.setItem('userType', 'driver');
+                  console.log("loading AsyncStorage Type: driver");
+                  props.navigation.navigate(AppRoute.HOME);
+                }
+  
+                else{
+                  AsyncStorage.setItem('userType', 'owner');
+                  console.log("loading AsyncStorage Type: owner");
+                  props.navigation.navigate(AppRoute.OWNER);
+                } 
+              })
+            }
+            else{
+              console.log('Login check Failed');
+              props.navigation.navigate(AppRoute.SIGN_IN);
+            }
           }
         })
-        
-      } else {
+      } 
+      else {
         console.log('Login check Failed');
         props.navigation.navigate(AppRoute.SIGN_IN);
       }
