@@ -37,6 +37,7 @@ import {
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
+import Toast from 'react-native-tiny-toast';
 
 let email;
 let nickname;
@@ -84,6 +85,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
             onPress={() => {
               console.log(nameInput);
               console.log(BankValue);
+              Toast.showSuccess('수정 완료');
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
@@ -196,6 +198,7 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
               console.log(carNumInput);
               console.log(BankValue);
               console.log(TonValue);
+              Toast.showSuccess('수정 완료');
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
