@@ -109,10 +109,11 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
     var user = auth().currentUser;
       if(user != null){
         //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
-        var ref = firestore().collection('freights');
+        var ref = firestore().collection('freights').doc();
         if(user != null){
           try {
-            ref.add({
+            ref.set({
+              id: ref.id,
               ownerId: auth().currentUser?.uid,
               carSize: selectedCarSize,
               carType: selectedCarType,
@@ -134,7 +135,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               endAddr_lat: endAddr_lat,
               endAddr_lon: endAddr_lon,
               endDate: selectedEndDate,
-              timeStamp: Date.now()
+              timeStamp: Date.now(),
+              state: 0
               });
               props.navigation.navigate(AppRoute.OWNER);
               console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());

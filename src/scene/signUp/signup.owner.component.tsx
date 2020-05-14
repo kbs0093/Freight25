@@ -85,28 +85,32 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             console.log("currentAuth uid: "+auth().currentUser?.uid);
 
             //auth리스너와 uid를 이용한 db 저장 부분
+            var authFlag = true;
             auth().onAuthStateChanged(function(user){
-              if(user){
-                //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
-                var ref = firestore().collection('owners').doc(user.uid);
-                if(user != null){
-                  console.log("firestore target uid: "+auth().currentUser?.uid);
-                  try {
-                    ref.update({
-                      name: nameInput,
-                      accountOwner: accountNumInput,
-
-                      companyNumber: manNumInput, 
-                      account: accountNumInput, 
-                      tel: phoneNumInput,
-                      bankName: BankValue,
-                      companyName: companyNameInput
-                      });
-                    
-                    props.navigation.navigate(AppRoute.OWNER);
-                  } catch (error) {
-                    //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
-                    console.log(error);
+              if(authFlag){
+                authFlag = false;
+                if(user){
+                  //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+                  var ref = firestore().collection('owners').doc(user.uid);
+                  if(user != null){
+                    console.log("firestore target uid: "+auth().currentUser?.uid);
+                    try {
+                      ref.update({
+                        name: nameInput,
+                        accountOwner: accountNumInput,
+  
+                        companyNumber: manNumInput, 
+                        account: accountNumInput, 
+                        tel: phoneNumInput,
+                        bankName: BankValue,
+                        companyName: companyNameInput
+                        });
+                      
+                      props.navigation.navigate(AppRoute.OWNER);
+                    } catch (error) {
+                      //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
+                      console.log(error);
+                    }
                   }
                 }
               }
