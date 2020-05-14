@@ -22,13 +22,23 @@ import firestore from '@react-native-firebase/firestore';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
+import Modal from 'react-native-modal'
+import Postcode from 'react-native-daum-postcode'
 
 const serverUrl = 'http://49.50.162.128:8000/';
+
+// Postcode API를 위한 URL선언
+const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
+const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
+const tmap_FullTextGeocodingURL_rest = '&coordType=WGS84GEO&fullAddr=';
+const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_FullTextGeocodingURL_rest;
 
 const logCallback = (log, callback) => {
   console.log(log);
   callback;
 };
+
+
 
 export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement => {
   const [nameInput, name] = React.useState('');
@@ -40,9 +50,16 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
   const [phoneNumInput, phoneNum] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
 
+  // Postcode API를 위한 변수들 선언
+  const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(false);
+  const [addrCompact, setAddrCompact] = useState<string>("주소 입력");
+  const [addrFull, setAddrFull] = useState<string>("");
+  const [addr_lat, setAddr_lat] = useState<string>("");
+  const [addr_lon, setAddr_lon] = useState<string>("");
+
   const resetAction = CommonActions.reset({
     index: 0,
-    routes: [{name: AppRoute.HOME}]
+    routes: [{name: AppRoute.SIGNUP}]
   });
 
   console.log(BankValue);
@@ -64,27 +81,36 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             auth().signInWithCustomToken(firebaseToken);
             //getProfile이 아닌 fb auth로부터 정보갱신해야할 것 같은데 논의가 필요합니다.
             //getProfile();
-            //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+            AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
             console.log("currentAuth uid: "+auth().currentUser?.uid);
 
             //auth리스너와 uid를 이용한 db 저장 부분
+            var authFlag = true;
             auth().onAuthStateChanged(function(user){
-              if(user){
-                //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
-                var ref = firestore().collection('owners').doc(user.uid);
-                if(user != null){
-                  console.log("firestore target uid: "+auth().currentUser?.uid);
-                  try {
-                    ref.update({
-                      manNum: manNumInput, 
-                      accountNum: accountNumInput, 
-                      phoneNum: phoneNumInput,
-                      bankVal: BankValue
-                      });
-                    props.navigation.dispatch(resetAction);
-                  } catch (error) {
-                    //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
-                    console.log(error);
+              if(authFlag){
+                authFlag = false;
+                if(user){
+                  //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+                  var ref = firestore().collection('owners').doc(user.uid);
+                  if(user != null){
+                    console.log("firestore target uid: "+auth().currentUser?.uid);
+                    try {
+                      ref.update({
+                        name: nameInput,
+                        accountOwner: accountNumInput,
+  
+                        companyNumber: manNumInput, 
+                        account: accountNumInput, 
+                        tel: phoneNumInput,
+                        bankName: BankValue,
+                        companyName: companyNameInput
+                        });
+                      
+                      props.navigation.navigate(AppRoute.OWNER);
+                    } catch (error) {
+                      //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
+                      console.log(error);
+                    }
                   }
                 }
               }
@@ -159,8 +185,18 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               <View style={styles.detailTitle}>
                 <Text style={styles.textStyle}>자주 쓰는 주소 :</Text>
               </View>
-              <View style={{flex: 3}}>
-                <Text style={styles.textStyle}>API 선생님 도와주세요</Text>
+              <View style={{flex: 2.3}}>
+                <Text style={styles.textStyle}>{addrCompact}</Text>
+              </View>
+              <View style={{flex: 0.7}}>
+                <Button 
+                    appearance='outline' 
+                    size='small'
+                    onPress={() => {
+                      setmodalAddAddrVisible(true);
+                    }}
+                    >입력
+                </Button>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -237,6 +273,66 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
               <Button style={{margin: 30}} status='primary' size='large' onPress={regOwner}>회원가입</Button>
           </View>
+
+          
+          <Modal
+            //isVisible Props에 State 값을 물려주어 On/off control
+            isVisible={modalAddAddrVisible}
+            //아이폰에서 모달창 동작시 깜박임이 있었는데, useNativeDriver Props를 True로 주니 해결되었다.
+            useNativeDriver={true}
+            hideModalContentWhileAnimating={true}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+            <View>
+              <Postcode
+                style={{width: 350, height: 600}}
+                jsOptions={{ animated: true }}
+                onSelected={(addrResult) => {
+                  let addrFull = JSON.stringify(addrResult.jibunAddress).replace(/\"/gi, "");
+                  if (addrFull == ''){
+                    addrFull = JSON.stringify(addrResult.autoJibunAddress).replace(/\"/gi, "");
+                  }
+                  setAddrFull(addrFull);
+                  let addr = addrFull.split(' ', 3).join(' ');
+                  setAddrCompact(addr);
+                  axios
+                    .get(tmap_FullTextGeocodingUrl + addrFull)
+                    .then((responseJSON) => {
+                      let tmapResponse = JSON.stringify(responseJSON.request._response)
+                      tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
+                      tmapResponse = tmapResponse.replace(/\\/gi, "") // '\'문자 replaceall
+                      tmapResponse = JSON.parse(tmapResponse)
+
+                      let coordinate = tmapResponse.coordinateInfo.coordinate[0]
+                      let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
+                      let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
+
+                      console.log('하차지 주소 :', addrFull)
+                      console.log('변환된 위도 :', lat);
+                      console.log('변환된 경도 :', lon);
+
+                      setAddr_lat(lat);
+                      setAddr_lon(lon);
+
+                      console.log('endAddrCordVal :', lat, lon);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                  setmodalAddAddrVisible(false)
+                }}
+              />
+              <Button
+                onPress={() => {
+                  setmodalAddAddrVisible(false)
+                }}>
+              뒤로 돌아가기</Button>
+            </View>
+          </Modal>
+
+
+
           </ScrollView>
 
 
