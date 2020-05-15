@@ -76,22 +76,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     myeon: '',
     dong: '',
     value: '1',
-    data: [{
-      id:      'A1234567',
-      startAddress:   '대전 서구',
-      startX:         '127.370187',
-      startY:         '36.334634',
-      endAddress:     '서울 성북',
-      startType:      '당상',
-      endType:        '당착',
-      Type:           '혼적',
-      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-      distanceX:      '',  //빈 칸으로 남겨둬라
-      distanceY:      190,
-      time:           '3시간 20분',
-      smart:          90,
-      money:          200000,    
-    }],
+    data: [],
   };
 
   constructor(props) {
@@ -104,23 +89,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       myeon: '',
       dong: '',
       value: '1',
-      data: [{
-        id:      'A1234567',
-        startAddress:   '대전 서구',
-        startX:         '127.370187',
-        startY:         '36.334634',
-        endAddress:     '서울 성북',
-        startType:      '당상',
-        endType:        '당착',
-        Type:           '혼적',
-        carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-        distanceX:      '',  //빈 칸으로 남겨둬라
-        distanceY:      190,
-        time:           '3시간 20분',
-        smart:          90,
-        money:          200000,      
-      },
-    ],
+      data: [],
     }
   }
 
