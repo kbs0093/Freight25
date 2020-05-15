@@ -18,7 +18,7 @@ export const SearchNavigator = (): React.ReactElement => (
   </TopTab.Navigator>
 );
 
-export const SearchDetailNavigator = (): React.ReactElement => (
+export const DetailNavigator = (): React.ReactElement => (
   <TopTab.Navigator tabBar={props => <TopTapBar {...props} />}>
     <Stack.Screen name={AppRoute.SEARCH_DETAIL_MAIN} component={DetailScreen}/>
   </TopTab.Navigator>

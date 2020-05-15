@@ -68,32 +68,6 @@ function distance(startX, startY){
 
 export class SearchScreen extends React.Component <SearchScreenProps> {
   
-  state = {
-    latitude: 'unknown',
-    longitude: 'unknown',
-    city: '',
-    gu: '',
-    myeon: '',
-    dong: '',
-    value: '1',
-    data: [{
-      id:      'A1234567',
-      startAddress:   '대전 서구',
-      startX:         '127.370187',
-      startY:         '36.334634',
-      endAddress:     '서울 성북',
-      startType:      '당상',
-      endType:        '당착',
-      Type:           '혼적',
-      carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
-      distanceX:      '',  //빈 칸으로 남겨둬라
-      distanceY:      190,
-      time:           '3시간 20분',
-      smart:          90,
-      money:          200000,    
-    }],
-  };
-
   constructor(props) {
     super(props);       
     this.state = {
@@ -105,23 +79,23 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       dong: '',
       value: '1',
       data: [{
-        id:      'A1234567',
-        startAddress:   '대전 서구',
-        startX:         '127.370187',
-        startY:         '36.334634',
-        endAddress:     '서울 성북',
-        startType:      '당상',
-        endType:        '당착',
-        Type:           '혼적',
-        carType: '5톤', carType2: '카고', freightSize: '6파렛', freightWeight: '4500Kg', loadType: '지게차',
+        id:      '',
+        startAddress:   [],
+        startX:         '',
+        startY:         '',
+        endAddress:     '',
+        startType:      '',
+        endType:        '',
+        Type:           '',
+        carType: '', carType2: '', freightSize: '', freightWeight: '', loadType: '',
         distanceX:      '',  //빈 칸으로 남겨둬라
-        distanceY:      190,
-        time:           '3시간 20분',
-        smart:          90,
-        money:          200000,      
-      },
-    ],
-    }
+        distanceY:      null,
+        time:           '',
+        smart:          null,
+        money:          null,
+        moneyPrint:     '',
+      }],
+    };
   }
 
   componentDidMount() {
@@ -138,7 +112,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     }
     else{
       this.state.data.sort(this.distanceSort);
-    }    
+    }
 
     Geolocation.getCurrentPosition(
       position => {
@@ -177,13 +151,21 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
           var list =[];
           for(var docCnt in querySnapshot.docs){            
             const doc = querySnapshot.docs[docCnt].data();
+            var parseStart = doc.startAddr + "";
+            var startArr = parseStart.split(" ");
+
+            var parseEnd = doc.endAddr + "";
+            var endArr = parseEnd.split(" ");
+
+            var moneyprint = doc.expense + "";
+            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
             list.push({
               id: doc.id,
-              startAddress: doc.startAddr,
+              startAddress: startArr,
               startX: doc.startAddrLon,
               startY: doc.startAddrLat,
-              endAddress: doc.endAddr,
+              endAddress: endArr,
               startType: doc.startDate,
               endType: doc.endDate,
               Type: doc.driveOption,
@@ -196,9 +178,44 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
               distanceY: doc.dist,
               time: null,
               smart: null,
-              money: doc.expense
+              money: doc.expense,
+              moneyPrint: moneyprint,
             });         
           }
+
+          /*Geolocation.getCurrentPosition(
+            position => {
+              const latitude = JSON.stringify(position.coords.latitude);
+              const longitude = JSON.stringify(position.coords.longitude);
+              var data = [];
+    
+              for(var docCnt in querySnapshot.docs){
+                const doc = querySnapshot.docs[docCnt].data();
+                
+                fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
+                method: 'POST',
+                headers:{
+                  "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+                },
+                body: JSON.stringify({
+                  "startX" : longitude,
+                  "startY" : latitude,
+                  "endX" : doc.startAddrLon,
+                  "endY" : doc.startAddrLat,
+                  "reqCoordType" : "WGS84GEO",
+                  "resCoordType" : "WGS84GEO",
+                  "searchOption" : '0',
+                  "totalValue" : '2',
+                  "trafficInfo" : 'N'
+                })})
+              .then(response => response.json())
+              .then(response =>{
+                console.log(response);
+                //return (response.features[0].properties.totalDistance/1000 + "");            
+              })
+              }          
+            }
+          )*/
           that.setState({data: list});
         })     
       } 
@@ -208,8 +225,8 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     }
   }
 
-  ClickList = index => () => {
-    //AsyncStorage.setItem('Freight', index);
+  ClickList = item => () => {
+    AsyncStorage.setItem('FreightID', item.id);
     this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
 
@@ -226,13 +243,28 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
   };
   
   _renderItem = ({item}) => (
+   
     <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
         <View style={styles.geoInfo1}>
-          <View style={styles.geoInfo11}><Text style={styles.geoText}>{item.startAddress}</Text></View>
+          <View style={styles.geoInfo11}>
+          <View style={{flex: 1, justifyContent: 'flex-end'}}>
+              <Text style={styles.geoTitleText}>{item.startAddress[0]}</Text>
+            </View>
+            <View>
+              <Text style={styles.geoText}>{item.startAddress[1]} {item.startAddress[2]}</Text>
+            </View>             
+          </View>
           <View style={styles.geoInfo12}><Icon style={styles.icon} fill='#8F9BB3' name='arrow-forward-outline'/></View>
-          <View style={styles.geoInfo11}><Text style={styles.geoText}>{item.endAddress}</Text></View>
+          <View style={styles.geoInfo11}>
+            <View style={{flex: 1, justifyContent: 'flex-end'}}>
+              <Text style={styles.geoTitleText}>{item.endAddress[0]}</Text>
+            </View>
+            <View>
+              <Text style={styles.geoText}>{item.startAddress[1]} {item.endAddress[2]}</Text>
+            </View> 
+          </View>
         </View>
         <View style={styles.geoInfo2}> 
           <View style={styles.geoInfo21}><Text style={styles.startType}>{item.startType}</Text></View>
@@ -243,18 +275,17 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
             <View style={{flex:1, alignItems: 'center'}}><Text style={styles.Type}>{item.Type}</Text></View>
             <View style={{flex:2}}><Text style={styles.distance}> 상차지 까지 {item.distanceX} Km</Text></View>            
           </View>
-          <View style={styles.geoInfo3}><Text style={styles.timeText}>{item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
+          <View style={styles.freightType}><Text style={styles.freightTypeText}>         {item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
         </View>
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
           <Text style={styles.driveText}></Text>
-          <Text style={styles.driveText}>{item.distanceY} Km</Text>
-          <Text style={styles.timeText}>{item.time}</Text>
+          <Text style={styles.driveText2}>{item.distanceY} Km</Text>
           <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
           <Text style={styles.timeText}></Text>
         </View>
         <View style={styles.moneyInfo}>
-          <Text style={styles.driveText}>{item.money} 원</Text>
+          <Text style={styles.driveText}>{item.moneyPrint} 원</Text>
         </View>
       </View>                          
     </View>
@@ -305,6 +336,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
           style={{backgroundColor : 'white'}}
           data={this.state.value? this.state.data : this.state.data}
           renderItem={this._renderItem}
+          keyExtractor={item => item.id}
         />                             
     </React.Fragment>
     
@@ -346,7 +378,13 @@ const styles = StyleSheet.create({
   geoText:{
     textAlign: 'center', 
     fontWeight: 'bold',
-    fontSize: 24,    
+    fontSize: 18,
+    margin: 2,  
+  },
+  geoTitleText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    margin: 2,
   },
   timeText: {
     fontWeight: 'bold',
@@ -356,8 +394,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 22,
   },
+  driveText2: {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
   geoInfo11: {
     justifyContent: 'flex-end',
+    flexDirection: 'column',
     alignItems: 'center',
     flex : 2,
   },
@@ -402,5 +445,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     color: '#E5E5E5',
+  },
+  freightTypeText: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#219653'
+  },
+  freightType: {
+    
+    flexDirection: 'row',
+    flex : 1,
   }
 });

@@ -24,16 +24,16 @@ import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handl
 
 const isAndroid = Platform.OS ==='android';
 
+
+
 export class DetailScreen extends React.Component <DetailScreenProps> {
-  state = {
-    data : [{}],
-    apiInfo : [],
-    mapVisible : true,
-    stopoverVisible : true
-  }
+  
+  
 
   constructor(props) {
-    super(props);   
+    super(props);
+    
+
     this.state = {
       data : [
         {
@@ -68,11 +68,40 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       ],
       apiInfo: [],
       mapVisible: true,
-      stopoverVisible : true
-    }    
+      stopoverVisible : true,
+      FreightID: null,
+    };
+
+    
   };
 
-  componentDidMount() {
+  retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('FreightID');
+      if (value !== null) {
+        this.setState({FreightID: value})
+        console.log(this.state.FreightID);
+
+
+
+      }
+    } catch (error) {
+
+    }
+  };
+  
+
+  componentDidMount = async () => {
+    try {
+      const value = await AsyncStorage.getItem('FreightID');
+      if (value !== null) {
+        this.setState({FreightID: value})        
+      }
+    } catch (error){}
+
+    // 이 시점부터 this.state.FreightID로 화물 ID에 접근이 가능합니다 바로 사용하시면 됩니다.
+
+
     /*const that = this;
     var data = fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
       method: 'POST',
@@ -118,6 +147,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       console.log(that.state.apiInfo);
       return JSON.stringify(jsonData);
     });*/
+
+    
   };
   
   hideMap = () => {
