@@ -22,6 +22,7 @@ import {AppRoute} from '../../navigation/app-routes';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
@@ -69,8 +70,36 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
               auth().signInWithCustomToken(firebaseToken);
               //getProfile이 아닌 fb auth로부터 정보갱신하는게 나을지
               //getProfile();
-              //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
-              props.navigation.navigate(AppRoute.HOME);
+              AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+              var authFlag = true;
+              auth().onAuthStateChanged(function(user){
+                if(authFlag){
+                  if(user){
+                    //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+                    var ref = firestore().collection('drivers').doc(user.uid);
+                    ref.get().then(function(doc) {
+                      if(doc.exists){
+                        AsyncStorage.setItem('userType', 'driver')
+                        .then( ()=>{
+                          console.log("auth AsyncStorage Type: driver");
+                        });
+                        authFlag = false;
+                        props.navigation.navigate(AppRoute.HOME);
+                      }
+                      else{
+                        AsyncStorage.setItem('userType', 'owner')
+                        .then(()=>{
+                          console.log("auth AsyncStorage Type: owner");
+                        });
+                        authFlag = false;
+                        props.navigation.navigate(AppRoute.OWNER);
+                      } 
+                    })
+                  }
+                }
+                
+              });
+              
             }
              //미등록된 uid인 경우 (false)
             else if(uidRegistered == 'false'){

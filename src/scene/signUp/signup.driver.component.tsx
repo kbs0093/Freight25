@@ -51,7 +51,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
 
   const resetAction = CommonActions.reset({
     index: 0,
-    routes: [{name: AppRoute.HOME}]
+    routes: [{name: AppRoute.SIGNUP}]
   });
 
   
@@ -95,30 +95,37 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
             auth().signInWithCustomToken(firebaseToken);
             //getProfile이 아닌 fb auth로부터 정보갱신해야할 것 같은데 논의가 필요합니다.
             //getProfile();
-            //AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
+            AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
             console.log("currentAuth uid: "+auth().currentUser?.uid);
 
             //auth리스너와 uid를 이용한 db 저장 부분
+            var authFlag = true;
             auth().onAuthStateChanged(function(user){
-              if(user){
-                //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
-                var ref = firestore().collection('drivers').doc(user.uid);
-                if(user != null){
-                  console.log("firestore target uid: "+auth().currentUser?.uid);
-                  try {
-                    ref.update({
-                      carNum: carNumInput, 
-                      manNum: manNumInput, 
-                      accountNum: accountNumInput, 
-                      phoneNum: phoneNumInput,
-                      TonValue: TonValue,
-                      TypeValue: TypeValue,
-                      BankValue: BankValue
-                      });
-                    props.navigation.dispatch(resetAction);
-                  } catch (error) {
-                    //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
-                    console.log(error);
+              if(authFlag){
+                authFlag = false;
+                if(user){
+                  //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+                  var ref = firestore().collection('drivers').doc(user.uid);
+                  if(user != null){
+                    console.log("firestore target uid: "+auth().currentUser?.uid);
+                    try {
+                      ref.update({
+                        name: nameInput,
+                        accountOwner: accountOwnerInput,
+                        carNumber: carNumInput, 
+                        companyNumber: manNumInput, 
+                        accountNumber: accountNumInput, 
+                        tel: phoneNumInput,
+                        carTon: TonValue,
+                        caryType: TypeValue,
+                        bankName: BankValue,
+                        });
+                      AsyncStorage.setItem('userType', 'driver');
+                      props.navigation.push(AppRoute.HOME);
+                    } catch (error) {
+                      //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
+                      console.log(error);
+                    }
                   }
                 }
               }
