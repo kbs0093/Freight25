@@ -30,4 +30,8 @@ export enum AppRoute {
   SIGNUP_OWNER = 'Signup_Owner',
   SIGNUP_OWNER_MAIN = 'Signup_Owner_Main',
   SIGNUP_DRIVER_MAIN = 'Signup_Driver_Main',
+  STOPOVER1 = 'Stopover1',
+  STOPOVER2 = 'Stopover2',
+  STOPOVER3 = 'Stopover3',
+  SEARCH_DETAIL_NAVIGATOR = 'Search Detail Navigator'
 }

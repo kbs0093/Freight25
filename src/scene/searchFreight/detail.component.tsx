@@ -37,7 +37,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     this.state = {
       data : [
         {
-          uid: '1',
+          id: '1',
           startX: '127.370187',
           startY: '36.334634',
           finishX: '127.043625',
@@ -48,7 +48,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           finishType: '당착'
         },
         {
-          uid: '2',
+          id: '2',
           startX: '127.370187',
           startY: '36.334634',
           finishX: '127.043625',
@@ -59,7 +59,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           finishType: '당착'
         },
         {
-          uid: '3',
+          id: '3',
           startX: '127.370187',
           startY: '36.334634',
           finishX: '127.043625',
@@ -252,6 +252,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             style={{backgroundColor : 'white'}}              
             data={this.state.data}
             renderItem={this.renderItem}
+            keyExtractor={item => item.id}
           />
           <Divider style={{backgroundColor: 'black'}}/>
         </View>

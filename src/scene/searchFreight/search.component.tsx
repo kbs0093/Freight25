@@ -117,7 +117,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
             var distance;
             moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                              
-            distance = await fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
+            /*distance = await fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
               method: 'POST',
               headers:{
                 "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
@@ -137,8 +137,8 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
               .then(response =>{
                 //console.log(response.features[0].properties.totalDistance/1000);
                 return response.features[0].properties.totalDistance/1000 + "";                
-            })
-            console.log(distance);
+            })*/
+
 
             list.push({
               id: doc.id,
