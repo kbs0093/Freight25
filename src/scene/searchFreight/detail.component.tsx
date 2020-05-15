@@ -27,45 +27,9 @@ const isAndroid = Platform.OS ==='android';
 
 
 export class DetailScreen extends React.Component <DetailScreenProps> {
-  
-  
-
   constructor(props) {
     super(props);
-    
-
     this.state = {
-      data : [
-        {
-          id: '1',
-          startX: '127.370187',
-          startY: '36.334634',
-          finishX: '127.043625',
-          finishY: '37.280209',
-          startAddress: '청주 상당',
-          finishAddress: '수원 영통',
-          startType: '당상',
-          finishType: '당착'
-        },
-        {
-          id: '2',
-          startX: '127.370187',
-          startY: '36.334634',
-          finishX: '127.043625',
-          finishY: '37.280209',
-          startAddress: '천안 ',
-          finishAddress: '수원 영통',
-          startType: '당상',
-          finishType: '당착'
-        },
-        {
-          id: '3',
-          startX: '127.370187',
-          startY: '36.334634',
-          finishX: '127.043625',
-          finishY: '37.280209',
-        }
-      ],
       apiInfo: [],
       mapVisible: true,
       stopoverVisible : true,
@@ -81,12 +45,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       if (value !== null) {
         this.setState({FreightID: value})
         console.log(this.state.FreightID);
-
-
-
       }
     } catch (error) {
-
     }
   };
   
@@ -165,48 +125,34 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     } else{
       this.setState({stopoverVisible: true})
     }
-  }
-  
-  renderItem = ({item}) => (   
-      <View style={{height: 25, flexDirection: 'row'}}>
-      <View style={{flex:3, flexDirection: 'row'}}>
-        <View style={{flex:5, flexDirection: 'row'}}>
-          <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold'}}>충남 천안</Text></View>
-          <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED'}}>당상</Text></View>
-        </View>
-        <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-        <View style={{flex:5, flexDirection: 'row'}}>
-          <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold'}}>서울 송파</Text></View>
-          <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757'}}>당착</Text></View>
-        </View>
-      </View>
-      <View style={{flex:1}}><Text style={{fontWeight: 'bold'}}>120,000원</Text></View>
-    </View>
-  );
+  } 
 
   render(){
      return (       
       <React.Fragment>
-        <View style={{height: 80, backgroundColor: 'white'}}>
-          <Text style={styles.Title}>  배차 정보</Text>
+        <ScrollView>
+
+        <View style={{backgroundColor: 'white'}}>
           <View style={styles.MainInfo}>
             <View style={styles.MainInfoGeo}>
-              <Text style={styles.geoText}>대전 서구</Text>
-              <Text style={styles.startType}>  당상</Text>
+              <View><Text style={styles.geoText}>대전</Text></View>
+              <View><Text style={styles.geoText}>서구 내동</Text></View>
+              <View><Text style={styles.startType}>당상</Text></View>              
             </View>
             <View style={styles.MainInfoIcon}>
               <Icon style={styles.icon} fill='black' name='arrow-forward-outline'/>
               <Text style={styles.Type}>혼적</Text>
             </View>            
-            <View style={styles.MainInfoGeo2}>
-              <Text style={styles.endType}>당착  </Text>
-              <Text style={styles.geoText}>서울 성북</Text>              
+            <View style={styles.MainInfoGeo}>
+              <View><Text style={styles.geoText}>서울</Text></View>
+              <View><Text style={styles.geoText}>성북구 정릉동 </Text></View>
+              <View><Text style={styles.endType}>당착</Text></View>               
             </View>
           </View>
           <Divider style={{backgroundColor: 'black'}}/>
         </View> 
 
-                  
+        
         <TouchableOpacity onPress={this.hideMap}>
           <View style={{backgroundColor: 'white'}}>
             <Text style={styles.Title}>  배차 정보 (Tmap)</Text>
@@ -245,21 +191,29 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             <Text style={styles.Title}>  경유지 정보</Text>
             <Divider style={{backgroundColor: 'black'}}/>
           </View>              
-        </TouchableOpacity>                
+        </TouchableOpacity>
+
         {this.state.stopoverVisible ? (
-        <View style={{backgroundColor: 'white'}}>         
-          <FlatList 
-            style={{backgroundColor : 'white'}}              
-            data={this.state.data}
-            renderItem={this.renderItem}
-            keyExtractor={item => item.id}
-          />
+          <View style={{backgroundColor: 'white', flexDirection: 'row', margin: 5}}>
           <Divider style={{backgroundColor: 'black'}}/>
-        </View>
+          <View style={{flex:3, flexDirection: 'row'}}>
+            <View style={{flex:5, flexDirection: 'row'}}>
+              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold'}}>충남 천안</Text></View>
+              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED'}}>당상</Text></View>
+            </View>
+            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
+            <View style={{flex:5, flexDirection: 'row'}}>
+              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold'}}>서울 송파</Text></View>
+              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757'}}>당착</Text></View>
+            </View>
+          </View>
+          <View style={{flex:1}}><Text style={{fontWeight: 'bold'}}>120,000원</Text></View>
+          <Divider style={{backgroundColor: 'black'}}/>
+        </View>      
         ) : null}
 
 
-        <ScrollView>
+        
           <View style={{backgroundColor: 'white'}}>          
             <Text style={styles.Title}>  화물 상세 정보</Text>
             <View style={{flexDirection: 'row'}}>
@@ -283,22 +237,23 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
               <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>하차대기 없습니다</Text></View>
             </View>
             <Divider style={{backgroundColor: 'black'}}/>
-          </View>   
-        </ScrollView>
+          </View>
+
+          <Divider style={{backgroundColor: 'black'}}/>        
+          <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
+            <View style={{flex:3}}>
+              <Text style={{fontWeight: 'bold', fontSize: 16, margin: 5}}>  스마트 확률</Text>
+              <View style={{alignItems: 'flex-end', justifyContent: 'flex-start'}}>
+                <Text style={{margin:2, fontSize: 14, fontWeight: 'bold', color: '#BDBDBD'}}>   하차지 서울 성북에서 화물이 있을 확률 </Text>
+              </View>            
+            </View>       
+            <View style={{flex:1, alignItems:'center', justifyContent:'flex-end'}}><Text style={{fontSize: 26, fontWeight: 'bold'}}>87%</Text></View>
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>
+        </ScrollView>        
 
         <Divider style={{backgroundColor: 'black'}}/>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
-          <View style={{flex:3}}>
-            <Text style={{fontWeight: 'bold', fontSize: 16, margin: 5}}>  스마트 확률</Text>
-            <View style={{alignItems: 'flex-end', justifyContent: 'flex-start'}}>
-              <Text style={{margin:2, fontSize: 14, fontWeight: 'bold', color: '#BDBDBD'}}>   하차지 서울 성북에서 화물이 있을 확률 </Text>
-            </View>            
-          </View>       
-          <View style={{flex:1, alignItems:'center', justifyContent:'flex-end'}}><Text style={{fontSize: 26, fontWeight: 'bold'}}>87%</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-
-        <Divider style={{backgroundColor: 'black'}}/>
+        
         <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
           <View style={{flex:5, justifyContent: 'center'}}>
             <Text style={styles.freightTitle}>      총 운행거리 : 250km </Text>
@@ -327,7 +282,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     flex : 2,
-    flexDirection: 'row'
+    flexDirection: 'column'
   },
   MainInfoGeo2: {
     justifyContent: 'flex-start',
@@ -341,7 +296,7 @@ const styles = StyleSheet.create({
     flex : 2,
   },
   MainInfoIcon: {
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     flex : 1,    
   },
@@ -353,7 +308,7 @@ const styles = StyleSheet.create({
   geoText:{
     textAlign: 'center', 
     fontWeight: 'bold',
-    fontSize: 24,    
+    fontSize: 20,    
   },
   icon: {
     width: 32,
