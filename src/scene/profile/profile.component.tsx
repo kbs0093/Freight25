@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Picker,
+  ScrollView,
 } from 'react-native';
 import {
   LayoutElement,
@@ -79,255 +80,265 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <View style={styles.titleContainer}>
-          <Text style={styles.Subtitle}>화주 정보 수정</Text>
-          <Button
-            onPress={() => {
-              console.log(nameInput);
-              console.log(BankValue);
-              Toast.showSuccess('수정 완료');
-            }}
-            style={styles.Button}
-            textStyle={styles.ButtonText}>
-            수정
-          </Button>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>개인 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>성 명: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="성명을 적어주세요"
-                value={nameInput}
-                onChangeText={name}
-              />
-            </Layout>
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>전화 번호: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="-를 빼고 입력하세요"
-                value={phoneNumInput}
-                onChangeText={phoneNum}
-              />
-            </Layout>
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>사업자등록번호: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="사업자 등록번호를 입력하세요"
-                value={manNumInput}
-                onChangeText={manNum}
-              />
-            </Layout>
-          </View>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>상 하차지 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>자주 쓰는 주소: </Text>
-            <Button style={styles.Button} textStyle={styles.ButtonText}>
-              주소검색
+        <ScrollView>
+          <View style={styles.titleContainer}>
+            <Text style={styles.Subtitle}>화주 정보 수정</Text>
+            <Button
+              onPress={() => {
+                console.log(nameInput);
+                console.log(BankValue);
+                Toast.showSuccess('수정 완료');
+              }}
+              style={styles.Button}
+              textStyle={styles.ButtonText}>
+              수정
             </Button>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>업체명: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="업체명을 적어주세요"
-                value={companyNameInput}
-                onChangeText={companyName}
-              />
-            </Layout>
-          </View>
-        </View>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>계좌 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>거래 은행: </Text>
-            <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
-              placeholder={{
-                label: '은행을 선택하세요',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={false}
-              items={[
-                {label: '국민', value: 'kukmin'},
-                {label: '신한', value: 'shinhan'},
-                {label: '농협', value: 'nognhyeob'},
-              ]}
-            />
+          <View style={styles.infoContainer}>
+            <Text style={styles.Subtitle}>개인 정보</Text>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>성 명: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="성명을 적어주세요"
+                  value={nameInput}
+                  onChangeText={name}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>전화 번호: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="-를 빼고 입력하세요"
+                  value={phoneNumInput}
+                  onChangeText={phoneNum}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>사업자등록번호: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="사업자 등록번호를 입력하세요"
+                  value={manNumInput}
+                  onChangeText={manNum}
+                />
+              </Layout>
+            </View>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>계좌 번호 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="-를 뺴고 입력하세요"
-                value={accountNumInput}
-                onChangeText={accountNum}
+          <View style={styles.infoContainer}>
+            <Text style={styles.Subtitle}>상 하차지 정보</Text>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>자주 쓰는 주소: </Text>
+              <Button style={styles.Button} textStyle={styles.ButtonText}>
+                주소검색
+              </Button>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>업체명: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="업체명을 적어주세요"
+                  value={companyNameInput}
+                  onChangeText={companyName}
+                />
+              </Layout>
+            </View>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <Text style={styles.Subtitle}>계좌 정보</Text>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>거래 은행: </Text>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) =>
+                  setBankValue(itemValue)
+                }
+                placeholder={{
+                  label: '은행을 선택하세요',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={[
+                  {label: '국민', value: 'kukmin'},
+                  {label: '신한', value: 'shinhan'},
+                  {label: '농협', value: 'nognhyeob'},
+                ]}
               />
-            </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>계좌 번호 : </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="-를 뺴고 입력하세요"
+                  value={accountNumInput}
+                  onChangeText={accountNum}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>예금주 : </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="예금주를 적어주세요"
+                  value={accountOwnerInput}
+                  onChangeText={accountOwner}
+                />
+              </Layout>
+            </View>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>예금주 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="예금주를 적어주세요"
-                value={accountOwnerInput}
-                onChangeText={accountOwner}
-              />
-            </Layout>
-          </View>
-        </View>
+        </ScrollView>
       </React.Fragment>
     );
   } else if (userType == 'driver') {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <View style={styles.titleContainer}>
-          <Text style={styles.Subtitle}>화물차 기사 정보 수정</Text>
-          <Button
-            onPress={() => {
-              console.log(carNumInput);
-              console.log(BankValue);
-              console.log(TonValue);
-              Toast.showSuccess('수정 완료');
-            }}
-            style={styles.Button}
-            textStyle={styles.ButtonText}>
-            수정
-          </Button>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>개인 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>성 명: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="성명을 적어주세요"
-                value={nameInput}
-                onChangeText={name}
-              />
-            </Layout>
+        <ScrollView>
+          <View style={styles.titleContainer}>
+            <Text style={styles.Subtitle}>화물차 기사 정보 수정</Text>
+            <Button
+              onPress={() => {
+                console.log(carNumInput);
+                console.log(BankValue);
+                console.log(TonValue);
+                Toast.showSuccess('수정 완료');
+              }}
+              style={styles.Button}
+              textStyle={styles.ButtonText}>
+              수정
+            </Button>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>전화 번호: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="-를 빼고 입력하세요"
-                value={phoneNumInput}
-                onChangeText={phoneNum}
-              />
-            </Layout>
+          <View style={styles.infoContainer}>
+            <Text style={styles.Subtitle}>개인 정보</Text>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>성 명: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="성명을 적어주세요"
+                  value={nameInput}
+                  onChangeText={name}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>전화 번호: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="-를 빼고 입력하세요"
+                  value={phoneNumInput}
+                  onChangeText={phoneNum}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>사업자등록번호: </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="사업자 등록번호를 입력하세요"
+                  value={manNumInput}
+                  onChangeText={manNum}
+                />
+              </Layout>
+            </View>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>사업자등록번호: </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="사업자 등록번호를 입력하세요"
-                value={manNumInput}
-                onChangeText={manNum}
-              />
-            </Layout>
-          </View>
-        </View>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>차량 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>차량 번호 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="차량 번호를 적어주세요"
-                value={carNumInput}
-                onChangeText={carNum}
+          <View style={styles.infoContainer}>
+            <Text style={styles.Subtitle}>차량 정보</Text>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>차량 번호 : </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="차량 번호를 적어주세요"
+                  value={carNumInput}
+                  onChangeText={carNum}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>차량 톤수 : </Text>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => setTonValue(itemValue)}
+                placeholder={{
+                  label: '차량 톤수를 선택하세요',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={[
+                  {label: '1 톤', value: '1'},
+                  {label: '2.5 톤', value: '2.5'},
+                  {label: '5 톤', value: '5'},
+                  {label: '11-15 톤', value: '15'},
+                  {label: '25 톤', value: '25'},
+                ]}
               />
-            </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>차량 유형 : </Text>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) =>
+                  setTypeValue(itemValue)
+                }
+                placeholder={{
+                  label: '차량 유형을 선택하세요',
+                  value: null,
+                  fontsize: 12,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={[
+                  {label: '카고', value: 'cargo'},
+                  {label: '윙카', value: 'wing'},
+                  {label: '냉동', value: 'ice'},
+                  {label: '냉장', value: 'superice'},
+                ]}
+              />
+            </View>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>차량 톤수 : </Text>
-            <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setTonValue(itemValue)}
-              placeholder={{
-                label: '차량 톤수를 선택하세요',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={false}
-              items={[
-                {label: '1 톤', value: '1'},
-                {label: '2.5 톤', value: '2.5'},
-                {label: '5 톤', value: '5'},
-                {label: '11-15 톤', value: '15'},
-                {label: '25 톤', value: '25'},
-              ]}
-            />
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>차량 유형 : </Text>
-            <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setTypeValue(itemValue)}
-              placeholder={{
-                label: '차량 유형을 선택하세요',
-                value: null,
-                fontsize: 12,
-              }}
-              useNativeAndroidPickerStyle={false}
-              items={[
-                {label: '카고', value: 'cargo'},
-                {label: '윙카', value: 'wing'},
-                {label: '냉동', value: 'ice'},
-                {label: '냉장', value: 'superice'},
-              ]}
-            />
-          </View>
-        </View>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>계좌 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>거래 은행: </Text>
-            <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
-              placeholder={{
-                label: '은행을 선택하세요',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={false}
-              items={[
-                {label: '국민', value: 'kukmin'},
-                {label: '신한', value: 'shinhan'},
-                {label: '농협', value: 'nognhyeob'},
-              ]}
-            />
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>계좌 번호 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="-를 뺴고 입력하세요"
-                value={accountNumInput}
-                onChangeText={accountNum}
+          <View style={styles.infoContainer}>
+            <Text style={styles.Subtitle}>계좌 정보</Text>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>거래 은행: </Text>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) =>
+                  setBankValue(itemValue)
+                }
+                placeholder={{
+                  label: '은행을 선택하세요',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={[
+                  {label: '국민', value: 'kukmin'},
+                  {label: '신한', value: 'shinhan'},
+                  {label: '농협', value: 'nognhyeob'},
+                ]}
               />
-            </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>계좌 번호 : </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="-를 뺴고 입력하세요"
+                  value={accountNumInput}
+                  onChangeText={accountNum}
+                />
+              </Layout>
+            </View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.infoTitle}>예금주 : </Text>
+              <Layout style={styles.selectContainer}>
+                <Input
+                  placeholder="예금주를 적어주세요"
+                  value={accountOwnerInput}
+                  onChangeText={accountOwner}
+                />
+              </Layout>
+            </View>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>예금주 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder="예금주를 적어주세요"
-                value={accountOwnerInput}
-                onChangeText={accountOwner}
-              />
-            </Layout>
-          </View>
-        </View>
+        </ScrollView>
       </React.Fragment>
     );
   } else {
@@ -340,13 +351,6 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
 };
 
 const styles = StyleSheet.create({
-  viewForm: {
-    fontSize: RFPercentage(2),
-    flex: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontWeight: 'bold',
-  },
   Button: {
     width: RFPercentage(12),
     height: RFPercentage(0.5),
@@ -366,7 +370,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingVertical: 10,
     flex: 0.2,
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -382,6 +386,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   rowContainer: {
+    paddingVertical: 10,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
