@@ -33,38 +33,8 @@ import RNPickerSelect from 'react-native-picker-select';
 
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS ==='android';
-/*
-function distance(startX, startY){
-  Geolocation.getCurrentPosition(
-    position => {
-      const latitude = JSON.stringify(position.coords.latitude);
-      const longitude = JSON.stringify(position.coords.longitude);
 
-      fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
-        method: 'POST',
-        headers:{
-          "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-        },
-        body: JSON.stringify({
-          "startX" : longitude,
-          "startY" : latitude,
-          "endX" : startX,
-          "endY" : startY,
-          "reqCoordType" : "WGS84GEO",
-          "resCoordType" : "WGS84GEO",
-          "searchOption" : '0',
-          "totalValue" : '2',
-          "trafficInfo" : 'N'
-        })})
-      .then(response => response.json())
-      .then(response =>{
-        //console.log(response);
-        return (response.features[0].properties.totalDistance/1000 + "");            
-      })
-    }
-  )
- 
-}*/
+
 
 export class SearchScreen extends React.Component <SearchScreenProps> {
   
@@ -78,27 +48,12 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       myeon: '',
       dong: '',
       value: '1',
-      data: [{
-        id:      '',
-        startAddress:   [],
-        startX:         '',
-        startY:         '',
-        endAddress:     '',
-        startType:      '',
-        endType:        '',
-        Type:           '',
-        carType: '', carType2: '', freightSize: '', freightWeight: '', loadType: '',
-        distanceX:      '',  //빈 칸으로 남겨둬라
-        distanceY:      null,
-        time:           '',
-        smart:          null,
-        money:          null,
-        moneyPrint:     '',
-      }],
+      data: [],
+      distance: []
     };
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
     let latitude;
     let longitude;
 
@@ -143,12 +98,14 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
 
     var user = auth().currentUser;
     const that = this;
+    
     if(user != null){  
       try {
         firestore().collection('freights').where("state", "==", 0)
         .get()
-        .then(function(querySnapshot){
+        .then(async function(querySnapshot){
           var list =[];
+
           for(var docCnt in querySnapshot.docs){            
             const doc = querySnapshot.docs[docCnt].data();
             var parseStart = doc.startAddr + "";
@@ -156,16 +113,39 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
 
             var parseEnd = doc.endAddr + "";
             var endArr = parseEnd.split(" ");
-
             var moneyprint = doc.expense + "";
+            var distance;
             moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                             
+            distance = await fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
+              method: 'POST',
+              headers:{
+                "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
+              },
+              body: JSON.stringify({
+                "startX" : longitude,
+                "startY" : latitude,
+                "endX" : doc.startAddr_lon,
+                "endY" : doc.startAddr_lat,
+                "reqCoordType" : "WGS84GEO",
+                "resCoordType" : "WGS84GEO",
+                "searchOption" : '0',
+                "totalValue" : '2',
+                "trafficInfo" : 'N'
+              })})
+              .then(response => response.json())
+              .then(response =>{
+                //console.log(response.features[0].properties.totalDistance/1000);
+                return response.features[0].properties.totalDistance/1000 + "";                
+            })
+            console.log(distance);
 
             list.push({
               id: doc.id,
               startAddress: startArr,
-              startX: doc.startAddrLon,
-              startY: doc.startAddrLat,
               endAddress: endArr,
+              startX: doc.startAddr_lon,
+              startY: doc.startAddr_lat,
               startType: doc.startDate,
               endType: doc.endDate,
               Type: doc.driveOption,
@@ -174,56 +154,26 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
               freightSize: doc.volume,
               freightWeight: doc.weight,
               loadType: doc.freightLoadType,
-              distanceX: "",
+              distanceX: distance,              
               distanceY: doc.dist,
               time: null,
               smart: null,
               money: doc.expense,
               moneyPrint: moneyprint,
-            });         
+              
+            });                 
           }
-
-          /*Geolocation.getCurrentPosition(
-            position => {
-              const latitude = JSON.stringify(position.coords.latitude);
-              const longitude = JSON.stringify(position.coords.longitude);
-              var data = [];
-    
-              for(var docCnt in querySnapshot.docs){
-                const doc = querySnapshot.docs[docCnt].data();
-                
-                fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
-                method: 'POST',
-                headers:{
-                  "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-                },
-                body: JSON.stringify({
-                  "startX" : longitude,
-                  "startY" : latitude,
-                  "endX" : doc.startAddrLon,
-                  "endY" : doc.startAddrLat,
-                  "reqCoordType" : "WGS84GEO",
-                  "resCoordType" : "WGS84GEO",
-                  "searchOption" : '0',
-                  "totalValue" : '2',
-                  "trafficInfo" : 'N'
-                })})
-              .then(response => response.json())
-              .then(response =>{
-                console.log(response);
-                //return (response.features[0].properties.totalDistance/1000 + "");            
-              })
-              }          
-            }
-          )*/
           that.setState({data: list});
         })     
       } 
       catch (error) {
         console.log(error);
       }
-    }
+    }      
   }
+
+  
+
 
   ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
@@ -247,42 +197,50 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
+        
         <View style={styles.geoInfo1}>
           <View style={styles.geoInfo11}>
           <View style={{flex: 1, justifyContent: 'flex-end'}}>
-              <Text style={styles.geoTitleText}>{item.startAddress[0]}</Text>
+              <Text style={styles.geoTitleText}>{item.startAddress[0]} {item.startAddress[1]}</Text>
             </View>
             <View>
-              <Text style={styles.geoText}>{item.startAddress[1]} {item.startAddress[2]}</Text>
+              <Text style={styles.geoTitleText}>{item.startAddress[2]}</Text>
             </View>             
           </View>
-          <View style={styles.geoInfo12}><Icon style={styles.icon} fill='#8F9BB3' name='arrow-forward-outline'/></View>
+
+          <View style={styles.geoInfo12}>
+            <View>
+              <Icon style={styles.icon} fill='#8F9BB3' name='arrow-forward-outline'/>
+            </View>
+            <View><Text style={styles.Type}>{item.Type}</Text></View>      
+          </View>
+          
           <View style={styles.geoInfo11}>
             <View style={{flex: 1, justifyContent: 'flex-end'}}>
-              <Text style={styles.geoTitleText}>{item.endAddress[0]}</Text>
+              <Text style={styles.geoTitleText}>{item.endAddress[0]} {item.endAddress[1]}</Text>
             </View>
             <View>
-              <Text style={styles.geoText}>{item.startAddress[1]} {item.endAddress[2]}</Text>
+              <Text style={styles.geoTitleText}>{item.endAddress[2]}</Text>
             </View> 
-          </View>
+          </View>          
         </View>
+
         <View style={styles.geoInfo2}> 
           <View style={styles.geoInfo21}><Text style={styles.startType}>{item.startType}</Text></View>
           <View style={styles.geoInfo12}></View>
           <View style={styles.geoInfo21}><Text style={styles.endType}>{item.endType}</Text></View>
         </View>
-          <View style={styles.geoInfo3}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={styles.Type}>{item.Type}</Text></View>
-            <View style={{flex:2}}><Text style={styles.distance}> 상차지 까지 {item.distanceX} Km</Text></View>            
+        <View style={styles.geoInfo3}>  
+                      
           </View>
-          <View style={styles.freightType}><Text style={styles.freightTypeText}>         {item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
+          <View style={styles.freightType}><Text style={styles.freightTypeText}>    {item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
         </View>
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
-          <Text style={styles.driveText}></Text>
-          <Text style={styles.driveText2}>{item.distanceY} Km</Text>
-          <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
-          <Text style={styles.timeText}></Text>
+            <Text style={styles.driveText}></Text>
+            <Text style={styles.driveText2}>{item.distanceY} Km</Text>
+            <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
+            <Text style={styles.distance}>{item.distanceX} Km</Text>      
         </View>
         <View style={styles.moneyInfo}>
           <Text style={styles.driveText}>{item.moneyPrint} 원</Text>
@@ -381,10 +339,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     margin: 2,  
   },
-  geoTitleText: {
+  geoTitleText: {    
     fontWeight: 'bold',
     fontSize: 18,
-    margin: 2,
+    margin: 2,    
   },
   timeText: {
     fontWeight: 'bold',
@@ -397,6 +355,7 @@ const styles = StyleSheet.create({
   driveText2: {
     fontWeight: 'bold',
     fontSize: 20,
+    justifyContent: 'flex-start',
   },
   geoInfo11: {
     justifyContent: 'flex-end',
@@ -435,7 +394,7 @@ const styles = StyleSheet.create({
   moneyInfo:{
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    flex: 3,
   },
   icon: {
     width: 32,
