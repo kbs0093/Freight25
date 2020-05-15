@@ -17,7 +17,7 @@ import {
   Divider,
   Button,
 } from '@ui-kitten/components';
-import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
 import { DetailScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
@@ -25,64 +25,118 @@ import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handl
 const isAndroid = Platform.OS ==='android';
 
 export class DetailScreen extends React.Component <DetailScreenProps> {
-  data = [
-    {
-      id: '1',
-      startX: '127.370187',
-      startY: '36.334634',
-      finishX: '127.043625',
-      finishY: '37.280209',
-    },
-    {
-      id: '2',
-      startX: '127.370187',
-      startY: '36.334634',
-      finishX: '127.043625',
-      finishY: '37.280209',
-    },
-    {
-      id: '3',
-      startX: '127.370187',
-      startY: '36.334634',
-      finishX: '127.043625',
-      finishY: '37.280209',
-    }
-  ];
+  state = {
+    data : [{}],
+    apiInfo : [],
+    mapVisible : true,
+    stopoverVisible : true
+  }
+
+  constructor(props) {
+    super(props);   
+    this.state = {
+      data : [
+        {
+          uid: '1',
+          startX: '127.370187',
+          startY: '36.334634',
+          finishX: '127.043625',
+          finishY: '37.280209',
+          startAddress: '청주 상당',
+          finishAddress: '수원 영통',
+          startType: '당상',
+          finishType: '당착'
+        },
+        {
+          uid: '2',
+          startX: '127.370187',
+          startY: '36.334634',
+          finishX: '127.043625',
+          finishY: '37.280209',
+          startAddress: '천안 ',
+          finishAddress: '수원 영통',
+          startType: '당상',
+          finishType: '당착'
+        },
+        {
+          uid: '3',
+          startX: '127.370187',
+          startY: '36.334634',
+          finishX: '127.043625',
+          finishY: '37.280209',
+        }
+      ],
+      apiInfo: [],
+      mapVisible: true,
+      stopoverVisible : true
+    }    
+  };
 
   componentDidMount() {
-    fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
+    /*const that = this;
+    var data = fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
       method: 'POST',
       headers:{
         "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
       },
       body: JSON.stringify({
-        "startX" : "126.958973",
-        "startY" : "37.534066",
-        "endX" : "126.932661",
-        "endY" : "37.520287",
+        "startX" : "126.769129",
+        "startY" : "37.698591", 
+        "endX" : "129.042082",
+        "endY" : "35.115199",
         "reqCoordType" : "WGS84GEO",
-        "resCoordType" : "EPSG3857",
+        "resCoordType" : "WGS84GEO",
         "angle" : "172",
         "searchOption" : '1',
+        "passlist" : ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
         "trafficInfo" : "Y",
         "truckType" : "1",
         "truckWidth" : "100",
         "truckHeight" : "100",
-        "truckWeight" : "35000",
-        "truckTotalWeight" : "35000",
-        "truckLength" : "200"
+        "truckWeight" : "35000",  // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+        "truckTotalWeight" : "35000", // 화물 무게도 불러올 것
+        "truckLength" : "200",  // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것        
       })
     })
-    .then(response => response.json())
-    .then(response => {
-      console.log(response);
+    .then(function(response) {
+      return response.json();
     })
+    .then(function(jsonData) {
+      var coordinates = [];
+      for(let i=0; i<Object(jsonData.features).length; i++){
+        if(typeof jsonData.features[i].geometry.coordinates[0] === 'object'){
+          for(let j=0; j<Object(jsonData.features[i].geometry.coordinates).length; j++){
+            coordinates.push({latitude: Number(jsonData.features[i].geometry.coordinates[j][1]), longitude: Number(jsonData.features[i].geometry.coordinates[j][0])});
+          }
+        } else{
+          if(jsonData.features[i].geometry.coordinates != null){
+            coordinates.push({latitude: Number(jsonData.features[i].geometry.coordinates[1]), longitude: Number(jsonData.features[i].geometry.coordinates[0])});
+          }           
+        }      
+      }
+      that.setState({ apiInfo: coordinates });
+      console.log(that.state.apiInfo);
+      return JSON.stringify(jsonData);
+    });*/
+  };
+  
+  hideMap = () => {
+    if(this.state.mapVisible){
+      this.setState({mapVisible: false})
+    } else{
+      this.setState({mapVisible: true})
+    }
   };
 
-
+  hideStopvoer = () => {
+    if(this.state.stopoverVisible){
+      this.setState({stopoverVisible: false})
+    } else{
+      this.setState({stopoverVisible: true})
+    }
+  }
   
-  renderItem = ({item}) => (
-    <TouchableOpacity>
+  renderItem = ({item}) => (   
       <View style={{height: 25, flexDirection: 'row'}}>
       <View style={{flex:3, flexDirection: 'row'}}>
         <View style={{flex:5, flexDirection: 'row'}}>
@@ -97,11 +151,10 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       </View>
       <View style={{flex:1}}><Text style={{fontWeight: 'bold'}}>120,000원</Text></View>
     </View>
-    </TouchableOpacity>    
   );
 
   render(){
-    return (
+     return (       
       <React.Fragment>
         <View style={{height: 80, backgroundColor: 'white'}}>
           <Text style={styles.Title}>  배차 정보</Text>
@@ -122,30 +175,59 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           <Divider style={{backgroundColor: 'black'}}/>
         </View> 
 
-        <ScrollView>
-          <View style={{height: 230, backgroundColor: 'white'}}>
+                  
+        <TouchableOpacity onPress={this.hideMap}>
+          <View style={{backgroundColor: 'white'}}>
             <Text style={styles.Title}>  배차 정보 (Tmap)</Text>
-            <MapView style={{flex: 1}} provider={PROVIDER_GOOGLE}
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>              
+        </TouchableOpacity>
+        {this.state.mapVisible ? (
+          <View style={{height: 200, backgroundColor: 'white'}}>            
+              <MapView style={{flex: 1}} provider={PROVIDER_GOOGLE}
               initialRegion={{
-                latitude: 37.52751472590552,
-                longitude: 126.9470910317561,
+                latitude: 35.115199,
+                longitude: 129.042082,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
-              }}              
-            />
-            <Divider style={{backgroundColor: 'black'}}/>
-          </View>
-                
-          <View style={{backgroundColor: 'white'}}>          
-            <Text style={styles.Title}>  경유지 정보</Text>
-            <FlatList 
-              style={{backgroundColor : 'white'}}              
-              data={this.data}
-              renderItem={this.renderItem}
-            />
-            <Divider style={{backgroundColor: 'black'}}/>
-          </View>
+              }}>
+              <Polyline
+                coordinates={this.state.apiInfo}
+                strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+                strokeColors={[
+                  '#7F0000',
+                  '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+                  '#B24112',
+                  '#E5845C',
+                  '#238C23',
+                  '#7F0000'
+                ]}
+                strokeWidth={6}
+              />
+            </MapView>              
+          <Divider style={{backgroundColor: 'black'}}/>                                 
+        </View>
+        ) : null}
 
+        <TouchableOpacity onPress={this.hideStopvoer}>
+          <View style={{backgroundColor: 'white'}}>
+            <Text style={styles.Title}>  경유지 정보</Text>
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>              
+        </TouchableOpacity>                
+        {this.state.stopoverVisible ? (
+        <View style={{backgroundColor: 'white'}}>         
+          <FlatList 
+            style={{backgroundColor : 'white'}}              
+            data={this.state.data}
+            renderItem={this.renderItem}
+          />
+          <Divider style={{backgroundColor: 'black'}}/>
+        </View>
+        ) : null}
+
+
+        <ScrollView>
           <View style={{backgroundColor: 'white'}}>          
             <Text style={styles.Title}>  화물 상세 정보</Text>
             <View style={{flexDirection: 'row'}}>
