@@ -39,23 +39,10 @@ AsyncStorage.getItem('userType', (err, result) => {
 });
 
 export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
-  // The number of frieght information from 'driver' could be more than one.
+  // The number of frieght information from 'owner' should be only one.
   state = [
     {
       key: 'A1234567', // Freight key?
-      lastState: '배송중', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-      latitude: 'unknown',
-      longitude: 'unknown',
-      //lastRefresh: 'null',
-      dist: '1234',
-      expense: '1234',
-      startAddress: '경기 군포',
-      endAddress: '제주 서귀포',
-      startDate: '당상', // 배송 출발 날짜
-      endDate: '내착',
-    },
-    {
-      key: 'A1234568', // Freight key?
       lastState: '배송중', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
       latitude: 'unknown',
       longitude: 'unknown',
@@ -143,117 +130,66 @@ export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
     // In owner check process, there is no navButton and completeButton.
     // Only need callButton and reviewButton
 
-    let navButton;
     let callButton;
-    let completeButton;
-    let freightIndex;
+    let reviewButton;
 
-    if (this.state[0].lastState == '배송완료') {
-      freightIndex = 1;
-    } else {
-      freightIndex = 0;
-    }
-
-    if (this.state[0].lastState == '배송전' && userType == 'owner') {
-      completeButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          운송 완료
-        </Button>
-      );
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          내비게이션 연결
-        </Button>
-      );
+    if (this.state.lastState == '배송전') {
       callButton = (
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          화주에게 전화
+          화물차 기사에게 전화
         </Button>
       );
-    } else if (this.state[0].lastState == '배송중') {
-      completeButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
-          운송 완료
-        </Button>
-      );
-      if (userType == 'owner') {
-        navButton = (
-          <Button
-            style={styles.button}
-            textStyle={styles.buttonText}
-            disabled={true}>
-            내비게이션 연결
-          </Button>
-        );
-      } else if (userType == 'driver') {
-        navButton = (
-          <Button style={styles.button} textStyle={styles.buttonText}>
-            내비게이션 연결
-          </Button>
-        );
-      }
-      callButton = (
+      reviewButton = (
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          화주에게 전화
+          화물차 기사 평가
         </Button>
       );
-    } else if (this.state[0].lastState == '배송완료') {
-      completeButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          운송 완료
-        </Button>
-      );
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          내비게이션 연결
-        </Button>
-      );
+    } else if (this.state.lastState == '배송중') {
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
-          화주에게 전화
+          화물차 기사에게 전화
+        </Button>
+      );
+      reviewButton = (
+        <Button
+          style={styles.button}
+          textStyle={styles.buttonText}
+          disabled={true}>
+          화물차 기사 평가
+        </Button>
+      );
+    } else if (this.state.lastState == '배송완료') {
+      callButton = (
+        <Button style={styles.button} textStyle={styles.buttonText}>
+          화물차 기사에게 전화
+        </Button>
+      );
+      reviewButton = (
+        <Button style={styles.button} textStyle={styles.buttonText}>
+          화물차 기사 평가
         </Button>
       );
     } else {
-      completeButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          운송 완료
-        </Button>
-      );
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          운송 완료
-        </Button>
-      );
       callButton = (
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          운송 완료
+          화물차 기사에게 전화
+        </Button>
+      );
+      reviewButton = (
+        <Button
+          style={styles.button}
+          textStyle={styles.buttonText}
+          disabled={true}>
+          화물차 기사 평가
         </Button>
       );
     }
