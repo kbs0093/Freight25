@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppRoute } from './app-routes';
-import { DetailScreen, StopoverScreen1 } from '../scene/searchFreight'
+import { DetailScreen, StopoverScreen1, StopoverScreen2, StopoverScreen3 } from '../scene/searchFreight'
 import { TopTapBar } from '../component/toptabbar'
 import { SearchTabBar } from '../component/search.Topbar'
 import { createStackNavigator } from '@react-navigation/stack';
@@ -34,12 +34,12 @@ export const DetailNavigator = (): React.ReactElement => (
     />
     <TopTab.Screen 
         name={AppRoute.STOPOVER2} 
-        component={StopoverScreen1}
+        component={StopoverScreen2}
         options={{ title: '경유지 2', tabBarIcon: MAPIcon}}
     />
     <TopTab.Screen 
         name={AppRoute.STOPOVER3} 
-        component={StopoverScreen1}
+        component={StopoverScreen3}
         options={{ title: '경유지 3', tabBarIcon: MAPIcon}}
     />
   </TopTab.Navigator>

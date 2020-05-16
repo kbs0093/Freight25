@@ -144,14 +144,6 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
             onPress={kakaoLogin}>
             카카오톡 로그인
           </Button>
-          <Button
-            appearance="ghost"
-            status="basic"
-            onPress={() => {
-              props.navigation.navigate(AppRoute.SIGNUP);
-            }}>
-            회원가입
-          </Button>
         </View>
       </ImageBackground>
     </React.Fragment>
