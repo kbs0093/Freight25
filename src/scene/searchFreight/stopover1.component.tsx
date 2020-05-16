@@ -1,34 +1,21 @@
-import React, {useState} from 'react';
+import React from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
   StyleSheet,
   View,
-  Linking,
-  Platform,
-  SafeAreaView,
-  FlatList,
-  FlatListProps,
   ScrollView,
 } from 'react-native';
 import {
-  LayoutElement,
-  Layout,
-  ViewPager,
   Icon,
   Divider,
   Button,
 } from '@ui-kitten/components';
 import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
-import { DetailScreenProps } from '../../navigation/search.navigator';
-import { AppRoute } from '../../navigation/app-routes';
-import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
+import { StopoverScreen1Props } from '../../navigation/search.navigator';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const isAndroid = Platform.OS ==='android';
-
-
-
-export class DetailScreen extends React.Component <DetailScreenProps> {
+export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
   constructor(props) {
     super(props);
     this.state = {
@@ -36,25 +23,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       mapVisible: true,
       stopoverVisible : true,
       FreightID: null,
-      selectedIndex: null,
-      setSelectedIndex: null,
-
-    };
-
-    
-  };
-
-  retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('FreightID');
-      if (value !== null) {
-        this.setState({FreightID: value})
-        console.log(this.state.FreightID);
-      }
-    } catch (error) {
-    }
-  };
-  
+    };    
+  };  
 
   componentDidMount = async () => {
     try {
@@ -124,33 +94,16 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     }
   };
 
-  hideStopvoer = () => {
-    if(this.state.stopoverVisible){
-      this.setState({stopoverVisible: false})
-    } else{
-      this.setState({stopoverVisible: true})
-    }
+  ClickApply = () => {
+
   }
 
-  ClickStopover1 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER1);
-  }
-  
-  ClickStopover2 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER2);
-  }
-
-  ClickStopover3 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER3);
-  }
-  
   
 
   render(){
      return (       
       <React.Fragment>
         <ScrollView>
-
         <View style={{backgroundColor: 'white'}}>
           <View style={styles.MainInfo}>
             <View style={styles.MainInfoGeo}>
@@ -203,83 +156,45 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             </MapView>              
           <Divider style={{backgroundColor: 'black'}}/>                                 
         </View>
-        ) : null}
-
-        <TouchableOpacity onPress={this.hideStopvoer}>
-          <View style={{backgroundColor: 'white'}}>
-            <Text style={styles.Title}>  경유지 정보</Text>
-            <Divider style={{backgroundColor: 'black'}}/>
-          </View>              
-        </TouchableOpacity>
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover1}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>1.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>    
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover2}>  
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>2.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>     
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover3}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>3.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>   
-        ) : null}
+        ) : null}       
 
 
           <Divider style={{backgroundColor: 'black'}}/> 
-          <View style={{backgroundColor: 'white'}}>
-                  
-            <Text style={styles.Title}>  화물 상세 정보</Text>
+          <View style={{backgroundColor: 'white'}}>                  
+            <Text style={styles.Title}>  화물 상세 정보 (기본 경로)</Text>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운행거리 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>187.9Km</Text></View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운임 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>200,000원</Text></View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>화물정보 및 적재 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>6톤 / 6파렛</Text></View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>적재방법 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>지게차 / 지게차</Text></View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>상차지 상세주소 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>대전광역시 서구 내동 27-3</Text></View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>하차지 상세주소 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>서울특별시 성북구 정릉동 11-7</Text></View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>특이사항 : </Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>하차대기 없습니다</Text></View>
+            </View>
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>
+
+          <View style={{backgroundColor: 'white'}}>                  
+            <Text style={styles.Title}>  화물 상세 정보 (경유지)</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운행거리 : </Text></View>
               <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>187.9Km</Text></View>
@@ -332,7 +247,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             <Text style={styles.freightTitle}>      총 운행운임 : 200,000원 </Text>
           </View>
           <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
-            <Button style={styles.button} status='success'>수 락</Button>
+            <Button style={styles.button} status='success' onPress={this.ClickApply}>수 락</Button>
           </View>
         </View>      
       </React.Fragment>      

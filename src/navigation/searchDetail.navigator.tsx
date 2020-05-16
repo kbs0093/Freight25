@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppRoute } from './app-routes';
-import { DetailScreen } from '../scene/searchFreight'
+import { DetailScreen, StopoverScreen1 } from '../scene/searchFreight'
 import { TopTapBar } from '../component/toptabbar'
 import { SearchTabBar } from '../component/search.Topbar'
 import { createStackNavigator } from '@react-navigation/stack';
@@ -21,7 +21,7 @@ export const searchDetailNavigator = (): React.ReactElement => (
 
 
 export const DetailNavigator = (): React.ReactElement => (
-  <TopTab.Navigator tabBar={props => <SearchTabBar {...props} />}>
+  <TopTab.Navigator swipeEnabled={true} tabBar={props => <SearchTabBar {...props}/>}>
     <TopTab.Screen 
         name={AppRoute.SEARCH_DETAIL_MAIN} 
         component={DetailScreen}
@@ -29,17 +29,17 @@ export const DetailNavigator = (): React.ReactElement => (
     />
     <TopTab.Screen 
         name={AppRoute.STOPOVER1} 
-        component={DetailScreen}
+        component={StopoverScreen1}
         options={{ title: '경유지 1', tabBarIcon: MAPIcon}}
     />
     <TopTab.Screen 
         name={AppRoute.STOPOVER2} 
-        component={DetailScreen}
+        component={StopoverScreen1}
         options={{ title: '경유지 2', tabBarIcon: MAPIcon}}
     />
     <TopTab.Screen 
         name={AppRoute.STOPOVER3} 
-        component={DetailScreen}
+        component={StopoverScreen1}
         options={{ title: '경유지 3', tabBarIcon: MAPIcon}}
     />
   </TopTab.Navigator>

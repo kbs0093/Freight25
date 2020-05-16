@@ -65,8 +65,11 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       this.state.data.sort(this.moneySort);
 
     }
-    else{
+    else if(this.state.value == '3'){
       this.state.data.sort(this.distanceSort);
+    }
+    else if(this.state.value == '2'){
+      this.state.data.sort(this.distanceSort2);
     }
 
     Geolocation.getCurrentPosition(
@@ -188,6 +191,10 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     if(a.distanceY == b.distanceY){ return 0} return a.distanceY < b.distanceY ? 1 : -1;
   };
 
+  distanceSort2(a, b) {
+    if(a.distanceY == b.distanceY){ return 0} return a.distanceY > b.distanceY ? 1 : -1;
+  };
+
   smartSort(a, b) {
     if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
   };
@@ -281,7 +288,8 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
               }}
               useNativeAndroidPickerStyle={isAndroid? true: false}
               items={[
-                {label: '운행거리 순', value: '3'},
+                {label: '운행거리 순 (낮음)', value: '4'},
+                {label: '운행거리 순 (높음)', value: '3'},
                 {label: '운임 순', value: '2'},
                 {label: '스마트 확률 순', value: '1'},
               ]}
