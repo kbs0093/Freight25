@@ -16,7 +16,7 @@ import {
   Icon,
   Button,
 } from '@ui-kitten/components';
-import {DetailCheckScreenProps} from '../../navigation/check.navigator';
+import {DetailCheckDriverScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import {
@@ -38,7 +38,9 @@ AsyncStorage.getItem('userType', (err, result) => {
   userType = result;
 });
 
-export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
+export class DetailCheckDriverScreen extends React.Component<
+  DetailCheckDriverScreenProps
+> {
   // The number of frieght information from 'driver' could be more than one.
   state = [
     {
