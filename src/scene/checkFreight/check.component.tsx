@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import {Icon, LayoutElement, Divider, Button} from '@ui-kitten/components';
 import {CheckScreenProps} from '../../navigation/check.navigator';
@@ -33,34 +34,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
       endAddress: '제주 서귀포',
       distance: '',
       lastRefresh: 'null',
-
-      start_month: '5', // 배송 출발 날짜
-      start_day: '8',
-      start_hour: '13',
-      start_min: '10',
-      end_month: '5',
-      end_day: '9',
-      end_hour: '10',
-      end_minutes: '10',
-    },
-    {
-      key: 'A1234569', // Freight key?
-      lastState: '완료', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-      latitude: 'unknown',
-      longitude: 'unknown',
-      startAddress: '평양 주석궁',
-      endAddress: '아오지 탄광',
-      distance: '',
-      lastRefresh: 'null',
-
-      start_month: '5', // 배송 출발 날짜
-      start_day: '8',
-      start_hour: '13',
-      start_min: '10',
-      end_month: '5',
-      end_day: '9',
-      end_hour: '10',
-      end_minutes: '10',
+      startDate: '당상', // 배송 출발 날짜
+      endDate: '내착',
     },
   ];
 
@@ -108,12 +83,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <FlatList
-          style={{backgroundColor: 'white'}}
-          data={this.state}
-          renderItem={this._renderItem}
-          keyExtractor={(item) => item.key}
-        />
+        <ScrollView>
+          <FlatList
+            style={{backgroundColor: 'white'}}
+            data={this.state}
+            renderItem={this._renderItem}
+            keyExtractor={(item) => item.key}
+          />
+        </ScrollView>
       </React.Fragment>
     );
   }
@@ -121,12 +98,12 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
 const styles = StyleSheet.create({
   Badge: {
-    width: 80,
-    height: 10,
-    borderRadius: 5,
+    width: RFPercentage(10),
+    height: RFPercentage(4),
+    borderRadius: 8,
   },
   badgeText: {
-    fontSize: RFPercentage(1.8),
+    fontSize: RFPercentage(1.6),
   },
   container: {
     paddingVertical: 10,
