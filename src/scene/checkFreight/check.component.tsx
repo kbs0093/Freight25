@@ -98,12 +98,12 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
 const styles = StyleSheet.create({
   Badge: {
-    width: 80,
-    height: 10,
-    borderRadius: 5,
+    width: RFPercentage(10),
+    height: RFPercentage(4),
+    borderRadius: 8,
   },
   badgeText: {
-    fontSize: RFPercentage(1.8),
+    fontSize: RFPercentage(1.6),
   },
   container: {
     paddingVertical: 10,

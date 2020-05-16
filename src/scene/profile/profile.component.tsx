@@ -353,11 +353,11 @@ export const ProfileScreen = (props: ProfileScreenProps): LayoutElement => {
 const styles = StyleSheet.create({
   Button: {
     width: RFPercentage(12),
-    height: RFPercentage(0.5),
+    height: RFPercentage(6),
     borderRadius: 8,
   },
   ButtonText: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.6),
   },
   titleStyles: {
     paddingHorizontal: 20,
