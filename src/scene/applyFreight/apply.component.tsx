@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {
   LayoutElement, TopNavigation,
-  Button, Layout, Select, Input, DateService,
+  Button, Layout, Input, DateService,
 } from '@ui-kitten/components';
 
 import Modal from 'react-native-modal'
@@ -22,50 +22,59 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import axios from 'axios';
+import RNPickerSelect from 'react-native-picker-select';
 
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
 const tmap_URL_rest = '&coordType=WGS84GEO&fullAddr=';
 
+const tmap_distCalcQueryUrl = 'https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response&appKey=';
+const tmap_distCalcUrl = tmap_distCalcQueryUrl + tmap_appKey;
 const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_URL_rest;
 
 const carSize = [
-  { text: '1톤' },
-  { text: '2.5톤' },
-  { text: '5톤' },
-  { text: '10톤 이상' },
+  { label: '1 톤', value: '1 톤'},
+  { label: '1.4 톤', value: '1.4 톤' },
+  { label: '2.5 톤' ,value: '2.5 톤'},
+  { label: '5 톤' ,value: '5 톤'},
+  { label: '11-15 톤' ,value: '11-15 톤'},
+  { label: '18 톤' ,value: '18 톤'},
+  { label: '25 톤' ,value: '25 톤'},
 ];
 const carType = [
-  { text: '탑' },
-  { text: '냉장' },
+  { label: '카고' ,value: '카고'},
+  { label: '탑차' ,value: '탑차'},
+  { label: '냉동' ,value: '냉동'},
+  { label: '냉장' ,value: '냉장'},
 ];
 const driveType = [
-  { text: '독차'},
-  { text: '혼적'},
+  { label: '독차',value: '독차'},
+  { label: '혼적',value: '혼적'},
 ];
 
 const freightType = [
-  { text: '파레트'},
+  { label: '파레트',value: '파레트'},
 ];
 
 const freightStartDate = [
-  { text: '당일 상차(당상)'},
-  { text: '내일 상차(내상)'},
+  { label: '당일 상차(당상)', value: '당일 상차(당상)'},
+  { label: '내일 상차(내상)', value: '내일 상차(내상)'},
 ]
 
 const freightEndDate = [
-  { text: '당일 도착(당착)'},
-  { text: '내일 도착(내착)'},
+  { label: '당일 도착(당착)', value: '당일 도착(당착)'},
+  { label: '내일 도착(내착)', value: '내일 도착(내착)'},
 ]
 export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
-  const [selectedCarSizeOption, setSelectedCarSizeOption] = React.useState(null);
-  const [selectedCarTypeOption, setSelectedCarTypeOption] = React.useState(null);
-  const [selectedDriveOption, setSelectedDriveOption] = React.useState(null);
+  const [selectedCarSize, setSelectedCarSize] = React.useState(null);
+  const [selectedCarType, setSelectedCarType] = React.useState(null);
+  const [selectedDrive, setSelectedDrive] = React.useState(null);
   
   const [weightValue, setWeightValue] = React.useState('');
   const [volumeValue, setVolumeValue] = React.useState('');
-  const [selectedFreightTypeOption, setSelectedFreightTypeOption] = React.useState(null);
+  //Select
+  const [selectedFreightType, setSelectedFreightType] = React.useState(null);
 
   const [freightLoadTypeValue, setFreightLoadTypeValue] = React.useState('');
   const [descValue, setDescValue] = React.useState('');
@@ -77,44 +86,59 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   const [modalStartAddrVisible, setmodalStartAddrVisible] = useState<boolean>(false);
   const [modalEndAddrVisible, setmodalEndAddrVisible] = useState<boolean>(false);
 
-  //Output을 State로 받아서 화면에 표출하거나 정보 값으로 활용
-  const [modalStartAddrOutput, setmodalStartAddrOutput] = useState<string>("주소를 선택/변경해주세요");
-  const [modalEndAddrOutput, setmodalEndAddrOutput] = useState<string>("주소를 선택/변경해주세요");
+  //Address의 간략한 버전 + Modal의 Output
+  const [startAddrCompact, setStartAddrCompact] = useState<string>("주소를 선택/변경해주세요");
+  const [endAddrCompact, setEndAddrCompact] = useState<string>("주소를 선택/변경해주세요");
 
-  const [startAddrCord_lat, setStartAddrCord_lat] = useState<string>("");
-  const [startAddrCord_lon, setStartAddrCord_lon] = useState<string>("");
+  //Address의 Full 버젼 (도로명주소로 한다)
+  const [startAddrFull, setStartAddrFull] = useState<string>("");
+  const [endAddrFull, setEndAddrFull] = useState<string>("");
 
-  const [endAddrCord_lat, setEndAddrCord_lat] = useState<string>("");
-  const [endAddrCord_lon, setEndAddrCord_lon] = useState<string>("");
+  const [startAddr_lat, setStartAddr_lat] = useState<string>("");
+  const [startAddr_lon, setStartAddr_lon] = useState<string>("");
 
-  // 당상/당착/내상/내착
-  const [selectedStartDateOption, setSelectedStartDateOption] = React.useState(null);
-  const [selectedEndDateOption, setSelectedEndDateOption] = React.useState(null);
+  const [endAddr_lat, setEndAddr_lat] = useState<string>("");
+  const [endAddr_lon, setEndAddr_lon] = useState<string>("");
+
+  // Select - 당상/내상/당착/내착
+  const [selectedStartDate, setSelectedStartDate] = React.useState(null);
+  const [selectedEndDate, setSelectedEndDate] = React.useState(null);
 
   //화물 db에 등록
   const applyFreightToDb = () => {
     var user = auth().currentUser;
       if(user != null){
         //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
-        var ref = firestore().collection('freights');
+        var ref = firestore().collection('freights').doc();
         if(user != null){
           try {
-            ref.add({
+            ref.set({
+              id: ref.id,
               ownerId: auth().currentUser?.uid,
-              carType: selectedCarTypeOption,
-              driveOption: selectedDriveOption,
+              carSize: selectedCarSize,
+              carType: selectedCarType,
+              driveOption: selectedDrive,
               weight: weightValue,
               voluem: volumeValue,
-              freightType: selectedFreightTypeOption,
+              freightType: selectedFreightType,
               freightLoadType: freightLoadTypeValue,
               desc: descValue,
               dist: distValue,
-              expenxe: expenseValue,
-              startDate: selectedStartDateOption,
-              endDate: selectedEndDateOption,
-              timeStamp: Date.now()
+              expense: expenseValue,
+              startAddr: startAddrCompact,
+              startAddr_Full: startAddrFull,
+              startAddr_lat: startAddr_lat,
+              startAddr_lon: startAddr_lon,
+              startDate: selectedStartDate,
+              endAddr: endAddrCompact,
+              endAddr_Full: endAddrFull,
+              endAddr_lat: endAddr_lat,
+              endAddr_lon: endAddr_lon,
+              endDate: selectedEndDate,
+              timeStamp: Date.now(),
+              state: 0
               });
-              props.navigation.navigate(AppRoute.HOME);
+              props.navigation.navigate(AppRoute.OWNER);
               console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
           } catch (error) {
             //오류 출력 
@@ -123,6 +147,28 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         }
       }
   };
+
+  // Calculate distance between startAddr and endAddr
+  const calcDist = () => {
+    let tmap_distCalcUrl_rest = `&startX=${startAddr_lon}&startY=${startAddr_lat}&endX=${endAddr_lon}&endY=${endAddr_lat}&truckType=1&truckWidth=100&truckHeight=100&truckWeight=35000&truckTotalWeight=35000&truckLength=200`
+    axios.post(tmap_distCalcUrl + tmap_distCalcUrl_rest)
+      .then((response) => {
+        let tmapdist_response = JSON.stringify(response.request._response)
+        tmapdist_response = tmapdist_response.substring(1, tmapdist_response.length - 1) // 따옴표 삭제
+        tmapdist_response = tmapdist_response.replace(/\\/gi, "") // '\'문자 replaceall
+        tmapdist_response = JSON.parse(tmapdist_response)
+
+        let tmapprops = tmapdist_response.features[0].properties
+        let tmapdist_km = tmapprops.totalDistance/1000
+        let tmaptime_min = tmapprops.totalTime/60
+        console.log("tmap dist :", tmapdist_km, "Km");
+        console.log("tmap time :", tmaptime_min, "분");
+        setDistValue(tmapdist_km+"")
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 
   return (
     <React.Fragment>
@@ -135,7 +181,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         <View style={styles.infoContainer}>
           <Text style={styles.subTitle}>위치 정보</Text>
           <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>상차지 : {modalStartAddrOutput}</Text>
+            <Text style={styles.infoTitle}>상차지 : {startAddrCompact}</Text>
             <Button 
               appearance='outline' 
               size='small'
@@ -146,18 +192,22 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           </View>
           <View style={styles.rowContainerWithLine}>
             <Text style={styles.infoTitle}>상차일 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Select
-                placeholder='선택'
-                basic
-                data={freightStartDate}
-                selectedOption={selectedStartDateOption}
-                onSelect={setSelectedStartDateOption}
+            <View style={{flex:3}}>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => 
+                  setSelectedStartDate(itemValue)  
+                }
+                placeholder={{
+                  label: '상차일을 선택하세요',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={freightStartDate}
               />
-            </Layout>
+            </View>
           </View>
           <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>하차지 : {modalEndAddrOutput}</Text>
+            <Text style={styles.infoTitle}>하차지 : {endAddrCompact}</Text>
             <Button 
               appearance='outline'
               size='small'
@@ -168,15 +218,19 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>하차일 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Select
-                placeholder='선택'
-                basic
-                data={freightEndDate}
-                selectedOption={selectedEndDateOption}
-                onSelect={setSelectedEndDateOption}
+            <View style={{flex:3}}>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => 
+                  setSelectedEndDate(itemValue)  
+                }
+                placeholder={{
+                  label: '하차일을 선택하세요',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={freightEndDate}
               />
-            </Layout>
+            </View>
           </View>
         </View>
 
@@ -184,33 +238,48 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           <Text style={styles.subTitle}>화물 정보</Text>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 정보 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Select
-                placeholder='톤수'
-                data={carSize}
-                selectedOption={selectedCarSizeOption}
-                onSelect={setSelectedCarSizeOption}
+            <View style={{flex:3}}>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => 
+                  setSelectedCarSize(itemValue)  
+                }
+                placeholder={{
+                  label: '톤수',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={carSize}
               />
-            </Layout>
-            <Layout style={styles.selectContainer}>
-              <Select
-                placeholder='타입'
-                data={carType}
-                selectedOption={selectedCarTypeOption}
-                onSelect={setSelectedCarTypeOption}
+            </View>
+            <View style={{flex:3}}>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => 
+                  setSelectedCarType(itemValue)  
+                }
+                placeholder={{
+                  label: '타입',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={carType}
               />
-            </Layout>
+            </View>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>운행 방식 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Select
-                placeholder='독차/혼적 여부 선택'
-                data={driveType}
-                selectedOption={selectedDriveOption}
-                onSelect={setSelectedDriveOption}
+            <View style={{flex:3}}>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => 
+                  setSelectedDrive(itemValue)  
+                }
+                placeholder={{
+                  label: '독차/혼적 여부 선택',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={driveType}
               />
-            </Layout>
+            </View>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 무게 : </Text>
@@ -230,14 +299,19 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               value={volumeValue}
               onChangeText={nextValue => setVolumeValue(nextValue)}
             />
-            <Layout style={styles.selectContainer}>
-              <Select
-                placeholder='단위'
-                data={freightType}
-                selectedOption={selectedFreightTypeOption}
-                onSelect={setSelectedFreightTypeOption}
+            <View style={{flex:3}}>
+              <RNPickerSelect
+                onValueChange={(itemValue, itemIndex) => 
+                  setSelectedFreightType(itemValue)  
+                }
+                placeholder={{
+                  label: '단위',
+                  value: null,
+                }}
+                useNativeAndroidPickerStyle={false}
+                items={freightType}
               />
-            </Layout>
+            </View>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>적재 방식 : </Text>
@@ -267,12 +341,13 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             <Text style={styles.infoTitle}>총 운행거리 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
-                placeholder='운행 거리를 입력하세요'
+                placeholder='수동입력'
                 value={distValue}
                 onChangeText={nextValue => setDistValue(nextValue)}
               />
             </Layout>
             <Text style={styles.infoTitle}>km</Text>
+            <Button onPress={calcDist} >자동계산</Button>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>요금 : </Text>
@@ -314,10 +389,16 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               style={{width: 350, height: 600}}
               jsOptions={{ animated: true }}
               onSelected={(startAddrResult) => {
-                let roadaddr = JSON.stringify(startAddrResult.roadAddress).replace(/\"/gi, "");
-                setmodalStartAddrOutput(roadaddr);
+                let addrFull = JSON.stringify(startAddrResult.jibunAddress).replace(/\"/gi, "");
+                if (addrFull == ''){
+                  addrFull = JSON.stringify(startAddrResult.autoJibunAddress).replace(/\"/gi, "");
+                }
+                setStartAddrFull(addrFull);
+                console.log('addrFull :', addrFull);
+                let addr = addrFull.split(' ', 3).join(' ');
+                setStartAddrCompact(addr);
                 axios
-                  .get(tmap_FullTextGeocodingUrl + roadaddr)
+                  .get(tmap_FullTextGeocodingUrl + addrFull)
                   .then((responseJSON) => {
                     let tmapResponse = JSON.stringify(responseJSON.request._response)
                     tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
@@ -325,18 +406,18 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     tmapResponse = JSON.parse(tmapResponse)
 
                     let coordinate = tmapResponse.coordinateInfo.coordinate[0]
-                    let lat = JSON.stringify(coordinate.newLat).replace(/\"/gi, "") //latitude 위도
-                    let lon = JSON.stringify(coordinate.newLon).replace(/\"/gi, "") //longitude 경도
+                    let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
+                    let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
 
-                    console.log('상차지 주소 :', roadaddr)
+                    console.log('상차지 주소 :', addrFull)
                     console.log('변환된 위도 :', lat);
                     console.log('변환된 경도 :', lon);
 
-                    setStartAddrCord_lat(lat);
-                    setStartAddrCord_lon(lon);
-
+                    setStartAddr_lat(lat);
+                    setStartAddr_lon(lon);
+                        
                     console.log('startAddrCordVal :', lat, lon);
-
+                    
                   })
                   .catch((error) => {
                     console.log(error);
@@ -366,10 +447,15 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               style={{width: 350, height: 600}}
               jsOptions={{ animated: true }}
               onSelected={(endAddrResult) => {
-                let roadaddr = JSON.stringify(endAddrResult.roadAddress).replace(/\"/gi, "");
-                setmodalEndAddrOutput(roadaddr);
+                let addrFull = JSON.stringify(endAddrResult.jibunAddress).replace(/\"/gi, "");
+                if (addrFull == ''){
+                  addrFull = JSON.stringify(endAddrResult.autoJibunAddress).replace(/\"/gi, "");
+                }
+                setEndAddrFull(addrFull);
+                let addr = addrFull.split(' ', 3).join(' ');
+                setEndAddrCompact(addr);
                 axios
-                  .get(tmap_FullTextGeocodingUrl + roadaddr)
+                  .get(tmap_FullTextGeocodingUrl + addrFull)
                   .then((responseJSON) => {
                     let tmapResponse = JSON.stringify(responseJSON.request._response)
                     tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
@@ -377,18 +463,17 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     tmapResponse = JSON.parse(tmapResponse)
 
                     let coordinate = tmapResponse.coordinateInfo.coordinate[0]
-                    let lat = JSON.stringify(coordinate.newLat).replace(/\"/gi, "") //latitude 위도
-                    let lon = JSON.stringify(coordinate.newLon).replace(/\"/gi, "") //longitude 경도
+                    let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
+                    let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
 
-                    console.log('하차지 주소 :', roadaddr)
+                    console.log('하차지 주소 :', addrFull)
                     console.log('변환된 위도 :', lat);
                     console.log('변환된 경도 :', lon);
 
-                    setEndAddrCord_lat(lat);
-                    setEndAddrCord_lon(lon);
+                    setEndAddr_lat(lat);
+                    setEndAddr_lon(lon);
 
                     console.log('endAddrCordVal :', lat, lon);
-
                   })
                   .catch((error) => {
                     console.log(error);
@@ -481,3 +566,4 @@ const styles = StyleSheet.create({
 
   
 });
+

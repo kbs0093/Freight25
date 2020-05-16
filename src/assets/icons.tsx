@@ -88,5 +88,9 @@ export const FORWARDIcon = (style): IconElement => (
   <Icon {...style} name='arrow-forward-outline'/>
 );
 
+export const CARIcon = (style): IconElement => (
+  <Icon {...style} name='car'/>
+);
+
 
 
