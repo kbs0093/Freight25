@@ -16,7 +16,7 @@ import {
   Icon,
   Button,
 } from '@ui-kitten/components';
-import {DetailCheckScreenProps} from '../../navigation/check.navigator';
+import {DetailCheckOwnerScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import {
@@ -38,7 +38,9 @@ AsyncStorage.getItem('userType', (err, result) => {
   userType = result;
 });
 
-export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
+export class DetailCheckOwnerScreen extends React.Component<
+  DetailCheckOwnerScreenProps
+> {
   // The number of frieght information from 'owner' should be only one.
   state = [
     {
@@ -82,43 +84,32 @@ export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
         </View>
       </View>
 
-      <ViewPager
-        initialPage={0}
-        style={styles.freightInfoContainer}
-        showPageIndicator={true}>
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="1">
-            <Text style={styles.infoTitle}>운행 거리</Text>
-            <Text style={styles.infoTitle}>운행 시간</Text>
-            <Text style={styles.infoTitle}>배차 날짜</Text>
-            <Text style={styles.infoTitle}>운행 운임</Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
-            <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
-            <Text style={styles.infoRightTitle}>12 시간</Text>
-            <Text style={styles.infoRightTitle}>2020년 5월 12일</Text>
-            <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          </View>
+      <View style={styles.freightInfoTotalContainer}>
+        <View style={styles.freightInfoHalfContainer} key="1">
+          <Text style={styles.infoTitle}>운행 거리</Text>
+          <Text style={styles.infoTitle}>운행 시간</Text>
+          <Text style={styles.infoTitle}>배차 날짜</Text>
+          <Text style={styles.infoTitle}>운행 운임</Text>
+          <Text style={styles.infoTitle}>상차지 주소</Text>
+          <Text style={styles.infoTitle}></Text>
+          <Text style={styles.infoTitle}>하차지 주소</Text>
+          <Text style={styles.infoTitle}></Text>
+          <Text style={styles.infoTitle}>화주 이름</Text>
+          <Text style={styles.infoTitle}>화주 연락처</Text>
         </View>
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="2">
-            <Text style={styles.infoTitle}>상차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}>하차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}>화주 이름</Text>
-            <Text style={styles.infoTitle}>화주 연락처</Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{item.startAddress}</Text>
-            <Text style={styles.infoTitle}>상세 주소</Text>
-            <Text style={styles.infoTitle}>{item.endAddress}</Text>
-            <Text style={styles.infoTitle}>상세 주소</Text>
-            <Text style={styles.infoTitle}>홍길동</Text>
-            <Text style={styles.infoTitle}>01018181818</Text>
-          </View>
+        <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
+          <Text style={styles.infoRightTitle}>12 시간</Text>
+          <Text style={styles.infoRightTitle}>2020년 5월 12일</Text>
+          <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
+          <Text style={styles.infoTitle}>{item.startAddress}</Text>
+          <Text style={styles.infoTitle}>상세 주소</Text>
+          <Text style={styles.infoTitle}>{item.endAddress}</Text>
+          <Text style={styles.infoTitle}>상세 주소</Text>
+          <Text style={styles.infoTitle}>홍길동</Text>
+          <Text style={styles.infoTitle}>01018181818</Text>
         </View>
-      </ViewPager>
+      </View>
       <View style={styles.lineStyle} />
     </View>
   );
@@ -209,20 +200,13 @@ export class DetailCheckScreen extends React.Component<DetailCheckScreenProps> {
             <Text style={styles.infoTitle}>총 운행 운임</Text>
           </View>
           <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>
-              {parseInt(this.state[0].dist) + parseInt(this.state[1].dist)} KM
-            </Text>
-            <Text style={styles.infoTitle}>
-              {parseInt(this.state[0].expense) +
-                parseInt(this.state[1].expense)}{' '}
-              원
-            </Text>
+            <Text style={styles.infoTitle}>{this.state[0].dist} KM</Text>
+            <Text style={styles.infoTitle}>{this.state[0].expense} 원</Text>
           </View>
         </View>
         <View style={styles.ButtonContainter}>
-          <View style={styles.ButtonHalfContainter}>{navButton}</View>
           <View style={styles.ButtonHalfContainter}>{callButton}</View>
-          <View style={styles.ButtonHalfContainter}>{completeButton}</View>
+          <View style={styles.ButtonHalfContainter}>{reviewButton}</View>
         </View>
       </React.Fragment>
     );

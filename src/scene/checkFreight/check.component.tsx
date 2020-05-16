@@ -22,6 +22,13 @@ import {
   NOTEIcon,
 } from '../../assets/icons';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
+import AsyncStorage from '@react-native-community/async-storage';
+
+let userType;
+
+AsyncStorage.getItem('userType', (err, result) => {
+  userType = result;
+});
 
 export class CheckScreen extends React.Component<CheckScreenProps> {
   state = [
@@ -41,7 +48,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
   ClickList = (index) => () => {
     //AsyncStorage.setItem('Freight', index);
-    this.props.navigation.navigate(AppRoute.CHECK_DETAIL);
+
+    if (userType == 'owner') {
+      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
+    } else if (userType == 'driver') {
+      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
+    } else {
+      console.log('undefined usertype');
+    }
   };
 
   _renderItem = ({item}) => (
