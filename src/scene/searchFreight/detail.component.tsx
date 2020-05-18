@@ -23,6 +23,8 @@ import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
 import { DetailScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const isAndroid = Platform.OS ==='android';
 
@@ -66,7 +68,25 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
 
     // 이 시점부터 this.state.FreightID로 화물 ID에 접근이 가능합니다 바로 사용하시면 됩니다.
 
+    var user = auth().currentUser;
+    const that = this;
+    if(user != null){  
+        var docRef = firestore().collection('freights').doc(this.state.FreightID);
+        docRef.get().then(function(doc) {
+          if (doc.exists) {
+              console.log("Document data:", doc.data());
+              //doc에 저장되어 있습니다.
+              //기사 배정을 위한 freight의 기사 변수명 driverId 입니다.
+          } 
+          else {
+              console.log("No such document!");
+          }
+        })
+      };
 
+        
+      
+    
     /*const that = this;
     var data = fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
       method: 'POST',

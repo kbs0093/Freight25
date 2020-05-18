@@ -136,7 +136,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               endAddr_lon: endAddr_lon,
               endDate: selectedEndDate,
               timeStamp: Date.now(),
-              state: 0
+              state: 0,
+              driverId: ""
               });
               props.navigation.navigate(AppRoute.OWNER);
               console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
