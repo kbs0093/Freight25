@@ -24,6 +24,7 @@ import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
 import Modal from 'react-native-modal'
 import Postcode from 'react-native-daum-postcode'
+import Toast from 'react-native-tiny-toast';
 
 const serverUrl = 'http://49.50.162.128:8000/';
 
@@ -52,10 +53,16 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
 
   // Postcode API를 위한 변수들 선언
   const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(false);
-  const [addrCompact, setAddrCompact] = useState<string>("주소 입력");
+  const [addrCompact, setAddrCompact] = useState<string>('상차지 설정');
   const [addrFull, setAddrFull] = useState<string>("");
   const [addr_lat, setAddr_lat] = useState<string>("");
   const [addr_lon, setAddr_lon] = useState<string>("");
+
+  const [modalAddEndAddrVisible, setmodalAddEndAddrVisible] = useState<boolean>(false);
+  const [endAddrCompact, setEndAddrCompact] = useState<string>("하차지 설정");
+  const [endAddrFull, setEndAddrFull] = useState<string>("");
+  const [endAddr_lat, setEndAddr_lat] = useState<string>("");
+  const [endAddr_lon, setEndAddr_lon] = useState<string>("");
 
   const resetAction = CommonActions.reset({
     index: 0,
@@ -105,11 +112,12 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                         bankName: BankValue,
                         companyName: companyNameInput
                         });
-                      
+                      Toast.showSuccess('회원가입이 완료되었습니다.');
                       props.navigation.navigate(AppRoute.OWNER);
                     } catch (error) {
                       //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
                       console.log(error);
+                      Toast.show('회원가입에 실패하였습니다.');
                     }
                   }
                 }
@@ -176,14 +184,29 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                 />
               </View>
             </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.detailTitle}>
+                <Text style={styles.textStyle}>업체명 :</Text>
+              </View>
+              <View style={{flex: 3}}>
+                <Input
+                  style={styles.input}
+                  placeholder='업체명을 적어주세요'
+                  size='small'
+                  value={companyNameInput}
+                  onChangeText={companyName}
+                />
+              </View>
+            </View>            
+
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
 
           <View> 
-            <Text style={styles.textStyle}>상 하차지 정보</Text>
+          <Text style={styles.textStyle}>자주 쓰는 상차/하차지 설정</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>자주 쓰는 주소 :</Text>
+              <Text style={styles.textStyle}>자주 쓰는 상차지 :</Text>
               </View>
               <View style={{flex: 2.3}}>
                 <Text style={styles.textStyle}>{addrCompact}</Text>
@@ -201,18 +224,23 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>업체명 :</Text>
+                <Text style={styles.textStyle}>자주 쓰는 하차지 :</Text>
               </View>
-              <View style={{flex: 3}}>
-                <Input
-                  style={styles.input}
-                  placeholder='업체명을 적어주세요'
-                  size='small'
-                  value={companyNameInput}
-                  onChangeText={companyName}
-                />
+              <View style={{flex: 2.3}}>
+                <Text style={styles.textStyle}>{endAddrCompact}</Text>
               </View>
-            </View>            
+              <View style={{flex: 0.7}}>
+                <Button 
+                    appearance='outline' 
+                    size='small'
+                    onPress={() => {
+                      setmodalAddEndAddrVisible(true);
+                    }}
+                    >입력
+                </Button>
+              </View>
+            </View>
+
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
 
@@ -315,7 +343,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                       setAddr_lat(lat);
                       setAddr_lon(lon);
 
-                      console.log('endAddrCordVal :', lat, lon);
+                      console.log('startAddrCordVal :', lat, lon);
                     })
                     .catch((error) => {
                       console.log(error);
@@ -331,6 +359,61 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             </View>
           </Modal>
 
+          <Modal
+            //isVisible Props에 State 값을 물려주어 On/off control
+            isVisible={modalAddEndAddrVisible}
+            //아이폰에서 모달창 동작시 깜박임이 있었는데, useNativeDriver Props를 True로 주니 해결되었다.
+            useNativeDriver={true}
+            hideModalContentWhileAnimating={true}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+            <View>
+              <Postcode
+                style={{width: 350, height: 600}}
+                jsOptions={{ animated: true }}
+                onSelected={(addrResult) => {
+                  let addrFull = JSON.stringify(addrResult.jibunAddress).replace(/\"/gi, "");
+                  if (addrFull == ''){
+                    addrFull = JSON.stringify(addrResult.autoJibunAddress).replace(/\"/gi, "");
+                  }
+                  setEndAddrFull(addrFull);
+                  let addr = addrFull.split(' ', 3).join(' ');
+                  setEndAddrCompact(addr);
+                  axios
+                    .get(tmap_FullTextGeocodingUrl + addrFull)
+                    .then((responseJSON) => {
+                      let tmapResponse = JSON.stringify(responseJSON.request._response)
+                      tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
+                      tmapResponse = tmapResponse.replace(/\\/gi, "") // '\'문자 replaceall
+                      tmapResponse = JSON.parse(tmapResponse)
+
+                      let coordinate = tmapResponse.coordinateInfo.coordinate[0]
+                      let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
+                      let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
+
+                      console.log('하차지 주소 :', addrFull)
+                      console.log('변환된 위도 :', lat);
+                      console.log('변환된 경도 :', lon);
+
+                      setEndAddr_lat(lat);
+                      setEndAddr_lon(lon);
+
+                      console.log('endAddrCordVal :', lat, lon);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                  setmodalAddEndAddrVisible(false)
+                }}
+              />
+              <Button
+                onPress={() => {
+                  setmodalAddEndAddrVisible(false)
+                }}>
+              뒤로 돌아가기</Button>
+            </View>
+          </Modal>
 
 
           </ScrollView>

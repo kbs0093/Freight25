@@ -23,6 +23,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import axios from 'axios';
 import RNPickerSelect from 'react-native-picker-select';
+import Toast from 'react-native-tiny-toast';
 
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
@@ -141,9 +142,11 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               });
               props.navigation.navigate(AppRoute.OWNER);
               console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
+              Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
           } catch (error) {
             //오류 출력 
             console.log(error);
+            Toast.show('화물이 등록되지 않았습니다.');
           }
         }
       }
