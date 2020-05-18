@@ -35,25 +35,11 @@ import RNPickerSelect from 'react-native-picker-select';
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS ==='android';
 
-async function requestLocationPermission() {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    )
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("You can use locations ")
-    } else {
-      console.log("Location permission denied")
-    }
-  } catch (err) {
-    console.warn(err)
-  }
-}
-
 export class SearchScreen extends React.Component <SearchScreenProps> {
   
   constructor(props) {
     super(props);       
+
     this.state = {
       latitude: 'unknown',
       longitude: 'unknown',
@@ -68,8 +54,6 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
   }
 
   componentDidMount = async () => {
-    requestLocationPermission();
-
     let latitude;
     let longitude;
 
@@ -88,36 +72,47 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
       this.state.data.sort(this.distanceSort2);
     }
 
-    Geolocation.getCurrentPosition(
-      position => {
-        latitude = JSON.stringify(position.coords.latitude);
-        longitude = JSON.stringify(position.coords.longitude);
-
-        this.setState({latitude});
-        this.setState({longitude});
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      )
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Geolocation.getCurrentPosition(
+          position => {
+            latitude = JSON.stringify(position.coords.latitude);
+            longitude = JSON.stringify(position.coords.longitude);
+    
+            this.setState({latitude});
+            this.setState({longitude});
+            
+            fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+            .then(response => response.json())
+            .then(response => {
+              const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
+              const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
+              const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
+              const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
+    
+              this.setState({city});
+              this.setState({gu});
+              this.setState({myeon});
+              this.setState({dong});          
+            })   
+            .catch(err => console.log(err));     
+          },
+          error => Alert.alert('Error', JSON.stringify(error)),
+          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
+        );
+      } else {
         
-        fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
-        .then(response => response.json())
-        .then(response => {
-          const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
-          const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
-          const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
-          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
+      }
+    } catch (err) {
+      console.warn(err)
+    }
 
-          this.setState({city});
-          this.setState({gu});
-          this.setState({myeon});
-          this.setState({dong});          
-        })   
-        .catch(err => console.log(err));     
-      },
-      error => Alert.alert('Error', JSON.stringify(error)),
-      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
-    );
-
+    
     var user = auth().currentUser;
     const that = this;
-    
     if(user != null){  
       try {
         firestore().collection('freights').where("state", "==", 0)

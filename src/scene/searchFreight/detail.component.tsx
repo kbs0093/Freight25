@@ -38,12 +38,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       mapVisible: true,
       stopoverVisible : true,
       FreightID: null,
-      selectedIndex: null,
-      setSelectedIndex: null,
-
-    };
-
-    
+      data: [],
+    };    
   };
 
 
@@ -77,7 +73,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       };
             
     
-    var data = fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
+    /*var data = fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
       method: 'POST',
       headers:{
         "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
@@ -120,7 +116,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
       that.setState({ apiInfo: coordinates });
       console.log(that.state.apiInfo);
       return JSON.stringify(jsonData);
-    });
+    });*/
 
     
   };
