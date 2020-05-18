@@ -23,7 +23,8 @@ import {
 } from '../../assets/icons';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 let userType;
 
 AsyncStorage.getItem('userType', (err, result) => {
@@ -31,20 +32,56 @@ AsyncStorage.getItem('userType', (err, result) => {
 });
 
 export class CheckScreen extends React.Component<CheckScreenProps> {
-  state = [
-    {
-      key: 'A1234567', // Freight key?
-      lastState: '배송전', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-      latitude: 'unknown',
-      longitude: 'unknown',
-      startAddress: '경기 군포',
-      endAddress: '제주 서귀포',
-      distance: '',
-      lastRefresh: 'null',
-      startDate: '당상', // 배송 출발 날짜
-      endDate: '내착',
-    },
-  ];
+  state = { 
+      data:[]
+  };
+
+  componentDidMount = async() => {
+    var user = auth().currentUser;
+    const that = this;
+    
+    if(user != null){  
+      var ref = null;
+      if(userType == 'driver'){
+        ref = firestore().collection('freights').where("driverId", "==", user.uid);
+      }
+      else if(userType = 'owner'){
+        ref = firestore().collection('freights').where("ownerId", "==", user.uid);
+      }
+      ref
+      .get()
+      .then(async function(querySnapshot){
+        var list =[];
+        
+        for(var docCnt in querySnapshot.docs){            
+          const doc = querySnapshot.docs[docCnt].data();
+          console.log(docCnt+"번째 화물 id: "+doc.id);
+
+          var freightState = '';
+          if(doc.state == 0)
+            freightState = "배송전";
+          else if(doc.state == 1)
+            freightState = "배송중";
+          else if(doc.sttate == 2)
+            freightState = "배송완료";
+
+          list.push({
+            key: doc.id, // Freight key?
+            lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+            latitude: '', //lat, lon 필요 없을 듯?
+            longitude: '',
+            startAddress: doc.startAddr,
+            endAddress: doc.endAddr,
+            distance: doc.dist,
+            lastRefresh: 'null',
+            startDate: doc.startDate, // 배송 출발 날짜 -> UI 고치기
+            endDate: doc.endDate,
+          });                 
+        }
+        that.setState({data: list});
+      })     
+    } 
+  };
 
   ClickList = (index) => () => {
     //AsyncStorage.setItem('Freight', index);
@@ -100,7 +137,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
         <ScrollView>
           <FlatList
             style={{backgroundColor: 'white'}}
-            data={this.state}
+            data={this.state.data}
             renderItem={this._renderItem}
             keyExtractor={(item) => item.key}
           />
