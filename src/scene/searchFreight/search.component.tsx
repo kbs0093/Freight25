@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Alert,
   RefreshControl,
+  PermissionsAndroid,
 } from 'react-native';
 import {
   LayoutElement, 
@@ -34,7 +35,20 @@ import RNPickerSelect from 'react-native-picker-select';
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS ==='android';
 
-
+async function requestLocationPermission() {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    )
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log("You can use locations ")
+    } else {
+      console.log("Location permission denied")
+    }
+  } catch (err) {
+    console.warn(err)
+  }
+}
 
 export class SearchScreen extends React.Component <SearchScreenProps> {
   
@@ -54,6 +68,8 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
   }
 
   componentDidMount = async () => {
+    requestLocationPermission();
+
     let latitude;
     let longitude;
 
@@ -240,7 +256,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
         <View style={styles.geoInfo3}>  
                       
           </View>
-          <View style={styles.freightType}><Text style={styles.freightTypeText}>    {item.carType} / {item.carType2} / {item.freightSize} / {item.freightWeight} / {item.loadType}</Text></View>
+          <View style={styles.freightType}><Text style={styles.freightTypeText}>    {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text></View>
         </View>
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>

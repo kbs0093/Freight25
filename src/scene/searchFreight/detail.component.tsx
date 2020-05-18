@@ -46,17 +46,6 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     
   };
 
-  retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('FreightID');
-      if (value !== null) {
-        this.setState({FreightID: value})
-        console.log(this.state.FreightID);
-      }
-    } catch (error) {
-    }
-  };
-  
 
   componentDidMount = async () => {
     try {
@@ -86,11 +75,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           }
         })
       };
-
-        
-      
+            
     
-    /*const that = this;
     var data = fetch( "https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result", {
       method: 'POST',
       headers:{
@@ -127,14 +113,14 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           }
         } else{
           if(jsonData.features[i].geometry.coordinates != null){
-            coordinates.push({latitude: Number(jsonData.features[i].geometry.coordinates[1]), longitude: Number(jsonData.features[i].geometry.coordinates[0])});
+            //coordinates.push({latitude: Number(jsonData.features[i].geometry.coordinates[1]), longitude: Number(jsonData.features[i].geometry.coordinates[0])});
           }           
         }      
       }
       that.setState({ apiInfo: coordinates });
       console.log(that.state.apiInfo);
       return JSON.stringify(jsonData);
-    });*/
+    });
 
     
   };
