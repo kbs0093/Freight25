@@ -23,6 +23,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import axios from 'axios';
 import RNPickerSelect from 'react-native-picker-select';
+import Toast from 'react-native-tiny-toast';
 
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
@@ -110,16 +111,18 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       if(user != null){
         //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
         var ref = firestore().collection('freights').doc();
+        
         if(user != null){
           try {
             ref.set({
               id: ref.id,
               ownerId: auth().currentUser?.uid,
+//              ownerTel: p
               carSize: selectedCarSize,
               carType: selectedCarType,
               driveOption: selectedDrive,
               weight: weightValue,
-              voluem: volumeValue,
+              volume: volumeValue,
               freightType: selectedFreightType,
               freightLoadType: freightLoadTypeValue,
               desc: descValue,
@@ -136,13 +139,21 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               endAddr_lon: endAddr_lon,
               endDate: selectedEndDate,
               timeStamp: Date.now(),
-              state: 0
+              state: 0,
+              driverId: ""
               });
+              firestore().collection('owners').doc(user.uid).get()
+              .then(function(snapShot){
+                    ref.update({ownerTel: snapShot.data().tel});
+                    console.log(snapShot.data().tel);
+                  });
               props.navigation.navigate(AppRoute.OWNER);
-              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+Date.now());
+              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " +Date.now());
+              Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
           } catch (error) {
             //오류 출력 
             console.log(error);
+            Toast.show('화물이 등록되지 않았습니다.');
           }
         }
       }
