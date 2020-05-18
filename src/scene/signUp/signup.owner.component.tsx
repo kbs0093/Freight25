@@ -110,7 +110,17 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                         account: accountNumInput, 
                         tel: phoneNumInput,
                         bankName: BankValue,
-                        companyName: companyNameInput
+                        companyName: companyNameInput,
+
+                        savedStartCompact:addrCompact,
+                        savedStartFull:addrFull,
+                        savedStartlat:addr_lat,
+                        savedStartlon:addr_lon,
+
+                        savedEndCompact:endAddrCompact,
+                        savedEndFull:endAddrFull,
+                        savedEndLat:endAddr_lat,
+                        savedEndLon:endAddr_lon
                         });
                       Toast.showSuccess('회원가입이 완료되었습니다.');
                       props.navigation.navigate(AppRoute.OWNER);

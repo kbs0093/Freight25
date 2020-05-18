@@ -72,11 +72,14 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     const that = this;
     if(user != null){  
         var docRef = firestore().collection('freights').doc(this.state.FreightID);
+        
         docRef.get().then(function(doc) {
           if (doc.exists) {
-              console.log("Document data:", doc.data());
-              //doc에 저장되어 있습니다.
-              //기사 배정을 위한 freight의 기사 변수명 driverId 입니다.
+              console.log("Document data:", doc.data().id);
+              
+              //doc.data()에 상세정보 저장되어 있습니다.
+              //화물의 배정 기사 변수: driverId
+              //화물 배정 상태 변수: state
           } 
           else {
               console.log("No such document!");
