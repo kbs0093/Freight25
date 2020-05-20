@@ -12,6 +12,7 @@ import {
   Alert,
   RefreshControl,
   PermissionsAndroid,
+  NavigatorIOS,
 } from 'react-native';
 import {
   LayoutElement, 
@@ -21,7 +22,6 @@ import {
   TopNavigation, 
   TopNavigationAction,
 } from '@ui-kitten/components';
-import Geolocation from '@react-native-community/geolocation';
 import { FORWARDIcon } from '../../assets/icons'
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -31,11 +31,12 @@ import { SearchScreenProps } from'../../navigation/search.navigator';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
+import Geolocation from 'react-native-geolocation-service';
 
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS ==='android';
 
-export class SearchScreen extends React.Component <SearchScreenProps> {
+export class SearchScreen extends Component <SearchScreenProps> {
   
   constructor(props) {
     super(props);       
@@ -53,34 +54,18 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     };
   }
 
-  componentDidMount = async () => {
-    let latitude;
-    let longitude;
-
-    if(this.state.value == '1'){
-      this.state.data.sort(this.smartSort);
-
-    }
-    else if(this.state.value == '2'){
-      this.state.data.sort(this.moneySort);
-
-    }
-    else if(this.state.value == '3'){
-      this.state.data.sort(this.distanceSort);
-    }
-    else if(this.state.value == '2'){
-      this.state.data.sort(this.distanceSort2);
-    }
-
+  requestLocationPermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       )
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {             
         Geolocation.getCurrentPosition(
-          position => {
-            latitude = JSON.stringify(position.coords.latitude);
-            longitude = JSON.stringify(position.coords.longitude);
+          (position) => {
+            let latitude = JSON.stringify(position.coords.latitude);
+            let longitude = JSON.stringify(position.coords.longitude);
+
+            console.log(latitude, longitude);
     
             this.setState({latitude});
             this.setState({longitude});
@@ -109,7 +94,31 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
     } catch (err) {
       console.warn(err)
     }
+  }
 
+
+  componentDidMount = async () => {
+    let latitude;
+    let longitude;
+
+    this.requestLocationPermission();
+
+    if(this.state.value == '1'){
+      this.state.data.sort(this.smartSort);
+
+    }
+    else if(this.state.value == '2'){
+      this.state.data.sort(this.moneySort);
+
+    }
+    else if(this.state.value == '3'){
+      this.state.data.sort(this.distanceSort);
+    }
+    else if(this.state.value == '2'){
+      this.state.data.sort(this.distanceSort2);
+    }
+
+    
     
     var user = auth().currentUser;
     const that = this;
@@ -251,7 +260,7 @@ export class SearchScreen extends React.Component <SearchScreenProps> {
         <View style={styles.geoInfo3}>  
                       
           </View>
-          <View style={styles.freightType}><Text style={styles.freightTypeText}>    {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text></View>
+          <View style={styles.freightType}><Text style={styles.freightTypeText}>{item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text></View>
         </View>
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
@@ -406,7 +415,6 @@ const styles = StyleSheet.create({
     height : "20%",
   },
   driveInfo1:{
-    justifyContent: 'center',
     alignItems: 'center',
     flex: 2,
   },

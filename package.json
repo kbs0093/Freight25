@@ -32,7 +32,7 @@
     "react-native": "0.62.1",
     "react-native-cli": "^2.0.1",
     "react-native-daum-postcode": "1.0.6",
-    "react-native-geolocation-service": "^4.0.0",
+    "react-native-geolocation-service": "^4.0.2",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-get-random-values": "^1.4.0",
     "react-native-map": "0.0.1",
