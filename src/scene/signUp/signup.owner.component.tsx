@@ -6,6 +6,10 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  NativeModules,
+  PermissionsAndroid,
+  Platform,
+  Linking,
 } from 'react-native';
 import {
   LayoutElement, 
@@ -27,6 +31,7 @@ import Postcode from 'react-native-daum-postcode'
 import Toast from 'react-native-tiny-toast';
 
 const serverUrl = 'http://49.50.162.128:8000/';
+const DirectSms = NativeModules.DirectSms;
 
 // Postcode API를 위한 URL선언
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
@@ -38,7 +43,6 @@ const logCallback = (log, callback) => {
   console.log(log);
   callback;
 };
-
 
 
 export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement => {
@@ -70,7 +74,6 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
   });
 
   console.log(BankValue);
-
   const regOwner = () => {
     //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
     //firebase jwt
@@ -142,6 +145,37 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
     });      
   };
 
+  sendDirectSms = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.SEND_SMS,
+          {
+            title: 'Freight25 App Sms Permission',
+            message:
+              'Freight25 App needs access to your inbox ' +
+              'so you can send messages in background.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          DirectSms.sendDirectSms(phoneNumInput, 'Signup process completed! ' + nameInput);
+          console.log('SMS sent successfully');
+        } else {
+          console.log('SMS permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+    else {
+      const url = `sms:${phoneNumInput}${Platform.OS === "ios" ? "&" : "?"}body=${"signup process completed! " + nameInput}`
+      Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    }
+  }
+  
     return (
         <React.Fragment>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -207,7 +241,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                   onChangeText={companyName}
                 />
               </View>
-            </View>            
+            </View>
 
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
@@ -310,6 +344,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
           <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>            
               <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
               <Button style={{margin: 30}} status='primary' size='large' onPress={regOwner}>회원가입</Button>
+              <Button style={{margin: 30}} status='primary' size='large' onPress={() => sendDirectSms()}>SMS</Button>
           </View>
 
           
