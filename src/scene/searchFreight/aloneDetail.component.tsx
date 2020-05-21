@@ -4,33 +4,21 @@ import {
   Text,
   StyleSheet,
   View,
-  Linking,
-  Platform,
-  SafeAreaView,
-  FlatList,
-  FlatListProps,
   ScrollView,
 } from 'react-native';
 import {
-  LayoutElement,
-  Layout,
-  ViewPager,
   Icon,
   Divider,
   Button,
 } from '@ui-kitten/components';
 import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
-import { DetailScreenProps } from '../../navigation/search.navigator';
+import { aloneDetailScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-const isAndroid = Platform.OS ==='android';
-
-
-
-export class DetailScreen extends React.Component <DetailScreenProps> {
+export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> {
   constructor(props) {
     super(props);
     this.state = {
@@ -189,33 +177,14 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     }
   };
 
-  hideStopvoer = () => {
-    if(this.state.stopoverVisible){
-      this.setState({stopoverVisible: false})
-    } else{
-      this.setState({stopoverVisible: true})
-    }
-  }
-
-  ClickStopover1 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER1);
-  }
-  
-  ClickStopover2 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER2);
-  }
-
-  ClickStopover3 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER3);
-  }
-
   onRegionChange =(region) => {
     this.setState({region});
   }
-  
+
   clickApply = () => {
     // 수락버튼을 클릭했을 시 함수
   }
+  
   
 
   render(){
@@ -273,77 +242,6 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           <Divider style={{backgroundColor: 'black'}}/>                                 
         </View>
         ) : null}
-
-        <TouchableOpacity onPress={this.hideStopvoer}>
-          <View style={{backgroundColor: 'white'}}>
-            <Text style={styles.Title}>  경유지 정보</Text>
-            <Divider style={{backgroundColor: 'black'}}/>
-          </View>              
-        </TouchableOpacity>
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover1}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>1.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>    
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover2}>  
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>2.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>     
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover3}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>3.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>   
-        ) : null}
-
 
           <Divider style={{backgroundColor: 'black'}}/> 
           <View style={{backgroundColor: 'white'}}>

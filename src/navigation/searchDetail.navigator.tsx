@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppRoute } from './app-routes';
-import { DetailScreen, StopoverScreen1, StopoverScreen2, StopoverScreen3 } from '../scene/searchFreight'
+import { DetailScreen, StopoverScreen1, StopoverScreen2, StopoverScreen3, aloneDetailScreen } from '../scene/searchFreight'
 import { TopTapBar } from '../component/toptabbar'
 import { SearchTabBar } from '../component/search.Topbar'
 import { createStackNavigator } from '@react-navigation/stack';
@@ -16,6 +16,12 @@ const Stack = createStackNavigator();
 export const searchDetailNavigator = (): React.ReactElement => (
   <TopTab2.Navigator tabBar={props => <TopTapBar {...props} />}>
     <Stack.Screen name={AppRoute.SEARCH_DETAIL_NAVIGATOR} component={DetailNavigator}/>
+  </TopTab2.Navigator>
+);
+
+export const aloneDetailNavigator = (): React.ReactElement => (
+  <TopTab2.Navigator tabBar={props => <TopTapBar {...props} />}>
+    <Stack.Screen name={AppRoute.ALONE_DETAIL_MAIN} component={aloneDetailScreen}/>
   </TopTab2.Navigator>
 );
 

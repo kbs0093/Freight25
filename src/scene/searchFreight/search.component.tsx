@@ -200,7 +200,12 @@ export class SearchScreen extends Component <SearchScreenProps> {
 
   ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
-    this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
+    if(item.Type == '독차'){
+      this.props.navigation.navigate(AppRoute.ALONE_DETAIL);
+    } else {
+      this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
+    }
+    
   };
 
   moneySort(a, b) {
