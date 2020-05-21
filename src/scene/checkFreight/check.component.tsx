@@ -26,10 +26,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-// AsyncStorage.getItem('userType', (err, result) => {
-//   userType = result;
-// });
-
 export class CheckScreen extends React.Component<CheckScreenProps> {
   constructor(props) {
     super(props);
@@ -52,14 +48,17 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     const that = this;
 
     if (user != null) {
-      var ref = firestore().collection('freights');
-      //var ref = null;
-      // if(userType == 'driver'){
-      //   ref = firestore().collection('freights').where("driverId", "==", user.uid);
-      // }
-      // else if(userType = 'owner'){
-      //   ref = firestore().collection('freights').where("ownerId", "==", user.uid);
-      // }
+      //var ref = firestore().collection('freights');
+      var ref = null;
+      if (this.state.userType == 'driver') {
+        ref = firestore()
+          .collection('freights')
+          .where('driverId', '==', user.uid);
+      } else if ((this.state.userType = 'owner')) {
+        ref = firestore()
+          .collection('freights')
+          .where('ownerId', '==', user.uid);
+      }
 
       ref.get().then(async function (querySnapshot) {
         var list = [];
@@ -74,10 +73,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           else if (doc.sttate == 2) freightState = '배송완료';
 
           list.push({
-            key: doc.id, // Freight key?
+            id: doc.id, // Freight key?
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-            latitude: '', //lat, lon 필요 없을 듯?
-            longitude: '',
             startAddress: doc.startAddr,
             endAddress: doc.endAddr,
             distance: doc.dist,
@@ -91,7 +88,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     }
   };
 
-  ClickList = (index) => () => {
+  ClickList = (item) => () => {
+    AsyncStorage.setItem('FreightID', item.id);
     if (this.state.userType == 'owner') {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
     } else if (this.state.userType == 'driver') {
