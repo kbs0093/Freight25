@@ -50,10 +50,10 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     if (user != null) {
       //var ref = firestore().collection('freights');
       var ref = null;
-       if(userType == 'driver'){
+       if(this.state.userType == 'driver'){
          ref = firestore().collection('freights').where("driverId", "==", user.uid);
        }
-       else if(userType = 'owner'){
+       else if(this.state.userType = 'owner'){
          ref = firestore().collection('freights').where("ownerId", "==", user.uid);
       }
 
