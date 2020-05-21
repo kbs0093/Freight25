@@ -31,6 +31,8 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import ViewPager from '@react-native-community/viewpager';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 let userType;
 
@@ -42,21 +44,62 @@ export class DetailCheckOwnerScreen extends React.Component<
   DetailCheckOwnerScreenProps
 > {
   // The number of frieght information from 'owner' should be only one.
-  state = [
-    {
-      key: 'A1234567', // Freight key?
-      lastState: '배송중', // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-      latitude: 'unknown',
-      longitude: 'unknown',
-      //lastRefresh: 'null',
-      dist: '1234',
-      expense: '1234',
-      startAddress: '경기 군포',
-      endAddress: '제주 서귀포',
-      startDate: '당상', // 배송 출발 날짜
-      endDate: '내착',
-    },
-  ];
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      FreightID: null,
+      data: {},
+    };
+  }
+
+  componentDidMount = async () => {
+    try {
+      const value = await AsyncStorage.getItem('FreightID');
+      if (value !== null) {
+        this.setState({FreightID: value});
+      }
+    } catch (error) {}
+
+    var user = auth().currentUser;
+    const that = this;
+    if (user != null) {
+      var docRef = firestore().collection('freights').doc(this.state.FreightID);
+
+      docRef.get().then(function (doc) {
+        //doc.data()에 상세정보 저장되어 있습니다.
+        //화물의 배정 기사 변수: driverId
+        //화물 배정 상태 변수: state
+        var list = [];
+
+        if (doc.exists) {
+          const docs = doc.data();
+          console.log('Document data:', docs.id);
+
+          var freightState = '';
+          if (docs.state == 0) freightState = '배송전';
+          else if (docs.state == 1) freightState = '배송중';
+          else if (docs.sttate == 2) freightState = '배송완료';
+
+          list.push({
+            key: docs.id,
+            lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+            startAddress: docs.startAddr,
+            endAddress: docs.endAddr,
+            dist: docs.dist,
+            startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
+            endDate: docs.endDate,
+            expense: docs.expense,
+            ownerId: docs.ownerId,
+            startAddrFull: docs.startAddrFull,
+          });
+          that.setState({data: list});
+        } else {
+          console.log('No such document!');
+        }
+      });
+    }
+  };
 
   _renderItem = ({item}) => (
     <View>
@@ -124,7 +167,7 @@ export class DetailCheckOwnerScreen extends React.Component<
     let callButton;
     let reviewButton;
 
-    if (this.state.lastState == '배송전') {
+    if (this.state.data.lastState == '배송전') {
       callButton = (
         <Button
           style={styles.button}
@@ -141,7 +184,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           화물차 기사 평가
         </Button>
       );
-    } else if (this.state.lastState == '배송중') {
+    } else if (this.state.data.lastState == '배송중') {
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
           화물차 기사에게 전화
@@ -155,7 +198,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           화물차 기사 평가
         </Button>
       );
-    } else if (this.state.lastState == '배송완료') {
+    } else if (this.state.data.lastState == '배송완료') {
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
           화물차 기사에게 전화
@@ -190,7 +233,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
         <FlatList
           style={{backgroundColor: 'white'}}
-          data={this.state}
+          data={this.state.data}
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
         />
@@ -200,13 +243,13 @@ export class DetailCheckOwnerScreen extends React.Component<
             <Text style={styles.infoTitle}>총 운행 운임</Text>
           </View>
           <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{this.state[0].dist} KM</Text>
-            <Text style={styles.infoTitle}>{this.state[0].expense} 원</Text>
+            <Text style={styles.infoTitle}>{this.state.data.dist} KM</Text>
+            <Text style={styles.infoTitle}>{this.state.data.expense} 원</Text>
           </View>
         </View>
         <View style={styles.ButtonContainter}>
-          <View style={styles.ButtonHalfContainter}>{callButton}</View>
-          <View style={styles.ButtonHalfContainter}>{reviewButton}</View>
+          <View style={styles.ButtonHalfContainer}>{callButton}</View>
+          <View style={styles.ButtonHalfContainer}>{reviewButton}</View>
         </View>
       </React.Fragment>
     );
