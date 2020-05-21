@@ -35,6 +35,7 @@
     "react-native-geolocation-service": "^4.0.2",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-get-random-values": "^1.4.0",
+    "react-native-make": "^1.0.1",
     "react-native-map": "0.0.1",
     "react-native-maps": "0.27.1",
     "react-native-modal": "11.5.6",
@@ -53,6 +54,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/runtime": "^7.9.2",
+    "@bam.tech/react-native-make": "^3.0.0",
     "@react-native-community/eslint-config": "^1.0.0",
     "@types/react": "^16.9.32",
     "@types/react-native": "^0.62.2",
