@@ -36,15 +36,17 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
               var ref = firestore().collection('drivers').doc(user.uid);
               ref.get().then(function(doc) {
                 if(doc.exists){
-                  AsyncStorage.setItem('userType', 'driver');
-                  console.log("loading AsyncStorage Type: driver");
-                  props.navigation.navigate(AppRoute.HOME);
+                  AsyncStorage.setItem('userType', 'driver').then(() =>{
+                    console.log("loading AsyncStorage Type: driver");
+                    props.navigation.navigate(AppRoute.HOME);
+                  });
                 }
   
                 else{
-                  AsyncStorage.setItem('userType', 'owner');
-                  console.log("loading AsyncStorage Type: owner");
-                  props.navigation.navigate(AppRoute.OWNER);
+                  AsyncStorage.setItem('userType', 'owner').then(()=>{
+                    console.log("loading AsyncStorage Type: owner");
+                    props.navigation.navigate(AppRoute.OWNER);
+                  });
                 } 
               })
             }

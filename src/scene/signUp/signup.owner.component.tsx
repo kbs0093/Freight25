@@ -123,6 +123,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                         savedEndLon:endAddr_lon
                         });
                       Toast.showSuccess('회원가입이 완료되었습니다.');
+                      AsyncStorage.setItem('userType', 'owner');
                       props.navigation.navigate(AppRoute.OWNER);
                     } catch (error) {
                       //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.

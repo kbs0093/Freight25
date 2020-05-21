@@ -213,6 +213,31 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     this.setState({region});
   }
   
+  ClickApply = async() => {
+    const user = auth().currentUser;
+    const value = await AsyncStorage.getItem('FreightID');
+    if(user != null){
+      if (value != null) {
+        var freightRef = firestore().collection('freights').doc(value);
+        var driverRef = firestore().collection('drivers').doc(user.uid);
+        var driverTel = (await driverRef.get()).data().tel;
+        console.log("target Freight ID:"+ freightRef.id);
+        try{
+          freightRef.update({
+            state: 1,
+            driverId: user.uid,
+            driverTel: driverTel
+          })
+          console.log(freightRef.id+" was assigned to "+ user.uid);
+          props.navigation.navigate(AppRoute.OWNER);
+          Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+        }
+        catch{
+          console.log("Failed assign to "+freightRef.id);
+        }
+      }
+    }
+  }
   
 
   render(){
@@ -402,7 +427,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             <Text style={styles.freightTitle}>      총 운행운임 : {this.state.data.moneyPrint}원 </Text>
           </View>
           <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
-            <Button style={styles.button} status='success'>수 락</Button>
+            <Button style={styles.button} status='success' onPress={this.ClickApply}>수 락</Button>
           </View>
         </View>      
       </React.Fragment>      

@@ -28,6 +28,7 @@ import firestore from '@react-native-firebase/firestore';
 let userType;
 
 AsyncStorage.getItem('userType', (err, result) => {
+  console.log("checkFreight asyncStorage: "+result);
   userType = result;
 });
 
@@ -37,16 +38,22 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
   };
 
   componentDidMount = async() => {
+    userType = await AsyncStorage.getItem('userType');
+    console.log(userType);
+
     var user = auth().currentUser;
     const that = this;
     
     if(user != null){  
       var ref = null;
+      
       if(userType == 'driver'){
         ref = firestore().collection('freights').where("driverId", "==", user.uid);
+        console.log('driver: '+user.uid);
       }
       else if(userType = 'owner'){
         ref = firestore().collection('freights').where("ownerId", "==", user.uid);
+        console.log('owner: '+user.uid);
       }
       ref
       .get()
