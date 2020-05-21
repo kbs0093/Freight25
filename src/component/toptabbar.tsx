@@ -111,10 +111,10 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       {
         /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
       }
-      AsyncStorage.clear().then
-      kakaoLogout();
-      fbLogout();
-
+      AsyncStorage.clear().then(()=>{
+        kakaoLogout();
+        fbLogout();
+      })
       props.navigation.dispatch(resetAction);
       console.log('Logout Success');
     }

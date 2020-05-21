@@ -25,70 +25,71 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-let userType;
-
-AsyncStorage.getItem('userType', (err, result) => {
-  userType = result;
-});
 
 export class CheckScreen extends React.Component<CheckScreenProps> {
-  state = { 
-      data:[]
-  };
+  constructor(props) {
+    super(props);
 
-  componentDidMount = async() => {
+    this.state = {
+      data: [],
+      userType: null,
+    };
+  }
+
+  componentDidMount = async () => {
+    try {
+      const value = await AsyncStorage.getItem('userType');
+      if (value !== null) {
+        this.setState({userType: value});
+      }
+    } catch (error) {}
+
     var user = auth().currentUser;
     const that = this;
-    
-    if(user != null){  
+
+    if (user != null) {
+      //var ref = firestore().collection('freights');
       var ref = null;
-      if(userType == 'driver'){
-        ref = firestore().collection('freights').where("driverId", "==", user.uid);
+       if(this.state.userType == 'driver'){
+         ref = firestore().collection('freights').where("driverId", "==", user.uid);
+       }
+       else if(this.state.userType = 'owner'){
+         ref = firestore().collection('freights').where("ownerId", "==", user.uid);
       }
-      else if(userType = 'owner'){
-        ref = firestore().collection('freights').where("ownerId", "==", user.uid);
-      }
-      ref
-      .get()
-      .then(async function(querySnapshot){
-        var list =[];
-        
-        for(var docCnt in querySnapshot.docs){            
+
+      ref.get().then(async function (querySnapshot) {
+        var list = [];
+
+        for (var docCnt in querySnapshot.docs) {
           const doc = querySnapshot.docs[docCnt].data();
-          console.log(docCnt+"번째 화물 id: "+doc.id);
+          console.log(docCnt + '번째 화물 id: ' + doc.id);
 
           var freightState = '';
-          if(doc.state == 0)
-            freightState = "배송전";
-          else if(doc.state == 1)
-            freightState = "배송중";
-          else if(doc.sttate == 2)
-            freightState = "배송완료";
+          if (doc.state == 0) freightState = '배송전';
+          else if (doc.state == 1) freightState = '배송중';
+          else if (doc.sttate == 2) freightState = '배송완료';
 
           list.push({
-            key: doc.id, // Freight key?
+            id: doc.id, // Freight key?
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-            latitude: '', //lat, lon 필요 없을 듯?
-            longitude: '',
             startAddress: doc.startAddr,
             endAddress: doc.endAddr,
             distance: doc.dist,
             lastRefresh: 'null',
             startDate: doc.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: doc.endDate,
-          });                 
+          });
         }
         that.setState({data: list});
-      })     
-    } 
+      });
+    }
   };
 
-  ClickList = (index) => () => {
-    //AsyncStorage.setItem('Freight', index);
-
-    if (userType == 'owner') {
+  ClickList = (item) => () => {
+    AsyncStorage.setItem('FreightID', item.id);
+    if (this.state.userType == 'owner') {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
-    } else if (userType == 'driver') {
+    } else if (this.state.userType == 'driver') {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
     } else {
       console.log('undefined usertype');

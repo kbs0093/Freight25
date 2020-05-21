@@ -32,5 +32,7 @@ export enum AppRoute {
   STOPOVER1 = 'Stopover1',
   STOPOVER2 = 'Stopover2',
   STOPOVER3 = 'Stopover3',
-  SEARCH_DETAIL_NAVIGATOR = 'Search Detail Navigator'
+  SEARCH_DETAIL_NAVIGATOR = 'Search Detail Navigator',
+  ALONE_DETAIL_MAIN = 'Alone Detail Main',
+  ALONE_DETAIL = 'Alone Detail'
 }
