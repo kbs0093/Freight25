@@ -25,6 +25,7 @@ import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-tiny-toast';
 
 const isAndroid = Platform.OS ==='android';
 
@@ -229,8 +230,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             driverTel: driverTel
           })
           console.log(freightRef.id+" was assigned to "+ user.uid);
-          props.navigation.navigate(AppRoute.OWNER);
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+          this.props.navigation.navigate(AppRoute.HOME);
         }
         catch{
           console.log("Failed assign to "+freightRef.id);
