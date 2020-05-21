@@ -43,7 +43,12 @@ export class DetailCheckDriverScreen extends React.Component<
 
     this.state = {
       FreightID: null,
-      data: {},
+      data: [],
+      addiData: {
+        lastState: null, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+        dist: null,
+        expense: null,
+      },
     };
   }
 
@@ -88,7 +93,15 @@ export class DetailCheckDriverScreen extends React.Component<
             // ownerId: docs.ownerId,
             // startAddrFull: docs.startAddrFull,
           });
+
+          var addiData = {
+            lastState: freightState,
+            dist: docs.dist,
+            expense: docs.expense,
+          };
+
           that.setState({data: list});
+          that.setState({data: addiData});
         } else {
           console.log('No such document!');
         }
@@ -174,9 +187,9 @@ export class DetailCheckDriverScreen extends React.Component<
     let callButton;
     let completeButton;
 
-    console.log(this.state.data.lastState);
+    console.log(this.state.addiData.lastState);
 
-    if (this.state.data.lastState == '배송중') {
+    if (this.state.addiData.lastState == '배송중') {
       navButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
           내비게이션 연결
@@ -192,7 +205,7 @@ export class DetailCheckDriverScreen extends React.Component<
           운송 완료하기
         </Button>
       );
-    } else if (this.state.data.lastState == '배송완료') {
+    } else if (this.state.addiData.lastState == '배송완료') {
       navButton = (
         <Button
           style={styles.button}
@@ -256,8 +269,10 @@ export class DetailCheckDriverScreen extends React.Component<
             <Text style={styles.infoTitle}>총 운행 운임</Text>
           </View>
           <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{this.state.data.dist} KM</Text>
-            <Text style={styles.infoTitle}>{this.state.data.expense} 원</Text>
+            <Text style={styles.infoTitle}>{this.state.addiData.dist} KM</Text>
+            <Text style={styles.infoTitle}>
+              {this.state.addiData.expense} 원
+            </Text>
           </View>
         </View>
         <View style={styles.ButtonContainter}>
@@ -373,10 +388,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     flex: 1,
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
   ButtonHalfContainer: {
     flex: 1,
+    alignItems: 'center',
   },
   iconSize: {
     width: 32,

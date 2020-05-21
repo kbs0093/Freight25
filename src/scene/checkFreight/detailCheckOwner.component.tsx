@@ -49,7 +49,12 @@ export class DetailCheckOwnerScreen extends React.Component<
 
     this.state = {
       FreightID: null,
-      data: {},
+      data: [],
+      addiData: {
+        lastState: null, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+        dist: null,
+        expense: null,
+      },
     };
   }
 
@@ -63,6 +68,7 @@ export class DetailCheckOwnerScreen extends React.Component<
 
     var user = auth().currentUser;
     const that = this;
+
     if (user != null) {
       var docRef = firestore().collection('freights').doc(this.state.FreightID);
 
@@ -93,6 +99,14 @@ export class DetailCheckOwnerScreen extends React.Component<
             ownerId: docs.ownerId,
             startAddrFull: docs.startAddrFull,
           });
+
+          var addiData = {
+            lastState: freightState,
+            dist: docs.dist,
+            expense: docs.expense,
+          };
+
+          that.setState({addiData: addiData});
           that.setState({data: list});
         } else {
           console.log('No such document!');
@@ -167,7 +181,7 @@ export class DetailCheckOwnerScreen extends React.Component<
     let callButton;
     let reviewButton;
 
-    if (this.state.data.lastState == '배송전') {
+    if (this.state.addiData.lastState == '배송전') {
       callButton = (
         <Button
           style={styles.button}
@@ -184,7 +198,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           화물차 기사 평가
         </Button>
       );
-    } else if (this.state.data.lastState == '배송중') {
+    } else if (this.state.addiData.lastState == '배송중') {
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
           화물차 기사에게 전화
@@ -198,7 +212,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           화물차 기사 평가
         </Button>
       );
-    } else if (this.state.data.lastState == '배송완료') {
+    } else if (this.state.addiData.lastState == '배송완료') {
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
           화물차 기사에게 전화
@@ -243,8 +257,10 @@ export class DetailCheckOwnerScreen extends React.Component<
             <Text style={styles.infoTitle}>총 운행 운임</Text>
           </View>
           <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{this.state.data.dist} KM</Text>
-            <Text style={styles.infoTitle}>{this.state.data.expense} 원</Text>
+            <Text style={styles.infoTitle}>{this.state.addiData.dist} KM</Text>
+            <Text style={styles.infoTitle}>
+              {this.state.addiData.expense} 원
+            </Text>
           </View>
         </View>
         <View style={styles.ButtonContainter}>
@@ -359,10 +375,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     flex: 1,
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
   ButtonHalfContainer: {
     flex: 1,
+    alignItems: 'center',
   },
   iconSize: {
     width: 32,
