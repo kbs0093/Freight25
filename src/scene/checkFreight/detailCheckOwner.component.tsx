@@ -86,6 +86,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           var freightState = '';
           var startAddrArray = docs.startAddr.split(' ');
           var endAddrArray = docs.endAddr.split(' ');
+
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.sttate == 2) freightState = '배송완료';
@@ -93,12 +94,12 @@ export class DetailCheckOwnerScreen extends React.Component<
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-            startAddr: docs.startAddr,
-            endAddr: docs.endAddr,
             dist: docs.dist,
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: docs.endDate,
             expense: docs.expense,
+            startAddr: docs.startAddr,
+            endAddr: docs.endAddr,
             startAddrFull: docs.startAddr_Full,
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
@@ -111,7 +112,7 @@ export class DetailCheckOwnerScreen extends React.Component<
             lastState: freightState,
             dist: docs.dist,
             expense: docs.expense,
-            ownerID: docs.ownerID,
+            ownerId: docs.ownerId,
           };
 
           that.setState({addiData: addiData});
@@ -195,8 +196,6 @@ export class DetailCheckOwnerScreen extends React.Component<
     let callButton;
     let reviewButton;
 
-    console.log(this.state.addiData.ownerID);
-
     if (this.state.addiData.lastState == '배송전') {
       callButton = (
         <Button
@@ -265,7 +264,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           style={{backgroundColor: 'white'}}
           data={this.state.data}
           renderItem={this._renderItem}
-          keyExtractor={(item) => item.key}
+          //keyExtractor={(item) => item.key}
         />
         <View style={styles.totalInfoContainer}>
           <View style={styles.totalInfoHalfContainer}>
@@ -295,7 +294,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   badgeText: {
-    fontSize: RFPercentage(1.4),
+    fontSize: RFPercentage(1.5),
   },
   button: {
     width: RFPercentage(18),

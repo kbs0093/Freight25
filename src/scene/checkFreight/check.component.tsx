@@ -48,14 +48,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     const that = this;
 
     if (user != null) {
-      //var ref = firestore().collection('freights');
-      var ref = null;
-       if(this.state.userType == 'driver'){
-         ref = firestore().collection('freights').where("driverId", "==", user.uid);
-       }
-       else if(this.state.userType = 'owner'){
-         ref = firestore().collection('freights').where("ownerId", "==", user.uid);
-      }
+      var ref = firestore().collection('freights');
+      // var ref = null;
+      //  if(this.state.userType == 'driver'){
+      //    ref = firestore().collection('freights').where("driverId", "==", user.uid);
+      //  }
+      //  else if(this.state.userType = 'owner'){
+      //    ref = firestore().collection('freights').where("ownerId", "==", user.uid);
+      // }
 
       ref.get().then(async function (querySnapshot) {
         var list = [];
