@@ -54,6 +54,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         lastState: null, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
         dist: null,
         expense: null,
+        ownerID: null,
       },
     };
   }
@@ -83,6 +84,8 @@ export class DetailCheckOwnerScreen extends React.Component<
           console.log('Document data:', docs.id);
 
           var freightState = '';
+          var startAddrArray = docs.startAddr.split(' ');
+          var endAddrArray = docs.endAddr.split(' ');
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.sttate == 2) freightState = '배송완료';
@@ -90,20 +93,25 @@ export class DetailCheckOwnerScreen extends React.Component<
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-            startAddress: docs.startAddr,
-            endAddress: docs.endAddr,
+            startAddr: docs.startAddr,
+            endAddr: docs.endAddr,
             dist: docs.dist,
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: docs.endDate,
             expense: docs.expense,
-            ownerId: docs.ownerId,
-            startAddrFull: docs.startAddrFull,
+            startAddrFull: docs.startAddr_Full,
+            endAddrFull: docs.endAddr_Full,
+            startAddrArray: startAddrArray,
+            endAddrArray: endAddrArray,
+            regDate: docs.timeStamp,
+            driveOption: docs.driveOption,
           });
 
           var addiData = {
             lastState: freightState,
             dist: docs.dist,
             expense: docs.expense,
+            ownerID: docs.ownerID,
           };
 
           that.setState({addiData: addiData});
@@ -125,7 +133,10 @@ export class DetailCheckOwnerScreen extends React.Component<
       </View>
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
-          <Text style={styles.geoText}>{item.startAddress} </Text>
+          <Text style={styles.geoText}>
+            {item.startAddrArray[0]} {item.startAddrArray[1]}{' '}
+          </Text>
+          <Text style={styles.geoText}>{item.startAddrArray[2]}</Text>
           <Text style={styles.geoSubText}>{item.startDate}</Text>
         </View>
         <View style={styles.geoInfoContainer}>
@@ -136,35 +147,44 @@ export class DetailCheckOwnerScreen extends React.Component<
           />
         </View>
         <View style={styles.geoInfoContainer}>
-          <Text style={styles.geoText}>{item.endAddress}</Text>
+          <Text style={styles.geoText}>
+            {item.endAddrArray[0]} {item.endAddrArray[1]}
+          </Text>
+          <Text style={styles.geoText}>{item.endAddrArray[2]}</Text>
           <Text style={styles.geoSubText}>{item.endDate}</Text>
         </View>
       </View>
 
       <View style={styles.freightInfoTotalContainer}>
         <View style={styles.freightInfoHalfContainer} key="1">
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>운행 시간</Text>
-          <Text style={styles.infoTitle}>배차 날짜</Text>
+          {item.lastState == '배송전' ? (
+            <Text style={styles.infoTitle}>등록 날짜</Text>
+          ) : (
+            <Text style={styles.infoTitle}>배차 날짜</Text>
+          )}
+          {item.lastState == '배송전' ? (
+            <Text style={styles.infoTitle}>예상 운행 거리</Text>
+          ) : (
+            <Text style={styles.infoTitle}>운행 거리</Text>
+          )}
           <Text style={styles.infoTitle}>운행 운임</Text>
+          <Text style={styles.infoTitle}>운행 방식</Text>
           <Text style={styles.infoTitle}>상차지 주소</Text>
+          <Text style={styles.infoTitle}></Text>
           <Text style={styles.infoTitle}></Text>
           <Text style={styles.infoTitle}>하차지 주소</Text>
           <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}>화주 이름</Text>
-          <Text style={styles.infoTitle}>화주 연락처</Text>
+          <Text style={styles.infoTitle}></Text>
         </View>
         <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoRightTitle}>{item.regDate}</Text>
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
-          <Text style={styles.infoRightTitle}>12 시간</Text>
-          <Text style={styles.infoRightTitle}>2020년 5월 12일</Text>
+          <Text style={styles.infoRightTitle}>{item.driveOption}</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          <Text style={styles.infoTitle}>{item.startAddress}</Text>
-          <Text style={styles.infoTitle}>상세 주소</Text>
-          <Text style={styles.infoTitle}>{item.endAddress}</Text>
-          <Text style={styles.infoTitle}>상세 주소</Text>
-          <Text style={styles.infoTitle}>홍길동</Text>
-          <Text style={styles.infoTitle}>01018181818</Text>
+          <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
+          <Text style={styles.infoRightTitle}></Text>
+          <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
+          <Text style={styles.infoRightTitle}></Text>
         </View>
       </View>
       <View style={styles.lineStyle} />
@@ -172,14 +192,10 @@ export class DetailCheckOwnerScreen extends React.Component<
   );
 
   render() {
-    // assert
-    // We need to check if the 'userType' is owner
-    //
-    // In owner check process, there is no navButton and completeButton.
-    // Only need callButton and reviewButton
-
     let callButton;
     let reviewButton;
+
+    console.log(this.state.addiData.ownerID);
 
     if (this.state.addiData.lastState == '배송전') {
       callButton = (
@@ -279,10 +295,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   badgeText: {
-    fontSize: RFPercentage(1.6),
+    fontSize: RFPercentage(1.4),
   },
   button: {
-    width: RFPercentage(15),
+    width: RFPercentage(18),
     height: RFPercentage(6),
     borderRadius: 8,
   },
@@ -295,37 +311,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   Subtitle: {
-    fontSize: RFPercentage(2.5),
+    fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
   freightContainer: {
     paddingHorizontal: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
-    paddingVertical: 5,
+    paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  freightInfoContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 70,
-    alignItems: 'flex-start',
-    borderColor: '#20232a',
-  },
   freightInfoTotalContainer: {
+    paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   freightInfoHalfContainer: {
     flex: 1,
   },
   geoContainer: {
     paddingVertical: 15,
+    paddingHorizontal: 20,
     flex: 0.5,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   geoInfoContainer: {
@@ -333,7 +345,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    //borderWidth: 1,
   },
   geoText: {
     fontSize: RFPercentage(3),
@@ -342,6 +353,7 @@ const styles = StyleSheet.create({
   geoSubText: {
     fontSize: RFPercentage(2),
     fontWeight: 'bold',
+    paddingVertical: 15,
   },
   infoTitle: {
     paddingVertical: 2,
