@@ -229,7 +229,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             driverId: user.uid,
             driverTel: driverTel
           })
-          console.log(freightRef.id+" was assigned to "+ user.uid);
+          console.log("StopOver X "+freightRef.id+" was assigned to "+ user.uid);
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
           this.props.navigation.navigate(AppRoute.HOME);
         }

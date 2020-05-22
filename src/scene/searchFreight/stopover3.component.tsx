@@ -14,6 +14,9 @@ import {
 import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
 import { StopoverScreen3Props } from '../../navigation/search.navigator';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-tiny-toast';
 
 export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
   constructor(props) {
@@ -94,8 +97,30 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
     }
   };
 
-  ClickApply = () => {
-
+  ClickApply = async() => {
+    const user = auth().currentUser;
+    const value = await AsyncStorage.getItem('FreightID');
+    if(user != null){
+      if (value != null) {
+        var freightRef = firestore().collection('freights').doc(value);
+        var driverRef = firestore().collection('drivers').doc(user.uid);
+        var driverTel = (await driverRef.get()).data().tel;
+        console.log("target Freight ID:"+ freightRef.id);
+        try{
+          freightRef.update({
+            state: 1,
+            driverId: user.uid,
+            driverTel: driverTel
+          })
+          console.log("StopOver3 "+freightRef.id+" was assigned to "+ user.uid);
+          Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+          this.props.navigation.navigate(AppRoute.HOME);
+        }
+        catch{
+          console.log("Failed assign to "+freightRef.id);
+        }
+      }
+    }
   }
 
   
