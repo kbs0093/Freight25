@@ -50,17 +50,17 @@ AsyncStorage.getItem('nickname', (err, result) => {
 //   userType = result;
 // });
 
-async function getUserType() {
-  try {
-    const value = await AsyncStorage.getItem('userType');
-    if (value !== null) {
-      userType = value;
-      console.log(userType);
-    }
-  } catch (error) {}
-}
+// async function getUserType() {
+//   try {
+//     const value = await AsyncStorage.getItem('userType');
+//     if (value !== null) {
+//       userType = value;
+//       console.log(userType);
+//     }
+//   } catch (error) {}
+// }
 
-getUserType();
+// getUserType();
 
 const resetAction = CommonActions.reset({
   index: 0,
@@ -116,14 +116,18 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
 
   const onMenuItemSelect = (index) => {
     setMenuVisible(false);
+
     console.log(index);
+
     if (index == 2) {
-      console.log(userType);
-      if (userType == 'owner') {
-        props.navigation.navigate(AppRoute.PROFILE_OWNER);
-      } else if (userType == 'driver') {
-        props.navigation.navigate(AppRoute.PROFILE_DRIVER);
-      }
+      AsyncStorage.getItem('userType').then((value) => {
+        userType = value;
+        if (userType == 'owner') {
+          props.navigation.navigate(AppRoute.PROFILE_OWNER);
+        } else if (userType == 'driver') {
+          props.navigation.navigate(AppRoute.PROFILE_DRIVER);
+        }
+      });
     } else if (index == 3) {
       {
         /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
