@@ -8,6 +8,7 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   LayoutElement, TopNavigation,
@@ -178,6 +179,48 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       });
   }
 
+  function is_integer(v){
+    var reg = /^(\s|\d)+$/;
+    return reg.test(v);
+  }
+
+  const isInteger = (props, setterProps) => {
+    if(is_integer(props)){
+      setterProps(props);
+    } else {
+      Alert.alert("숫자만 입력하세요")
+      setterProps('');
+    }
+  }
+
+  function is_double_plus(v) {
+    var reg = /^\d+\.?\d*$/;
+    return reg.test(v);
+  }
+
+  const isDoublePlus = (props, setterProps) => {
+    if(is_double_plus(props)){
+      setterProps(props);
+    } else{
+      Alert.alert("숫자만 입력하세요")
+      setterProps('');
+    }
+  }
+
+  function is_letter(v) {
+    var reg = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+$/;
+    return reg.test(v)
+  }
+
+  const isName = (props, setterProps) => {
+    if(is_letter(props)){
+      setterProps(props);
+    } else{
+      Alert.alert("문자만 입력하세요")
+      setterProps('');
+    }
+  }
+
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -291,7 +334,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               <Input
                 placeholder='화물 무게를 입력하세요'
                 value={weightValue}
-                onChangeText={nextValue => setWeightValue(nextValue)}
+                onChangeText={nextValue => isDoublePlus(nextValue, setWeightValue)}
               />
             </Layout>
             <Text style={styles.infoTitle}> 톤</Text>
@@ -301,7 +344,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             <Input
               placeholder='숫자로 입력'
               value={volumeValue}
-              onChangeText={nextValue => setVolumeValue(nextValue)}
+              onChangeText={nextValue => isDoublePlus(nextValue, setVolumeValue)}
             />
             <View style={{flex:3}}>
               <Text style={styles.infoTitle}> 파레트</Text>
@@ -349,7 +392,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               <Input
                 placeholder='화물 요금을 입력하세요'
                 value={expenseValue}
-                onChangeText={nextValue => setExpenseValue(nextValue)}
+                onChangeText={nextValue => isInteger(nextValue, setExpenseValue)}
               />
             </Layout>
 

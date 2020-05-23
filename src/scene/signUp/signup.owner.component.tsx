@@ -180,17 +180,8 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
 
   const onPressCall = () => {
     const url = `tel:${phoneNumInput}`;
-    Linking.canOpenURL(url)
-		.then((supported) => {
-			if (!supported) {
-          console.error('Can\'t handle url: ' + url);
-			} else {
-				return Linking.openURL(url)
-					.then((data) => console.error("then", data))
-					.catch((err) => { throw err; });
-			}
-		})
-		.catch((err) => console.error('An error occurred', err));
+    Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    console.log('Call sended')
   }
 
   
