@@ -9,10 +9,16 @@ import {
   CheckDetailOwnerNavigator,
 } from './check.navigator';
 import {SearchNavigator} from './search.navigator';
-import { searchDetailNavigator, aloneDetailNavigator } from './searchDetail.navigator'
+import {
+  searchDetailNavigator,
+  aloneDetailNavigator,
+} from './searchDetail.navigator';
 import {ApplyNavigator} from './apply.navigator';
 import {AppRoute} from './app-routes';
-import {ProfileNavigator} from './profile.navigator';
+import {
+  ProfileOwnerNavigator,
+  ProfileDriverNavigator,
+} from './profile.navigator';
 import {SignupNavigator} from './signup.navigator';
 
 const Stack = createStackNavigator();
@@ -24,8 +30,14 @@ export const AppNavigator = (props): React.ReactElement => (
     <Stack.Screen name={AppRoute.HOME} component={HomeNavigator} />
     <Stack.Screen name={AppRoute.OWNER} component={OwnerNavigator} />
     <Stack.Screen name={AppRoute.SEARCH} component={SearchNavigator} />
-    <Stack.Screen name={AppRoute.SEARCH_DETAIL} component={searchDetailNavigator}/>
-    <Stack.Screen name={AppRoute.ALONE_DETAIL} component={aloneDetailNavigator}/>
+    <Stack.Screen
+      name={AppRoute.SEARCH_DETAIL}
+      component={searchDetailNavigator}
+    />
+    <Stack.Screen
+      name={AppRoute.ALONE_DETAIL}
+      component={aloneDetailNavigator}
+    />
     <Stack.Screen name={AppRoute.CHECK} component={CheckNavigator} />
     <Stack.Screen
       name={AppRoute.CHECK_DETAIL_OWNER}
@@ -36,6 +48,13 @@ export const AppNavigator = (props): React.ReactElement => (
       component={CheckDetailDriverNavigator}
     />
     <Stack.Screen name={AppRoute.APPLY} component={ApplyNavigator} />
-    <Stack.Screen name={AppRoute.PROFILE} component={ProfileNavigator} />
+    <Stack.Screen
+      name={AppRoute.PROFILE_OWNER}
+      component={ProfileOwnerNavigator}
+    />
+    <Stack.Screen
+      name={AppRoute.PROFILE_DRIVER}
+      component={ProfileDriverNavigator}
+    />
   </Stack.Navigator>
 );

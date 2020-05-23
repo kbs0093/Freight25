@@ -48,14 +48,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     const that = this;
 
     if (user != null) {
-      //var ref = firestore().collection('freights');
-      var ref = null;
-       if(this.state.userType == 'driver'){
-         ref = firestore().collection('freights').where("driverId", "==", user.uid);
-       }
-       else if(this.state.userType = 'owner'){
-         ref = firestore().collection('freights').where("ownerId", "==", user.uid);
-      }
+      var ref = firestore().collection('freights');
+      // var ref = null;
+      //  if(this.state.userType == 'driver'){
+      //    ref = firestore().collection('freights').where("driverId", "==", user.uid);
+      //  }
+      //  else if(this.state.userType = 'owner'){
+      //    ref = firestore().collection('freights').where("ownerId", "==", user.uid);
+      // }
 
       ref.get().then(async function (querySnapshot) {
         var list = [];
@@ -117,8 +117,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           </View>
           <View style={styles.geoInfo1}>
             <Text style={styles.timeText}>
-              출발 {item.start_month} 월 {item.start_day} 일 - 도착{' '}
-              {item.end_month} 월 {item.end_day} 일
+              출발 {item.startMonth} 월 {item.startDay} 일 - 도착{' '}
+              {item.endMonth} 월 {item.endDay} 일
             </Text>
           </View>
         </View>
@@ -135,14 +135,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <ScrollView>
-          <FlatList
-            style={{backgroundColor: 'white'}}
-            data={this.state.data}
-            renderItem={this._renderItem}
-            keyExtractor={(item) => item.key}
-          />
-        </ScrollView>
+        {/* <ScrollView> */}
+        <FlatList
+          style={{backgroundColor: 'white'}}
+          data={this.state.data}
+          renderItem={this._renderItem}
+          keyExtractor={(item) => item.key}
+        />
+        {/* </ScrollView> */}
       </React.Fragment>
     );
   }
