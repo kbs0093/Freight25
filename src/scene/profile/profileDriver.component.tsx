@@ -33,6 +33,9 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {Value} from 'react-native-reanimated';
 
 const useInputState = (initialValue = '') => {
@@ -59,6 +62,31 @@ export const ProfileDriverScreen = (
   const [manNumInput, manNum] = React.useState('');
   const [companyNameInput, companyName] = React.useState('');
 
+  const reviseProfile = () => {
+    var user = auth().currentUser?.uid;
+    var ref = firestore().collection('drivers').doc(user);
+    if (user != null) {
+      console.log('firestore target uid: ' + auth().currentUser?.uid);
+      try {
+        ref.update({
+          name: nameInput,
+          accountOwner: accountOwnerInput,
+          carNumber: carNumInput,
+          companyNumber: manNumInput,
+          accountNumber: accountNumInput,
+          tel: phoneNumInput,
+          carTon: TonValue,
+          caryType: TypeValue,
+          bankName: BankValue,
+        });
+      } catch (error) {
+        //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
+        Toast.showSuccess('수정 실패');
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -67,7 +95,7 @@ export const ProfileDriverScreen = (
           <Text style={styles.Subtitle}>화물차 기사 정보 수정</Text>
           <Button
             onPress={() => {
-              console.log(carNumInput);
+              reviseProfile();
               Toast.showSuccess('수정 완료');
             }}
             style={styles.Button}
@@ -108,6 +136,7 @@ export const ProfileDriverScreen = (
             </Layout>
           </View>
         </View>
+        <View style={styles.lineStyle} />
 
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>차량 정보</Text>
@@ -158,6 +187,7 @@ export const ProfileDriverScreen = (
             />
           </View>
         </View>
+        <View style={styles.lineStyle} />
 
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
@@ -232,14 +262,14 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
     justifyContent: 'space-between',
   },
   rowContainer: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
@@ -265,6 +295,6 @@ const styles = StyleSheet.create({
   lineStyle: {
     borderWidth: 0.5,
     borderColor: 'black',
-    margin: 10,
+    margin: 5,
   },
 });

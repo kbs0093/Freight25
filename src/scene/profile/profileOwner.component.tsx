@@ -34,43 +34,53 @@ import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
 import {Value} from 'react-native-reanimated';
-
-const useInputState = (initialValue = '') => {
-  const [value, setValue] = React.useState(initialValue);
-  return {value, onChangeText: setValue};
-};
-
-const useSelectState = (initialValue = '') => {
-  const [value, setValue] = React.useState(initialValue);
-  return {value, onSelect: setValue, selectedOption: value};
-};
-
-let userType;
-
-async function getType() {
-  try {
-    const value = await AsyncStorage.getItem('userType');
-    if (value !== null) {
-      userType = value;
-      console.log(userType);
-    }
-  } catch (error) {}
-}
-getType();
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 export const ProfileOwnerScreen = (
   props: ProfileOwnerScreenProps,
 ): LayoutElement => {
-  const [TonValue, setTonValue] = React.useState('');
-  const [TypeValue, setTypeValue] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
   const [nameInput, name] = React.useState('');
   const [phoneNumInput, phoneNum] = React.useState('');
   const [accountNumInput, accountNum] = React.useState('');
   const [accountOwnerInput, accountOwner] = React.useState('');
-  const [carNumInput, carNum] = React.useState('');
   const [manNumInput, manNum] = React.useState('');
   const [companyNameInput, companyName] = React.useState('');
+
+  const reviseProfile = () => {
+    var user = auth().currentUser?.uid;
+    var ref = firestore().collection('owners').doc(user);
+    if (user != null) {
+      console.log('firestore target uid: ' + auth().currentUser?.uid);
+      try {
+        ref.update({
+          name: nameInput,
+          tel: phoneNumInput,
+          companyNumber: manNumInput,
+
+          // TODO: Need to add Favorite address
+          // savedStartCompact: addrCompact,
+          // savedStartFull: addrFull,
+          // savedStartlat: addr_lat,
+          // savedStartlon: addr_lon,
+          // savedEndCompact: endAddrCompact,
+          // savedEndFull: endAddrFull,
+          // savedEndLat: endAddr_lat,
+          // savedEndLon: endAddr_lon,
+          companyName: companyNameInput,
+
+          bankName: BankValue,
+          account: accountNumInput,
+          accountOwner: accountNumInput,
+        });
+      } catch (error) {
+        console.log(error);
+        Toast.show('수정 실패');
+      }
+    }
+  };
 
   return (
     <React.Fragment>
@@ -80,7 +90,7 @@ export const ProfileOwnerScreen = (
           <Text style={styles.Subtitle}>화주 정보 수정</Text>
           <Button
             onPress={() => {
-              console.log(nameInput);
+              reviseProfile();
               Toast.showSuccess('수정 완료');
             }}
             style={styles.Button}
@@ -122,6 +132,8 @@ export const ProfileOwnerScreen = (
             </Layout>
           </View>
         </View>
+        <View style={styles.lineStyle} />
+
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>상 하차지 정보</Text>
           <View style={styles.rowContainer}>
@@ -142,6 +154,7 @@ export const ProfileOwnerScreen = (
           </View>
         </View>
 
+        <View style={styles.lineStyle} />
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
           <View style={styles.rowContainer}>
@@ -215,14 +228,14 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
     justifyContent: 'space-between',
   },
   rowContainer: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
@@ -248,6 +261,6 @@ const styles = StyleSheet.create({
   lineStyle: {
     borderWidth: 0.5,
     borderColor: 'black',
-    margin: 10,
+    margin: 5,
   },
 });
