@@ -38,6 +38,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
                 if(doc.exists){
                   AsyncStorage.setItem('userType', 'driver').then(() =>{
                     console.log("loading AsyncStorage Type: driver");
+                    console.log(user.uid+" succeeded in loging / loading Stage");
                     props.navigation.navigate(AppRoute.HOME);
                   });
                 }
@@ -45,6 +46,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
                 else{
                   AsyncStorage.setItem('userType', 'owner').then(()=>{
                     console.log("loading AsyncStorage Type: owner");
+                    console.log(user.uid+" succeeded in loging / loading Stage");
                     props.navigation.navigate(AppRoute.OWNER);
                   });
                 } 

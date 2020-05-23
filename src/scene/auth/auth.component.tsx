@@ -82,6 +82,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                         AsyncStorage.setItem('userType', 'driver')
                         .then( ()=>{
                           console.log("auth AsyncStorage Type: driver");
+                          console.log(user.uid+" succeeded in loging / auth Stage");
                         });
                         authFlag = false;
                         props.navigation.navigate(AppRoute.HOME);
@@ -90,6 +91,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                         AsyncStorage.setItem('userType', 'owner')
                         .then(()=>{
                           console.log("auth AsyncStorage Type: owner");
+                          console.log(user.uid+" succeeded in loging / auth Stage");
                         });
                         authFlag = false;
                         props.navigation.navigate(AppRoute.OWNER);

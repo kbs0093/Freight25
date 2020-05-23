@@ -22,6 +22,7 @@ import firestore from '@react-native-firebase/firestore';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
+import Toast from 'react-native-tiny-toast';
 
 const serverUrl = 'http://49.50.162.128:8000/';
 
@@ -119,8 +120,10 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                         carTon: TonValue,
                         caryType: TypeValue,
                         bankName: BankValue,
-                        });
+                      });
+                      Toast.showSuccess('회원가입이 완료되었습니다.');
                       AsyncStorage.setItem('userType', 'driver');
+                      console.log(user.uid+" succeeded in loging / signup Stage");
                       props.navigation.push(AppRoute.HOME);
                     } catch (error) {
                       //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
