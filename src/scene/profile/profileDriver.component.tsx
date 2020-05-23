@@ -35,9 +35,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
 import axios from 'axios';
+import {Value} from 'react-native-reanimated';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {Value} from 'react-native-reanimated';
+import KakaoLogins from '@react-native-seoul/kakao-login';
+import {CommonActions} from '@react-navigation/native';
+const resetAction = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.AUTH}],
+});
 
 const useInputState = (initialValue = '') => {
   const [value, setValue] = React.useState(initialValue);
@@ -63,17 +69,42 @@ export const ProfileDriverScreen = (
   const [manNumInput, manNum] = React.useState('');
   const [companyNameInput, companyName] = React.useState('');
 
-  // TODO: Implement withdrawal function.
-  const withdrawHandler = () => {
-    console.log('회원 탈퇴 구현');
+    // TODO: Implement withdrawal function.
+  const withdrawHandler = async () => {
+    var user = auth().currentUser;
+    var ref = firestore().collection('drivers').doc(user?.uid);
+    try{
+      ref.delete()
+      .then(() => {
+        console.log("1. "+user.uid+" 탈퇴 시작");
 
-    // If the withdraw process is complete,
-    // alert to the user using 'withdrawAlertHandler'
-    withdrawAlertHandler();
+        user?.delete()
+        .then(async () => {
+          await KakaoLogins.logout()
+          .then((result) => {
+            console.log(`2. Kakao Logout Finished:${result}`);
+          })
+
+          AsyncStorage.clear().then(() => {
+            console.log("3. AsyncStorage 초기화 완료");
+            withdrawAlertHandler();
+          });
+        })
+      })
+      
+    }
+    catch{
+      (error) => {
+        Toast.show('탈퇴가 실패하였습니다.');
+        console.log(error);
+      }
+    }
   };
 
   const withdrawAlertHandler = () => {
+    console.log("4. 탈퇴 완료");
     Alert.alert('탈퇴가 완료되었습니다.');
+    props.navigation.dispatch(resetAction);
   };
 
   const _twoOptionAlertHandler = () => {
