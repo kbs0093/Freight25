@@ -11,7 +11,8 @@ export enum AppRoute {
   CHECK_LOGIN = 'Check Login',
   LOGOUT = 'Logout',
   PROFILE = 'Profile',
-  PROFILE_MAIN = 'Profile_Main',
+  PROFILE_DRIVER = 'Profile_Driver',
+  PROFILE_OWNER = 'Profile_Owner',
   SEARCH = 'Search',
   SEARCH_MAIN = 'Search_Main',
   SEARCH_DETAIL = 'Search_Detail',
@@ -34,5 +35,5 @@ export enum AppRoute {
   STOPOVER3 = 'Stopover3',
   SEARCH_DETAIL_NAVIGATOR = 'Search Detail Navigator',
   ALONE_DETAIL_MAIN = 'Alone Detail Main',
-  ALONE_DETAIL = 'Alone Detail'
+  ALONE_DETAIL = 'Alone Detail',
 }
