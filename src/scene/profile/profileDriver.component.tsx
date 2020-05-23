@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   LayoutElement,
@@ -61,6 +62,39 @@ export const ProfileDriverScreen = (
   const [carNumInput, carNum] = React.useState('');
   const [manNumInput, manNum] = React.useState('');
   const [companyNameInput, companyName] = React.useState('');
+
+  // TODO: Implement withdrawal function.
+  const withdrawHandler = () => {
+    console.log('회원 탈퇴 구현');
+
+    // If the withdraw process is complete,
+    // alert to the user using 'withdrawAlertHandler'
+    withdrawAlertHandler();
+  };
+
+  const withdrawAlertHandler = () => {
+    Alert.alert('탈퇴가 완료되었습니다.');
+  };
+
+  const _twoOptionAlertHandler = () => {
+    //function to make two option alert
+    Alert.alert(
+      //title
+      '화물차 기사 회원 탈퇴',
+      //body
+      '정말로 탈퇴를 하시겠어요?',
+      [
+        {text: '네', onPress: () => withdrawHandler()},
+        {
+          text: '취소',
+          onPress: () => console.log('No Pressed'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+      //clicking out side of alert will not cancel
+    );
+  };
 
   const reviseProfile = () => {
     var user = auth().currentUser?.uid;
@@ -228,6 +262,21 @@ export const ProfileDriverScreen = (
             </Layout>
           </View>
         </View>
+        <View style={styles.withdrawContainer}>
+          <Button
+            onPress={() => {
+              try {
+                _twoOptionAlertHandler();
+              } catch (error) {
+                console.log('Failed to withdraw');
+                Toast.show('탈퇴 실패');
+              }
+            }}
+            style={styles.withdrawButton}
+            textStyle={styles.withdrawButtonText}>
+            회원 탈퇴
+          </Button>
+        </View>
       </ScrollView>
     </React.Fragment>
   );
@@ -236,11 +285,19 @@ export const ProfileDriverScreen = (
 const styles = StyleSheet.create({
   Button: {
     width: RFPercentage(12),
-    height: RFPercentage(6),
+    height: RFPercentage(5),
     borderRadius: 8,
   },
   ButtonText: {
-    fontSize: RFPercentage(1.6),
+    fontSize: RFPercentage(1.5),
+  },
+  withdrawButton: {
+    width: RFPercentage(14),
+    height: RFPercentage(6),
+    borderRadius: 8,
+  },
+  withdrawButtonText: {
+    fontSize: RFPercentage(1.8),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -253,7 +310,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 5,
     flex: 0.2,
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -281,6 +338,12 @@ const styles = StyleSheet.create({
   pickerItem: {
     color: 'black',
     fontWeight: 'bold',
+  },
+  withdrawContainer: {
+    flex: 1,
+    alignItems: 'center',
+    borderColor: '#20232a',
+    justifyContent: 'space-between',
   },
   infoTitle: {
     paddingVertical: 2,
