@@ -177,6 +177,22 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
       Linking.openURL(url).catch(err => console.error('An error occurred', err));
     }
   }
+
+  const onPressCall = () => {
+    const url = `tel:${phoneNumInput}`;
+    Linking.canOpenURL(url)
+		.then((supported) => {
+			if (!supported) {
+          console.error('Can\'t handle url: ' + url);
+			} else {
+				return Linking.openURL(url)
+					.then((data) => console.error("then", data))
+					.catch((err) => { throw err; });
+			}
+		})
+		.catch((err) => console.error('An error occurred', err));
+  }
+
   
     return (
         <React.Fragment>
@@ -344,9 +360,12 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
           </View>
           
           <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>            
-              <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
-              <Button style={{margin: 30}} status='primary' size='large' onPress={regOwner}>회원가입</Button>
-              <Button style={{margin: 30}} status='primary' size='large' onPress={() => sendDirectSms()}>SMS</Button>
+            <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
+            <Button style={{margin: 30}} status='primary' size='large' onPress={regOwner}>회원가입</Button>
+          </View>
+          <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>            
+            <Button style={{margin: 30}} status='primary' size='large' onPress={() => sendDirectSms()}>SMS</Button>
+            <Button style={{margin: 30}} status='primary' size='large' onPress={onPressCall}>전화</Button>
           </View>
 
           

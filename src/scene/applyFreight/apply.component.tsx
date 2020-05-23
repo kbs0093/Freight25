@@ -57,10 +57,6 @@ const driveType = [
   { label: '혼적',value: '혼적'},
 ];
 
-const freightType = [
-  { label: '파레트',value: '파레트'},
-];
-
 const freightStartDate = [
   { label: '당일 상차(당상)', value: '당일 상차(당상)'},
   { label: '내일 상차(내상)', value: '내일 상차(내상)'},
@@ -78,8 +74,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   
   const [weightValue, setWeightValue] = React.useState('');
   const [volumeValue, setVolumeValue] = React.useState('');
-  //Select
-  const [selectedFreightType, setSelectedFreightType] = React.useState(null);
 
   const [freightLoadTypeValue, setFreightLoadTypeValue] = React.useState('');
   const [descValue, setDescValue] = React.useState('');
@@ -127,7 +121,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               driveOption: selectedDrive,
               weight: weightValue,
               volume: volumeValue,
-              freightType: selectedFreightType,
               freightLoadType: freightLoadTypeValue,
               desc: descValue,
               dist: distValue,
@@ -311,17 +304,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               onChangeText={nextValue => setVolumeValue(nextValue)}
             />
             <View style={{flex:3}}>
-              <RNPickerSelect
-                onValueChange={(itemValue, itemIndex) => 
-                  setSelectedFreightType(itemValue)  
-                }
-                placeholder={{
-                  label: '단위',
-                  value: null,
-                }}
-                useNativeAndroidPickerStyle={false}
-                items={freightType}
-              />
+              <Text style={styles.infoTitle}> 파레트</Text>
             </View>
           </View>
           <View style={styles.rowContainer}>
