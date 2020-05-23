@@ -141,7 +141,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               });
               firestore().collection('owners').doc(user.uid).get()
               .then(function(snapShot){
-                    ref.update({ownerTel: snapShot.data().tel});
+                    ref.update({ownerTel: snapShot.data().tel, ownerName: snapShot.data().name});
                     console.log(snapShot.data().tel);
                   });
               props.navigation.navigate(AppRoute.OWNER);

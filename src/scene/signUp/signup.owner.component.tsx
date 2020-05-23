@@ -117,8 +117,8 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
 
                         savedStartCompact:addrCompact,
                         savedStartFull:addrFull,
-                        savedStartlat:addr_lat,
-                        savedStartlon:addr_lon,
+                        savedStartLat:addr_lat,
+                        savedStartLon:addr_lon,
 
                         savedEndCompact:endAddrCompact,
                         savedEndFull:endAddrFull,
