@@ -34,7 +34,7 @@ import auth from '@react-native-firebase/auth';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import {NavigationActions} from 'react-navigation';
 import {useRoute} from '@react-navigation/native';
-import { CommonActions } from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 
 let email;
 let nickname = 'unknown';
@@ -52,7 +52,7 @@ AsyncStorage.getItem('userType', (err, result) => {
 
 const resetAction = CommonActions.reset({
   index: 0,
-  routes: [{name: AppRoute.AUTH}]
+  routes: [{name: AppRoute.AUTH}],
 });
 
 export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
@@ -106,15 +106,20 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
     setMenuVisible(false);
     console.log(index);
     if (index == 2) {
-      props.navigation.navigate(AppRoute.PROFILE);
+      console.log(userType);
+      if (userType == 'owner') {
+        props.navigation.navigate(AppRoute.PROFILE_OWNER);
+      } else if (userType == 'driver') {
+        props.navigation.navigate(AppRoute.PROFILE_DRIVER);
+      }
     } else if (index == 3) {
       {
         /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
       }
-      AsyncStorage.clear().then(()=>{
+      AsyncStorage.clear().then(() => {
         kakaoLogout();
         fbLogout();
-      })
+      });
       props.navigation.dispatch(resetAction);
       console.log('Logout Success');
     }
