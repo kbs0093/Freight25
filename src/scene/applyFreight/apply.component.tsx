@@ -24,6 +24,7 @@ import firestore from '@react-native-firebase/firestore';
 import axios from 'axios';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
+import { color } from 'react-native-reanimated';
 
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
@@ -32,6 +33,9 @@ const tmap_URL_rest = '&coordType=WGS84GEO&fullAddr=';
 const tmap_distCalcQueryUrl = 'https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response&appKey=';
 const tmap_distCalcUrl = tmap_distCalcQueryUrl + tmap_appKey;
 const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_URL_rest;
+
+const favoriteStartAddr = '서울시 용산구 효창대로 270 114동 2801호 (용산동, 이촌시범아파트)';
+const favoriteEndAddr = '경기도 수원시 권선대로';
 
 const carSize = [
   { label: '1 톤', value: '1 톤'},
@@ -184,10 +188,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <TopNavigation
-        title="화물 25"
-        titleStyle={styles.titleStyles}
-      />
       <ScrollView>
         <View style={styles.infoContainer}>
           <Text style={styles.subTitle}>위치 정보</Text>
@@ -395,9 +395,14 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <View>
+
+          <View style ={{flex : 1}}>
+            <View style = {styles.modalContainer}>
+              <Text style = {styles.subTitle}>자주쓰는 상차지로 설정하기 </Text>
+              <Text style = {styles.textHyperlink} onPress = {() => setmodalStartAddrVisible(false)}>{favoriteStartAddr}</Text>
+            </View>
             <Postcode
-              style={{width: 350, height: 600}}
+              style={styles.postcodeContainer}
               jsOptions={{ animated: true }}
               onSelected={(startAddrResult) => {
                 let addrFull = JSON.stringify(startAddrResult.jibunAddress).replace(/\"/gi, "");
@@ -453,9 +458,14 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <View>
+          <View style ={{flex : 1}}>
+            <View style = {styles.modalContainer}>
+              <Text style = {styles.subTitle}>자주쓰는 하차지로 설정하기 </Text>
+              <Text style = {styles.textHyperlink} onPress = {() => setmodalEndAddrVisible(false)}>{favoriteEndAddr}</Text>
+            </View>
+
             <Postcode
-              style={{width: 350, height: 600}}
+              style={styles.postcodeContainer}
               jsOptions={{ animated: true }}
               onSelected={(endAddrResult) => {
                 let addrFull = JSON.stringify(endAddrResult.jibunAddress).replace(/\"/gi, "");
@@ -574,6 +584,30 @@ const styles = StyleSheet.create({
     borderColor:'black',
     margin:10,
   },
+
+  modalContainer:{
+    width : 350,
+    alignItems: 'flex-start',
+    borderColor: '#0000FF',
+    borderWidth: 3,
+    alignItems: "center",
+    backgroundColor: '#FFFFFF'
+  },
+
+  textHyperlink: {
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    //fontSize: RFPercentage(2),
+    fontSize: 18,
+    textDecorationLine: 'underline',
+    fontStyle: 'normal',
+    color: 'blue',
+  },
+
+  postcodeContainer: {
+    width : 350,
+    height: 600,
+  }
 
   
 });
