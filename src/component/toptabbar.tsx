@@ -46,9 +46,21 @@ AsyncStorage.getItem('email', (err, result) => {
 AsyncStorage.getItem('nickname', (err, result) => {
   nickname = result;
 });
-AsyncStorage.getItem('userType', (err, result) => {
-  userType = result;
-});
+// AsyncStorage.getItem('userType', (err, result) => {
+//   userType = result;
+// });
+
+async function getUserType() {
+  try {
+    const value = await AsyncStorage.getItem('userType');
+    if (value !== null) {
+      userType = value;
+      console.log(userType);
+    }
+  } catch (error) {}
+}
+
+getUserType();
 
 const resetAction = CommonActions.reset({
   index: 0,
