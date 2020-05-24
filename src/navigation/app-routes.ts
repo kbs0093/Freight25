@@ -29,10 +29,14 @@ export enum AppRoute {
   SIGNUP_OWNER = 'Signup_Owner',
   SIGNUP_OWNER_MAIN = 'Signup_Owner_Main',
   SIGNUP_DRIVER_MAIN = 'Signup_Driver_Main',
+  STOPOVER = 'Stopover',
+  STOPOVER_MAIN = 'Stopover Main',
   STOPOVER1 = 'Stopover1',
   STOPOVER2 = 'Stopover2',
   STOPOVER3 = 'Stopover3',
   SEARCH_DETAIL_NAVIGATOR = 'Search Detail Navigator',
   ALONE_DETAIL_MAIN = 'Alone Detail Main',
-  ALONE_DETAIL = 'Alone Detail'
+  ALONE_DETAIL = 'Alone Detail',
+  STOPOVERAD = 'Stopover AD',
+  STOPOVERAD_MAIN = 'Stopover AD Main'
 }

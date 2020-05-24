@@ -58,6 +58,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         money: null,
         moneyPrint: null,
         isShowLocation: false,
+        desc: null,
       },
       region: {
         latitude: 37.78825,
@@ -118,6 +119,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
                 startFull:  doc.data().startAddr_Full,
                 endFull:  doc.data().endAddr_Full,
                 isShowLocation: true,
+                desc: doc.data().desc,
               }
 
               var region = {
@@ -272,6 +274,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             <Divider style={{backgroundColor: 'black'}}/>
           </View>              
         </TouchableOpacity>
+
         {this.state.data.isShowLocation ? (
           <View style={{height: 200, backgroundColor: 'white'}}>            
               <MapView style={{flex: 1}} provider={PROVIDER_GOOGLE}
@@ -295,84 +298,13 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         </View>
         ) : null}
 
-        <TouchableOpacity onPress={this.hideStopvoer}>
-          <View style={{backgroundColor: 'white'}}>
-            <Text style={styles.Title}>  경유지 정보</Text>
-            <Divider style={{backgroundColor: 'black'}}/>
-          </View>              
-        </TouchableOpacity>
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover1}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>1.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>    
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover2}>  
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>2.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>     
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover3}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>3.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>   
-        ) : null}
-
-
-          <Divider style={{backgroundColor: 'black'}}/> 
-          <View style={{backgroundColor: 'white'}}>
+        <Divider style={{backgroundColor: 'black'}}/> 
+        <View style={{backgroundColor: 'white'}}>
                   
             <Text style={styles.Title}>  화물 상세 정보</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운행거리 : </Text></View>
-              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.distanceY}</Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.distanceY} Km</Text></View>
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운임 : </Text></View>
@@ -400,7 +332,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>특이사항 : </Text></View>
-              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>하차대기 없습니다</Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.desc}</Text></View>
             </View>
             <Divider style={{backgroundColor: 'black'}}/>
           </View>

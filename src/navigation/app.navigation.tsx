@@ -10,6 +10,7 @@ import {
 } from './check.navigator';
 import {SearchNavigator} from './search.navigator';
 import { searchDetailNavigator, aloneDetailNavigator } from './searchDetail.navigator'
+import { StopoverADNavigator, StopoverNavigator } from './stopover.navigator'
 import {ApplyNavigator} from './apply.navigator';
 import {AppRoute} from './app-routes';
 import {ProfileNavigator} from './profile.navigator';
@@ -26,6 +27,8 @@ export const AppNavigator = (props): React.ReactElement => (
     <Stack.Screen name={AppRoute.SEARCH} component={SearchNavigator} />
     <Stack.Screen name={AppRoute.SEARCH_DETAIL} component={searchDetailNavigator}/>
     <Stack.Screen name={AppRoute.ALONE_DETAIL} component={aloneDetailNavigator}/>
+    <Stack.Screen name={AppRoute.STOPOVERAD} component={StopoverADNavigator}/>
+    <Stack.Screen name={AppRoute.STOPOVER} component={StopoverNavigator}/>
     <Stack.Screen name={AppRoute.CHECK} component={CheckNavigator} />
     <Stack.Screen
       name={AppRoute.CHECK_DETAIL_OWNER}

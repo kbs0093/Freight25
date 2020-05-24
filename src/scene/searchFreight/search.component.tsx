@@ -129,7 +129,6 @@ export class SearchScreen extends Component <SearchScreenProps> {
   };
 
   FirebaseRequest = async() => {
-    console.log("파이어베이스!")
     var user = auth().currentUser;
     const that = this;
     if(user != null){  
@@ -209,21 +208,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
 
 
   componentDidMount = () => {
-
-    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()
-
-    if(this.state.value == '1'){
-      this.state.data.sort(this.smartSort);
-    }
-    else if(this.state.value == '2'){
-      this.state.data.sort(this.moneySort);
-    }
-    else if(this.state.value == '3'){
-      this.state.data.sort(this.distanceSort);
-    }
-    else if(this.state.value == '2'){
-      this.state.data.sort(this.distanceSort2);
-    }   
+    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()    
   }
 
    ClickList = item => () => {
@@ -240,12 +225,12 @@ export class SearchScreen extends Component <SearchScreenProps> {
   };
 
   distanceSort(a, b) {
-    if(a.distanceY == b.distanceY){ return 0} return a.distanceY < b.distanceY ? 1 : -1;
+    return Number(a.distanceY) > Number(b.distanceY) ? -1 : Number(a.distanceY) < Number(b.distanceY) ? 1: 0;
   };
 
   distanceSort2(a, b) {
-    if(a.distanceY == b.distanceY){ return 0} return a.distanceY > b.distanceY ? 1 : -1;
-  };
+    return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;
+  };    
 
   smartSort(a, b) {
     if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
@@ -309,6 +294,20 @@ export class SearchScreen extends Component <SearchScreenProps> {
   );
   
   render(){
+
+    if(this.state.value == '1'){  
+      this.state.data.sort(this.smartSort);
+    }
+    else if(this.state.value == '2'){
+      this.state.data.sort(this.moneySort);
+    }
+    else if(this.state.value == '3'){
+      this.state.data.sort(this.distanceSort);
+    }
+    else if(this.state.value == '4'){
+      this.state.data.sort(this.distanceSort2);
+    }   
+
     return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
