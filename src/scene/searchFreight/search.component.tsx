@@ -34,7 +34,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import Geolocation from 'react-native-geolocation-service';
 
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
-const isAndroid = Platform.OS ==='android';
+const isAndroid = Platform.OS === 'android';
 
 export class SearchScreen extends Component <SearchScreenProps> {
   
@@ -54,7 +54,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
     };
   }
 
-  requestLocationPermission = async () => {
+  requestLocationAndroid = async () => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -64,9 +64,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
           (position) => {
             let latitude = JSON.stringify(position.coords.latitude);
             let longitude = JSON.stringify(position.coords.longitude);
-
-            console.log(latitude, longitude);
-    
+   
             this.setState({latitude});
             this.setState({longitude});
             
@@ -81,7 +79,8 @@ export class SearchScreen extends Component <SearchScreenProps> {
               this.setState({city});
               this.setState({gu});
               this.setState({myeon});
-              this.setState({dong});          
+              this.setState({dong});
+              this.FirebaseRequest();          
             })   
             .catch(err => console.log(err));     
           },
@@ -96,30 +95,40 @@ export class SearchScreen extends Component <SearchScreenProps> {
     }
   }
 
+  requestLocationIos = () => {
+    var latitude;
+    var longitude;
 
-  componentDidMount = async () => {
-    let latitude;
-    let longitude;
+    Geolocation.getCurrentPosition(
+      position => {
+        latitude = JSON.stringify(position.coords.latitude);
+        longitude = JSON.stringify(position.coords.longitude);
 
-    this.requestLocationPermission();
+        this.setState({latitude});
+        this.setState({longitude});
+        
+        fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+        .then(response => response.json())
+        .then(response => {
+          const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
+          const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
+          const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
+          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
 
-    if(this.state.value == '1'){
-      this.state.data.sort(this.smartSort);
+          this.setState({city});
+          this.setState({gu});
+          this.setState({myeon});
+          this.setState({dong});
+          this.FirebaseRequest();       
+        })   
+        .catch(err => console.log(err));     
+      },
+      error => Alert.alert('Error', JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
+    );
+  };
 
-    }
-    else if(this.state.value == '2'){
-      this.state.data.sort(this.moneySort);
-
-    }
-    else if(this.state.value == '3'){
-      this.state.data.sort(this.distanceSort);
-    }
-    else if(this.state.value == '2'){
-      this.state.data.sort(this.distanceSort2);
-    }
-
-    
-    
+  FirebaseRequest = async() => {
     var user = auth().currentUser;
     const that = this;
     if(user != null){  
@@ -129,7 +138,8 @@ export class SearchScreen extends Component <SearchScreenProps> {
         .then(async function(querySnapshot){
           var list =[];
 
-          for(var docCnt in querySnapshot.docs){            
+          for(var docCnt in querySnapshot.docs){
+              
             const doc = querySnapshot.docs[docCnt].data();
             var parseStart = doc.startAddr + "";
             var startArr = parseStart.split(" ");
@@ -138,16 +148,16 @@ export class SearchScreen extends Component <SearchScreenProps> {
             var endArr = parseEnd.split(" ");
             var moneyprint = doc.expense + "";
             var distance;
-            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");                     
                              
-            /*distance = await fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
+            distance = await fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
               method: 'POST',
               headers:{
                 "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
               },
               body: JSON.stringify({
-                "startX" : longitude,
-                "startY" : latitude,
+                "startX" : that.state.longitude,
+                "startY" : that.state.latitude,
                 "endX" : doc.startAddr_lon,
                 "endY" : doc.startAddr_lat,
                 "reqCoordType" : "WGS84GEO",
@@ -158,9 +168,8 @@ export class SearchScreen extends Component <SearchScreenProps> {
               })})
               .then(response => response.json())
               .then(response =>{
-                //console.log(response.features[0].properties.totalDistance/1000);
                 return response.features[0].properties.totalDistance/1000 + "";                
-            })*/
+            })
 
 
             list.push({
@@ -198,14 +207,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
   
 
 
-  ClickList = item => () => {
+  componentDidMount = () => {
+    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()    
+  }
+
+   ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
     if(item.Type == '독차'){
       this.props.navigation.navigate(AppRoute.ALONE_DETAIL);
     } else {
       this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
-    }
-    
+    }    
   };
 
   moneySort(a, b) {
@@ -213,19 +225,18 @@ export class SearchScreen extends Component <SearchScreenProps> {
   };
 
   distanceSort(a, b) {
-    if(a.distanceY == b.distanceY){ return 0} return a.distanceY < b.distanceY ? 1 : -1;
+    return Number(a.distanceY) > Number(b.distanceY) ? -1 : Number(a.distanceY) < Number(b.distanceY) ? 1: 0;
   };
 
   distanceSort2(a, b) {
-    if(a.distanceY == b.distanceY){ return 0} return a.distanceY > b.distanceY ? 1 : -1;
-  };
+    return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;
+  };    
 
   smartSort(a, b) {
     if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
   };
   
-  _renderItem = ({item}) => (
-   
+  _renderItem = ({item}) => (   
     <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
@@ -283,6 +294,20 @@ export class SearchScreen extends Component <SearchScreenProps> {
   );
   
   render(){
+
+    if(this.state.value == '1'){  
+      this.state.data.sort(this.smartSort);
+    }
+    else if(this.state.value == '2'){
+      this.state.data.sort(this.moneySort);
+    }
+    else if(this.state.value == '3'){
+      this.state.data.sort(this.distanceSort);
+    }
+    else if(this.state.value == '4'){
+      this.state.data.sort(this.distanceSort2);
+    }   
+
     return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />

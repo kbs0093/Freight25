@@ -48,6 +48,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
         money: null,
         moneyPrint: null,
         isShowLocation: false,
+        desc: null
       },
       region: {
         latitude: 37.78825,
@@ -108,6 +109,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
                 startFull:  doc.data().startAddr_Full,
                 endFull:  doc.data().endAddr_Full,
                 isShowLocation: true,
+                desc: doc.data().desc
               }
 
               var region = {
@@ -273,7 +275,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
             <Text style={styles.Title}>  화물 상세 정보</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운행거리 : </Text></View>
-              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.distanceY}</Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.distanceY} Km</Text></View>
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운임 : </Text></View>
@@ -301,7 +303,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>특이사항 : </Text></View>
-              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>하차대기 없습니다</Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.desc}</Text></View>
             </View>
             <Divider style={{backgroundColor: 'black'}}/>
           </View>

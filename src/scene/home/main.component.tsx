@@ -1,112 +1,117 @@
 import React, {useState} from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import {
   Image,
   StyleSheet,
   View,
-  Linking,
   TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  PanResponder,
 } from 'react-native';
 import {
-  Input,
-  InputElement,
-  InputProps,
-  Button,
-  CheckBox,
-  Layout,
   LayoutElement,
-  Icon,
   Text,
-  TopNavigation,
-  TopNavigationAction,
-  OverflowMenu,
+  ViewPager
 } from '@ui-kitten/components';
-import {
-  CommonActions,
-  NavigationContainer,
-  BaseRouter,
-} from '@react-navigation/native';
+import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
-import {
-  BackIcon,
-  MenuIcon,
-  InfoIcon,
-  LogoutIcon,
-  MAPIcon,
-  PHONEIcon,
-  NOTEIcon,
-} from '../../assets/icons';
-import auth from '@react-native-firebase/auth';
-import KakaoLogins from '@react-native-seoul/kakao-login';
 
+export const MainScreen = (props: MainScreenProps): LayoutElement => {
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
 
-export class MainScreen extends React.Component <MainScreenProps> {
-
-  componentDidMount() {  
-  }
-
-  clickButtonType = () => {
-    this.props.navigation.navigate(AppRoute.SEARCH);
+  const clickButtonType = () => {
+    props.navigation.navigate(AppRoute.SEARCH);
   };
 
-  clickCheck = () => {
-    this.props.navigation.navigate(AppRoute.CHECK);
+  const clickCheck = () => {
+    props.navigation.navigate(AppRoute.CHECK);
   };
 
-  render(){
-    
-    return (
-      <React.Fragment>
-        <ScrollView>
-          <View style={styles.viewForm}>
-            <TouchableOpacity onPress={this.clickButtonType}>
-              <Image style={styles.Button} source={require('../../assets/SearchButton-round.png')} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.clickCheck}>
-              <Image
-                style={styles.Button}
-                source={require('../../assets/CheckButton-round.png')}
-              />
-            </TouchableOpacity>
-  
-            <Button
-              style={styles.IconButton}
-              textStyle={styles.IconButtonText}
-              status="basic"
-              size="giant"
-              icon={MAPIcon}>
-              네비게이션으로 연결
-            </Button>
-            <Button
-              style={styles.IconButton}
-              textStyle={styles.IconButtonText}
-              status="basic"
-              size="giant"
-              icon={PHONEIcon}>
-              화주와 통화 연결
-            </Button>
-            <Button
-              style={styles.IconButton}
-              textStyle={styles.IconButtonText}
-              status="basic"
-              size="giant"
-              icon={NOTEIcon}>
-              이 달의 매출확인
-            </Button>
-            <View style={styles.empty} />
+  return (
+    <React.Fragment>
+      <View style={styles.viewForm}>
+        <TouchableOpacity onPress={clickButtonType}>
+          <Image style={styles.Button} source={require('../../assets/SearchButton-round.png')} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={clickCheck}>
+          <Image
+            style={styles.Button}
+            source={require('../../assets/CheckButton-round.png')}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={{backgroundColor: 'white'}}>
+        <Text style={styles.adtitle}>  </Text>
+        <ViewPager selectedIndex={selectedIndex} onSelect={index => setSelectedIndex(index)}>
+          <View>
+            <Image style={styles.adImage} source={require('../../assets/AD/ad1.jpg')}/>
           </View>
-        </ScrollView>
-      </React.Fragment>
-    );
-  }
+          <View>
+            <Image style={styles.adImage} source={require('../../assets/AD/ad2.jpg')}/>
+          </View>
+          <View>
+            <Image style={styles.adImage} source={require('../../assets/AD/ad3.jpg')}/>
+          </View>
+        </ViewPager>
+      </View>
+
+    </React.Fragment>
+  );
+  
   
 };
 
+export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const clickButtonType = () => {
+    props.navigation.navigate(AppRoute.APPLY)
+  };
+  const clickCheck = () => {
+    props.navigation.navigate(AppRoute.CHECK);
+  };
+
+ 
+  return (
+    <React.Fragment>
+      <View style={styles.viewForm}>
+        <TouchableOpacity onPress={clickButtonType}>
+          <Image style={styles.Button} source={require('../../assets/ApplyButton.png')} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={clickCheck}>
+          <Image
+            style={styles.Button}
+            source={require('../../assets/CheckButton-round.png')}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View style={{backgroundColor: 'white'}}>
+        <Text style={styles.adtitle}>  </Text>
+        <ViewPager selectedIndex={selectedIndex} onSelect={index => setSelectedIndex(index)}>
+          <View>
+            <Image style={styles.adImage} source={require('../../assets/AD/ad1.jpg')}/>
+          </View>
+          <View>
+            <Image style={styles.adImage} source={require('../../assets/AD/ad2.jpg')}/>
+          </View>
+          <View>
+            <Image style={styles.adImage} source={require('../../assets/AD/ad3.jpg')}/>
+          </View>
+        </ViewPager>
+      </View>
+    </React.Fragment>
+  );
+};
+
 const styles = StyleSheet.create({
+  adImage: {
+    width: '100%',
+    margin: 5, 
+    borderRadius: 15
+  },
+  adtitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    margin: 5
+  },
   viewForm: {
     flex: 1,
     backgroundColor: 'white',
