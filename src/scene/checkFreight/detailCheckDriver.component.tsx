@@ -98,7 +98,7 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            regDate: docs.timeStamp,
+            regDate: docs.timeStampCreated,
             driveOption: docs.driveOption,
             ownerTel: docs.ownerTel,
             desc: docs.desc,

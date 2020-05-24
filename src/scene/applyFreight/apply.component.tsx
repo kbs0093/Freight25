@@ -67,6 +67,8 @@ const freightEndDate = [
   { label: '당일 도착(당착)', value: '당일 도착(당착)'},
   { label: '내일 도착(내착)', value: '내일 도착(내착)'},
 ]
+
+const week = new Array('일', '월', '화', '수', '목', '금', '토');
 export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   const [selectedCarSize, setSelectedCarSize] = React.useState(null);
@@ -104,13 +106,33 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   const [selectedStartDate, setSelectedStartDate] = React.useState(null);
   const [selectedEndDate, setSelectedEndDate] = React.useState(null);
 
+  //날짜,요일 계산 
+  var startDay = new Date();
+  var endDay = new Date(); 
+  var startDayLabel, endDayLabel;
+  const getDate = () =>{
+    var today = new Date();
+    if(selectedStartDate == '당일 상차(당상)')
+      startDay = today;
+    else{
+      startDay = new Date(today.valueOf() + (24*60*60*1000));
+    }
+    if(selectedEndDate == '당일 도착(당착)')
+      endDay = today;
+    else{
+      endDay = new Date(today.valueOf() + (24*60*60*1000));
+    }
+    startDayLabel = week[startDay.getDay()];
+    endDayLabel = week[endDay.getDay()];
+  };
+
   //화물 db에 등록
   const applyFreightToDb = () => {
     var user = auth().currentUser;
       if(user != null){
         //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
         var ref = firestore().collection('freights').doc();
-        
+        getDate();
         if(user != null){
           try {
             ref.set({
@@ -136,7 +158,11 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               endAddr_lat: endAddr_lat,
               endAddr_lon: endAddr_lon,
               endDate: selectedEndDate,
-              timeStamp: Date.now(),
+              timeStampCreated: new Date(),
+              startDay: startDay,
+              endDay: endDay,
+              startDayLabel: startDayLabel,
+              endDayLabel: endDayLabel,
               state: 0,
               driverId: ""
               });
@@ -146,7 +172,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                     console.log(snapShot.data().tel);
                   });
               props.navigation.navigate(AppRoute.OWNER);
-              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " +Date.now());
+              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " + new Date());
               Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
           } catch (error) {
             //오류 출력 

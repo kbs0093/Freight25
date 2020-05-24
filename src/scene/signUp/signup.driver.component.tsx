@@ -78,10 +78,11 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
         );
       });
   };
-
+ 
   const regDriver = () => {
     //분기화면이 생길 시 각 분기화면에서 타입에 맞게 처리되도록 해야 함
     //firebase jwt
+    const toastLoading = Toast.showLoading('Loading...');
     var accessToken;
     AsyncStorage.getItem('accessToken', (error,result)=>{
       if(error){
@@ -93,51 +94,48 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
           .post(serverUrl+"verifyToken", {token: accessToken, type: "drivers"})
           .then((response) => {
             let firebaseToken = JSON.stringify(response.data.firebase_token);
-            auth().signInWithCustomToken(firebaseToken);
             //getProfile이 아닌 fb auth로부터 정보갱신해야할 것 같은데 논의가 필요합니다.
             //getProfile();
             AsyncStorage.setItem('fbToken', JSON.stringify(firebaseToken));
-            console.log("currentAuth uid: "+auth().currentUser?.uid);
-
-            //auth리스너와 uid를 이용한 db 저장 부분
-            var authFlag = true;
-            auth().onAuthStateChanged(function(user){
-              if(authFlag){
-                authFlag = false;
-                if(user){
-                  //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
-                  var ref = firestore().collection('drivers').doc(user.uid);
-                  if(user != null){
-                    console.log("firestore target uid: "+auth().currentUser?.uid);
-                    try {
-                      ref.update({
-                        name: nameInput,
-                        accountOwner: accountOwnerInput,
-                        carNumber: carNumInput, 
-                        companyNumber: manNumInput, 
-                        accountNumber: accountNumInput, 
-                        tel: phoneNumInput,
-                        carTon: TonValue,
-                        caryType: TypeValue,
-                        bankName: BankValue,
-                      });
-                      Toast.showSuccess('회원가입이 완료되었습니다.');
-                      AsyncStorage.setItem('userType', 'driver');
-                      console.log(user.uid+" succeeded in loging / signup Stage");
-                      props.navigation.push(AppRoute.HOME);
-                    } catch (error) {
-                      //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
-                      console.log(error);
-                    }
-                  }
+            auth().signInWithCustomToken(firebaseToken)
+            .then( (value) => {
+              var user = auth().currentUser;
+              console.log("currentAuth uid: "+user?.uid);
+              //auth리스너와 uid를 이용한 db 저장 부분
+              //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
+              var ref = firestore().collection('drivers').doc(user?.uid);
+              if(user != null){
+                console.log("firestore target uid: "+user.uid);
+                try {
+                  ref.update({
+                    name: nameInput,
+                    accountOwner: accountOwnerInput,
+                    carNumber: carNumInput, 
+                    companyNumber: manNumInput, 
+                    accountNumber: accountNumInput, 
+                    tel: phoneNumInput,
+                    carTon: TonValue,
+                    caryType: TypeValue,
+                    bankName: BankValue,
+                    timeStampSignup: new Date()
+                  });
+                  Toast.hide(toastLoading);
+                  Toast.showSuccess('회원가입이 완료되었습니다.');
+                  AsyncStorage.setItem('userType', 'driver');
+                  console.log(user.uid+" succeeded in loging / signup Stage");
+                  props.navigation.push(AppRoute.HOME);
+                } 
+                catch (error) {
+                  //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
+                  console.log(error);
                 }
               }
-            });
-          })
+              });
+            })
           .catch((error) => {
-            //verifyToken Request가 실패하는 경우
-            console.log(error);
-          });  
+          //verifyToken Request가 실패하는 경우
+          console.log(error);
+        });  
       }
     });      
   };

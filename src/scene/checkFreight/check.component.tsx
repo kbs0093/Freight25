@@ -67,8 +67,10 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           var freightState = '';
           if (doc.state == 0) freightState = '배송전';
           else if (doc.state == 1) freightState = '배송중';
-          else if (doc.sttate == 2) freightState = '배송완료';
-
+          else if (doc.state == 2) freightState = '배송완료';
+          var docStartDate = new Date(doc.startDay._seconds*1000);
+          var docEndDate = new Date(doc.endDay._seconds*1000);
+          
           list.push({
             id: doc.id, // Freight key?
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -76,8 +78,13 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             endAddress: doc.endAddr,
             distance: doc.dist,
             lastRefresh: 'null',
-            startDate: doc.startDate, // 배송 출발 날짜 -> UI 고치기
-            endDate: doc.endDate,
+            startMonth: docStartDate.getMonth(),
+            startDay: docStartDate.getDate(),
+            endMonth: docEndDate.getMonth(),
+            endDay: docEndDate.getDate(),
+            //요일도 했으니 UI 에서 만들어주세요
+            startDayLabel: doc.startDayLabel,
+            endDayLabel: doc.endDayaLabel
           });
         }
         that.setState({data: list});

@@ -227,7 +227,8 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           freightRef.update({
             state: 1,
             driverId: user.uid,
-            driverTel: driverTel
+            driverTel: driverTel,
+            timeStampAssigned: new Date()
           })
           console.log("StopOver X "+freightRef.id+" was assigned to "+ user.uid);
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
