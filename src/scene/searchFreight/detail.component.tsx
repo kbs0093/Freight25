@@ -232,7 +232,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           })
           console.log("StopOver X "+freightRef.id+" was assigned to "+ user.uid);
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
-          this.props.navigation.navigate(AppRoute.HOME);
+          this.props.navigation.navigate(AppRoute.STOPOVERAD);
         }
         catch{
           console.log("Failed assign to "+freightRef.id);
@@ -275,7 +275,6 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             <Divider style={{backgroundColor: 'black'}}/>
           </View>              
         </TouchableOpacity>
-
         {this.state.data.isShowLocation ? (
           <View style={{height: 200, backgroundColor: 'white'}}>            
               <MapView style={{flex: 1}} provider={PROVIDER_GOOGLE}
@@ -299,13 +298,23 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         </View>
         ) : null}
 
-        <Divider style={{backgroundColor: 'black'}}/> 
-        <View style={{backgroundColor: 'white'}}>
+        <TouchableOpacity onPress={this.hideStopvoer}>
+          <View style={{backgroundColor: 'white'}}>
+            <Text style={styles.Title}>  경유지 정보</Text>
+            <Divider style={{backgroundColor: 'black'}}/>
+          </View>              
+        </TouchableOpacity>
+
+  
+
+
+          <Divider style={{backgroundColor: 'black'}}/> 
+          <View style={{backgroundColor: 'white'}}>
                   
             <Text style={styles.Title}>  화물 상세 정보</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운행거리 : </Text></View>
-              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.distanceY} Km</Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.distanceY}</Text></View>
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>운임 : </Text></View>
