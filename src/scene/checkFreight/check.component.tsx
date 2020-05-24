@@ -70,7 +70,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           else if (doc.state == 2) freightState = '배송완료';
           var docStartDate = new Date(doc.startDay._seconds*1000);
           var docEndDate = new Date(doc.endDay._seconds*1000);
-          
+
           list.push({
             id: doc.id, // Freight key?
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -78,9 +78,9 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             endAddress: doc.endAddr,
             distance: doc.dist,
             lastRefresh: 'null',
-            startMonth: docStartDate.getMonth(),
+            startMonth: docStartDate.getMonth()+1,
             startDay: docStartDate.getDate(),
-            endMonth: docEndDate.getMonth(),
+            endMonth: docEndDate.getMonth()+1,
             endDay: docEndDate.getDate(),
             //요일도 했으니 UI 에서 만들어주세요
             startDayLabel: doc.startDayLabel,
