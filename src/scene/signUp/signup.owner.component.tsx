@@ -110,6 +110,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                     tel: phoneNumInput,
                     bankName: BankValue,
                     companyName: companyNameInput,
+                    timeStampSignup: new Date(),
 
                     savedStartCompact:addrCompact,
                     savedStartFull:addrFull,

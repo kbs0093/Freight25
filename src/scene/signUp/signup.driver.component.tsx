@@ -117,6 +117,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                     carTon: TonValue,
                     caryType: TypeValue,
                     bankName: BankValue,
+                    timeStampSignup: new Date()
                   });
                   Toast.hide(toastLoading);
                   Toast.showSuccess('회원가입이 완료되었습니다.');
