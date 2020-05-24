@@ -29,8 +29,6 @@ import Toast from 'react-native-tiny-toast';
 
 const isAndroid = Platform.OS ==='android';
 
-
-
 export class DetailScreen extends React.Component <DetailScreenProps> {
   constructor(props) {
     super(props);
@@ -150,7 +148,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
                   "truckType" : "1",
                   "truckWidth" : "100",
                   "truckHeight" : "100",
-                  "truckWeight" : "35000",  // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+                  "truckWeight" : "2000",  // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
                   "truckTotalWeight" : "35000", // 화물 무게도 불러올 것
                   "truckLength" : "200",  // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것        
                 })

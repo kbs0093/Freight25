@@ -15,7 +15,7 @@ const Stack = createStackNavigator();
 
 export const searchDetailNavigator = (): React.ReactElement => (
   <TopTab2.Navigator tabBar={props => <TopTapBar {...props} />}>
-    <Stack.Screen name={AppRoute.SEARCH_DETAIL_NAVIGATOR} component={DetailNavigator}/>
+    <Stack.Screen name={AppRoute.SEARCH_DETAIL_NAVIGATOR} component={DetailScreen}/>
   </TopTab2.Navigator>
 );
 
