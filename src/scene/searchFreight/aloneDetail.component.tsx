@@ -17,6 +17,7 @@ import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-tiny-toast';
 
 export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> {
   constructor(props) {
@@ -183,8 +184,31 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
     this.setState({region});
   }
 
-  clickApply = () => {
-    // 수락버튼을 클릭했을 시 함수
+  clickApply = async() => {
+    const user = auth().currentUser;
+    const value = await AsyncStorage.getItem('FreightID');
+    if(user != null){
+      if (value != null) {
+        var freightRef = firestore().collection('freights').doc(value);
+        var driverRef = firestore().collection('drivers').doc(user.uid);
+        var driverTel = (await driverRef.get()).data().tel;
+        console.log("target Freight ID:"+ freightRef.id);
+        try{
+          freightRef.update({
+            state: 1,
+            driverId: user.uid,
+            driverTel: driverTel
+          })
+          console.log(freightRef.id+" was assigned to "+ user.uid);
+          Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+          this.props.navigation.navigate(AppRoute.HOME);
+        }
+        catch{
+          console.log("Failed assign to "+freightRef.id);
+        }
+      }
+    }
+   
   }
   
   

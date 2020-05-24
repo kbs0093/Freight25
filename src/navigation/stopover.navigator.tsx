@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppRoute } from './app-routes';
-import { StopoverScreen1, StopoverScreen2, StopoverScreen3 } from '../scene/stopoverFreight'
+import { StopoverADScreen ,StopoverScreen1, StopoverScreen2, StopoverScreen3 } from '../scene/stopoverFreight'
 import { TopTapBar } from '../component/toptabbar'
 import { SearchTabBar } from '../component/search.Topbar'
 import { createStackNavigator } from '@react-navigation/stack';
@@ -15,7 +15,7 @@ const Stack = createStackNavigator();
 
 export const StopoverADNavigator = (): React.ReactElement => (
   <TopTab2.Navigator tabBar={props => <TopTapBar {...props} />}>
-    <Stack.Screen name={AppRoute.STOPOVERAD_MAIN} component={StopoverNavigator}/>
+    <Stack.Screen name={AppRoute.STOPOVERAD_MAIN} component={StopoverADScreen}/>
   </TopTab2.Navigator>
 );
 
