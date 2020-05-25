@@ -84,7 +84,10 @@ export class DetailCheckDriverScreen extends React.Component<
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.state == 2) freightState = '배송완료';
+          var docStartDate = new Date(docs.startDay._seconds * 1000);
+          var docEndDate = new Date(docs.endDay._seconds * 1000);
 
+          console.log('Document data:', docs.endDate);
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -98,11 +101,16 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            regDate: docs.timeStampCreated,
+            //regDate: docs.timeStampCreated,
+            startMonth: docStartDate.getMonth() + 1,
+            startDay: docStartDate.getDate(),
+            endMonth: docEndDate.getMonth() + 1,
+            endDay: docEndDate.getDate(),
+            startDayLabel: doc.startDayLabel,
+            endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
             ownerTel: docs.ownerTel,
             desc: docs.desc,
-            //ownerName: docs.ownerName,
           });
 
           var addiData = {
@@ -163,8 +171,9 @@ export class DetailCheckDriverScreen extends React.Component<
             <Text style={styles.infoTitle}>운행 운임</Text>
           </View>
           <View style={styles.freightInfoHalfContainer}>
-            {/* <Text style={styles.infoRightTitle}>2020년 5월 12일</Text> */}
-            <Text style={styles.infoRightTitle}>{item.regDate}</Text>
+            <Text style={styles.infoRightTitle}>
+              {item.startMonth}월 {item.startDay}일
+            </Text>
             <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
             <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
           </View>
@@ -369,7 +378,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3),
+    fontSize: RFPercentage(2.8),
     fontWeight: 'bold',
   },
   geoSubText: {

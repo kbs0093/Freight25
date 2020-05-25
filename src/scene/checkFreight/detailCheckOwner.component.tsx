@@ -90,6 +90,8 @@ export class DetailCheckOwnerScreen extends React.Component<
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.sttate == 2) freightState = '배송완료';
+          var docStartDate = new Date(docs.startDay._seconds * 1000);
+          var docEndDate = new Date(docs.endDay._seconds * 1000);
 
           list.push({
             key: docs.id,
@@ -104,7 +106,14 @@ export class DetailCheckOwnerScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            regDate: docs.timeStampCreated,
+            //regDate: docs.timeStampCreated,
+            startMonth: docStartDate.getMonth() + 1,
+            startDay: docStartDate.getDate(),
+            endMonth: docEndDate.getMonth() + 1,
+            endDay: docEndDate.getDate(),
+            //요일도 했으니 UI 에서 만들어주세요
+            startDayLabel: doc.startDayLabel,
+            endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
           });
 
@@ -178,7 +187,9 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.infoTitle}></Text>
         </View>
         <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoRightTitle}>{item.regDate}</Text>
+          <Text style={styles.infoRightTitle}>
+            {item.startMonth}월 {item.startDay}일
+          </Text>
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
           <Text style={styles.infoRightTitle}>{item.driveOption}</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
@@ -346,7 +357,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3),
+    fontSize: RFPercentage(2.8),
     fontWeight: 'bold',
   },
   geoSubText: {
