@@ -110,6 +110,7 @@ export class DetailCheckDriverScreen extends React.Component<
             endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
             ownerTel: docs.ownerTel,
+            ownerName: docs.owenerName,
             desc: docs.desc,
           });
 
@@ -201,7 +202,7 @@ export class DetailCheckDriverScreen extends React.Component<
             <Text style={styles.infoTitle}></Text>
           </View>
           <View style={styles.freightInfoHalfContainer}>
-            <Text style={styles.infoRightTitle}>홍길동</Text>
+            <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
             <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
             <Text style={styles.infoRightTitle}>{item.desc}</Text>
           </View>

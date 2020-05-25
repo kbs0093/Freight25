@@ -111,7 +111,6 @@ export class DetailCheckOwnerScreen extends React.Component<
             startDay: docStartDate.getDate(),
             endMonth: docEndDate.getMonth() + 1,
             endDay: docEndDate.getDate(),
-            //요일도 했으니 UI 에서 만들어주세요
             startDayLabel: doc.startDayLabel,
             endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
