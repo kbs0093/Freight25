@@ -29,8 +29,6 @@ import Toast from 'react-native-tiny-toast';
 
 const isAndroid = Platform.OS ==='android';
 
-
-
 export class DetailScreen extends React.Component <DetailScreenProps> {
   constructor(props) {
     super(props);
@@ -60,6 +58,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
         money: null,
         moneyPrint: null,
         isShowLocation: false,
+        desc: null,
       },
       region: {
         latitude: 37.78825,
@@ -120,6 +119,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
                 startFull:  doc.data().startAddr_Full,
                 endFull:  doc.data().endAddr_Full,
                 isShowLocation: true,
+                desc: doc.data().desc,
               }
 
               var region = {
@@ -150,7 +150,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
                   "truckType" : "1",
                   "truckWidth" : "100",
                   "truckHeight" : "100",
-                  "truckWeight" : "35000",  // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+                  "truckWeight" : "2000",  // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
                   "truckTotalWeight" : "35000", // 화물 무게도 불러올 것
                   "truckLength" : "200",  // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것        
                 })
@@ -232,7 +232,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           })
           console.log("StopOver X "+freightRef.id+" was assigned to "+ user.uid);
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
-          this.props.navigation.navigate(AppRoute.HOME);
+          this.props.navigation.navigate(AppRoute.STOPOVERAD);
         }
         catch{
           console.log("Failed assign to "+freightRef.id);
@@ -305,68 +305,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
           </View>              
         </TouchableOpacity>
 
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover1}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>1.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>    
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover2}>  
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>2.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>     
-        ) : null}
-
-        {this.state.stopoverVisible ? (
-        <TouchableOpacity onPress={this.ClickStopover3}>
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex:3, flexDirection: 'row', margin: 5}}>
-            <View style={{flex:1, alignItems: 'center'}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>3.</Text></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold',fontSize: 16,}}>충남 천안</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#2F80ED' ,fontSize: 16,}}>당상</Text></View>
-            </View>
-            <View style={{flex:1}}><Icon style={styles.icon2} fill='black' name='arrow-forward-outline'/></View>
-            <View style={{flex:5, flexDirection: 'row'}}>
-              <View style={{flex: 2}}><Text style={{textAlign: 'center',fontWeight: 'bold', fontSize: 16,}}>서울 송파</Text></View>
-              <View style={{flex: 1}}><Text style={{fontWeight: 'bold', color: '#EB5757', fontSize: 16,}}>당착</Text></View>
-            </View>
-          </View>
-          <View style={{flex:1, margin: 5}}><Text style={{fontWeight: 'bold',fontSize: 16,}}>120,000원</Text></View>
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>
-        </TouchableOpacity>   
-        ) : null}
+  
 
 
           <Divider style={{backgroundColor: 'black'}}/> 
@@ -403,7 +342,7 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={{flex:3, alignItems:'flex-end'}}><Text style={styles.freightTitle}>특이사항 : </Text></View>
-              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>하차대기 없습니다</Text></View>
+              <View style={{flex:5, alignItems:'center'}}><Text style={styles.freightTitle}>{this.state.data.desc}</Text></View>
             </View>
             <Divider style={{backgroundColor: 'black'}}/>
           </View>
