@@ -184,7 +184,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
     this.setState({region});
   }
 
-  clickApply = async() => {
+  ClickApply = async() => {
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('FreightID');
     if(user != null){
@@ -197,9 +197,10 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
           freightRef.update({
             state: 1,
             driverId: user.uid,
-            driverTel: driverTel
+            driverTel: driverTel,
+            timeStampAssigned: new Date()
           })
-          console.log(freightRef.id+" was assigned to "+ user.uid);
+          console.log("StopOver X "+freightRef.id+" was assigned to "+ user.uid);
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
           this.props.navigation.navigate(AppRoute.HOME);
         }
@@ -208,13 +209,11 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
         }
       }
     }
-   
   }
   
   
 
-  render(){
-    
+  render(){    
      return (       
       <React.Fragment>
         <ScrollView>
