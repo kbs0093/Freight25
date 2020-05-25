@@ -48,14 +48,17 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     const that = this;
 
     if (user != null) {
-      var ref = firestore().collection('freights');
-      // var ref = null;
-      //  if(this.state.userType == 'driver'){
-      //    ref = firestore().collection('freights').where("driverId", "==", user.uid);
-      //  }
-      //  else if(this.state.userType = 'owner'){
-      //    ref = firestore().collection('freights').where("ownerId", "==", user.uid);
-      // }
+      //var ref = firestore().collection('freights');
+      var ref = null;
+      if (this.state.userType == 'driver') {
+        ref = firestore()
+          .collection('freights')
+          .where('driverId', '==', user.uid);
+      } else if ((this.state.userType = 'owner')) {
+        ref = firestore()
+          .collection('freights')
+          .where('ownerId', '==', user.uid);
+      }
 
       ref.get().then(async function (querySnapshot) {
         var list = [];
@@ -68,8 +71,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           if (doc.state == 0) freightState = '배송전';
           else if (doc.state == 1) freightState = '배송중';
           else if (doc.state == 2) freightState = '배송완료';
-          var docStartDate = new Date(doc.startDay._seconds*1000);
-          var docEndDate = new Date(doc.endDay._seconds*1000);
+          var docStartDate = new Date(doc.startDay._seconds * 1000);
+          var docEndDate = new Date(doc.endDay._seconds * 1000);
 
           list.push({
             id: doc.id, // Freight key?
@@ -78,13 +81,12 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             endAddress: doc.endAddr,
             distance: doc.dist,
             lastRefresh: 'null',
-            startMonth: docStartDate.getMonth()+1,
+            startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
-            endMonth: docEndDate.getMonth()+1,
+            endMonth: docEndDate.getMonth() + 1,
             endDay: docEndDate.getDate(),
-            //요일도 했으니 UI 에서 만들어주세요
             startDayLabel: doc.startDayLabel,
-            endDayLabel: doc.endDayaLabel
+            endDayLabel: doc.endDayLabel,
           });
         }
         that.setState({data: list});
@@ -124,8 +126,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           </View>
           <View style={styles.geoInfo1}>
             <Text style={styles.timeText}>
-              출발 {item.startMonth} 월 {item.startDay} 일 - 도착{' '}
-              {item.endMonth} 월 {item.endDay} 일
+              {item.startMonth}월 {item.startDay}일 {item.startDayLabel}요일 -{' '}
+              {item.endMonth}월 {item.endDay}일 {item.endDayLabel}요일
             </Text>
           </View>
         </View>
