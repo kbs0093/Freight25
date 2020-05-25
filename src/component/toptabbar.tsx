@@ -46,21 +46,6 @@ AsyncStorage.getItem('email', (err, result) => {
 AsyncStorage.getItem('nickname', (err, result) => {
   nickname = result;
 });
-// AsyncStorage.getItem('userType', (err, result) => {
-//   userType = result;
-// });
-
-// async function getUserType() {
-//   try {
-//     const value = await AsyncStorage.getItem('userType');
-//     if (value !== null) {
-//       userType = value;
-//       console.log(userType);
-//     }
-//   } catch (error) {}
-// }
-
-// getUserType();
 
 const resetAction = CommonActions.reset({
   index: 0,
@@ -156,7 +141,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
 
   // Action for navigate back routes except for home screen.
   const navigateBack = () => {
-    if (routeName != 'Home') props.navigation.goBack();
+    if (routeName != 'Home' && routeName != 'Owner') props.navigation.goBack();
   };
 
   const BackAction = () => (
