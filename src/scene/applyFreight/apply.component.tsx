@@ -196,35 +196,24 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         tmapdist_response = JSON.parse(tmapdist_response)
 
         let tmapprops = tmapdist_response.features[0].properties
-        let tmapdist_km = tmapprops.totalDistance/1000
+        let tmapdist_km = parseInt(tmapprops.totalDistance/1000);
         let tmaptime_min = tmapprops.totalTime/60
         console.log("tmap dist :", tmapdist_km, "Km");
         console.log("tmap time :", tmaptime_min, "분");
         setDistValue(tmapdist_km+"")
+        Toast.hide(toastLoading);
       })
       .catch(err => {
         console.log(err);
+        Toast.hide(toastLoading);
       });
-    Toast.hide(toastLoading);
   }
 
   const loadStartNEndFavoriteAddr = () => {
     firestore().collection('owners').doc(user.uid).get()
     .then(function(snapShot){
       setFavoriteStartAddr(snapShot.data().savedStartFull);
-
       setFavoriteEndAddr(snapShot.data().savedEndFull);
-
-      /*
-      snapShot.data().savedStartCompact;
-      snapShot.data().savedStartLat;
-      snapShot.data().savedStartLon;
-
-      snapShot.data().savedEndCompact;
-      snapShot.data().savedEndLat;
-      snapShot.data().savedEndLon;
-      */
-
       console.log(snapShot.data().savedStartCompact);
     });
   }
@@ -473,14 +462,9 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
             <Text style={styles.infoTitle}> 원</Text>
           </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>지불 : 인수증</Text>
-          </View>
         </View>
         
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoTitle}>상차지 반경 30km 내에 00대의 차량이 있습니다</Text>
-          
+        <View style={styles.infoContainer}>          
           <View style={styles.buttonsContainer}>
             <Button style={styles.IconButton} status='danger'>취소</Button>
             <Button style={styles.IconButton} onPress={applyFreightToDb} >등록</Button>
