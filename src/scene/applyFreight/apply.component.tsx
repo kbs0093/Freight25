@@ -184,6 +184,11 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
     }
   };
 
+  const cancelButtonPressed = () => {
+    props.navigation.navigate(AppRoute.OWNER);
+  }
+
+
   // Calculate distance between startAddr and endAddr
   const calcDist = () => {
     let tmap_distCalcUrl_rest = `&startX=${startAddr_lon}&startY=${startAddr_lat}&endX=${endAddr_lon}&endY=${endAddr_lat}&truckType=1&truckWidth=100&truckHeight=100&truckWeight=35000&truckTotalWeight=35000&truckLength=200`
@@ -206,15 +211,18 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       .catch(err => {
         console.log(err);
         Toast.hide(toastLoading);
+        Toast.show('상/하차지 정보가 제대로 설정되지 않았습니다.')
       });
   }
 
   const loadStartNEndFavoriteAddr = () => {
+    const toastLoading = Toast.showLoading('Loading...');
     firestore().collection('owners').doc(user.uid).get()
     .then(function(snapShot){
       setFavoriteStartAddr(snapShot.data().savedStartFull);
       setFavoriteEndAddr(snapShot.data().savedEndFull);
       console.log(snapShot.data().savedStartCompact);
+      Toast.hide(toastLoading);
     });
   }
 
@@ -294,9 +302,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               appearance='outline' 
               size='small'
               onPress={() => {
-                const toastLoading = Toast.showLoading('Loading...');
                 loadStartNEndFavoriteAddr();
-                Toast.hide(toastLoading);
                 setmodalStartAddrVisible(true);
               }}
             >변경</Button>
@@ -466,7 +472,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         
         <View style={styles.infoContainer}>          
           <View style={styles.buttonsContainer}>
-            <Button style={styles.IconButton} status='danger'>취소</Button>
+            <Button style={styles.IconButton} onPress={cancelButtonPressed} status='danger'>취소</Button>
             <Button style={styles.IconButton} onPress={applyFreightToDb} >등록</Button>
           </View>
         </View>
