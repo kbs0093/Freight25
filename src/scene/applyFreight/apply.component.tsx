@@ -35,9 +35,6 @@ const tmap_distCalcQueryUrl = 'https://apis.openapi.sk.com/tmap/routes?version=1
 const tmap_distCalcUrl = tmap_distCalcQueryUrl + tmap_appKey;
 const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_URL_rest;
 
-const favoriteStartAddr = '서울시 용산구 효창대로 270 114동 2801호 (용산동, 이촌시범아파트)';
-const favoriteEndAddr = '경기도 수원시 권선대로';
-
 const carSize = [
   { label: '1 톤', value: '1 톤'},
   { label: '1.4 톤', value: '1.4 톤' },
@@ -106,6 +103,9 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   const [selectedStartDate, setSelectedStartDate] = React.useState(null);
   const [selectedEndDate, setSelectedEndDate] = React.useState(null);
 
+  const [favoriteStartAddr, setFavoriteStartAddr] = useState<string>("자주쓰는 주소가 등록되어있지 않습니다.");
+  const [favoriteEndAddr, setFavoriteEndAddr] = useState<string>("자주쓰는 주소가 등록되어있지 않습니다.");
+
   //날짜,요일 계산 
   var startDay = new Date();
   var endDay = new Date(); 
@@ -126,66 +126,68 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
     endDayLabel = week[endDay.getDay()];
   };
 
+  var user = auth().currentUser;
+
   //화물 db에 등록
   const applyFreightToDb = () => {
-    var user = auth().currentUser;
+    if(user != null){
+      //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
+      var ref = firestore().collection('freights').doc();
+      getDate();
       if(user != null){
-        //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
-        var ref = firestore().collection('freights').doc();
-        getDate();
-        if(user != null){
-          try {
-            ref.set({
-              id: ref.id,
-              ownerId: auth().currentUser?.uid,
+        try {
+          ref.set({
+            id: ref.id,
+            ownerId: auth().currentUser?.uid,
 //              ownerTel: p
-              carSize: selectedCarSize,
-              carType: selectedCarType,
-              driveOption: selectedDrive,
-              weight: weightValue,
-              volume: volumeValue,
-              freightLoadType: freightLoadTypeValue,
-              desc: descValue,
-              dist: distValue,
-              expense: expenseValue,
-              startAddr: startAddrCompact,
-              startAddr_Full: startAddrFull,
-              startAddr_lat: startAddr_lat,
-              startAddr_lon: startAddr_lon,
-              startDate: selectedStartDate,
-              endAddr: endAddrCompact,
-              endAddr_Full: endAddrFull,
-              endAddr_lat: endAddr_lat,
-              endAddr_lon: endAddr_lon,
-              endDate: selectedEndDate,
-              timeStampCreated: new Date(),
-              startDay: startDay,
-              endDay: endDay,
-              startDayLabel: startDayLabel,
-              endDayLabel: endDayLabel,
-              state: 0,
-              driverId: ""
-              });
-              firestore().collection('owners').doc(user.uid).get()
-              .then(function(snapShot){
-                    ref.update({ownerTel: snapShot.data().tel, ownerName: snapShot.data().name});
-                    console.log(snapShot.data().tel);
-                  });
-              props.navigation.navigate(AppRoute.OWNER);
-              console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " + new Date());
-              Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
-          } catch (error) {
-            //오류 출력 
-            console.log(error);
-            Toast.show('화물이 등록되지 않았습니다.');
-          }
+            carSize: selectedCarSize,
+            carType: selectedCarType,
+            driveOption: selectedDrive,
+            weight: weightValue,
+            volume: volumeValue,
+            freightLoadType: freightLoadTypeValue,
+            desc: descValue,
+            dist: distValue,
+            expense: expenseValue,
+            startAddr: startAddrCompact,
+            startAddr_Full: startAddrFull,
+            startAddr_lat: startAddr_lat,
+            startAddr_lon: startAddr_lon,
+            startDate: selectedStartDate,
+            endAddr: endAddrCompact,
+            endAddr_Full: endAddrFull,
+            endAddr_lat: endAddr_lat,
+            endAddr_lon: endAddr_lon,
+            endDate: selectedEndDate,
+            timeStampCreated: new Date(),
+            startDay: startDay,
+            endDay: endDay,
+            startDayLabel: startDayLabel,
+            endDayLabel: endDayLabel,
+            state: 0,
+            driverId: ""
+            });
+            firestore().collection('owners').doc(user.uid).get()
+            .then(function(snapShot){
+                  ref.update({ownerTel: snapShot.data().tel, ownerName: snapShot.data().name});
+                  console.log(snapShot.data().tel);
+                });
+            props.navigation.navigate(AppRoute.OWNER);
+            console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " + new Date());
+            Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
+        } catch (error) {
+          //오류 출력 
+          console.log(error);
+          Toast.show('화물이 등록되지 않았습니다.');
         }
       }
+    }
   };
 
   // Calculate distance between startAddr and endAddr
   const calcDist = () => {
     let tmap_distCalcUrl_rest = `&startX=${startAddr_lon}&startY=${startAddr_lat}&endX=${endAddr_lon}&endY=${endAddr_lat}&truckType=1&truckWidth=100&truckHeight=100&truckWeight=35000&truckTotalWeight=35000&truckLength=200`
+    const toastLoading = Toast.showLoading('Loading...');
     axios.post(tmap_distCalcUrl + tmap_distCalcUrl_rest)
       .then((response) => {
         let tmapdist_response = JSON.stringify(response.request._response)
@@ -203,6 +205,50 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       .catch(err => {
         console.log(err);
       });
+    Toast.hide(toastLoading);
+  }
+
+  const loadStartNEndFavoriteAddr = () => {
+    firestore().collection('owners').doc(user.uid).get()
+    .then(function(snapShot){
+      setFavoriteStartAddr(snapShot.data().savedStartFull);
+
+      setFavoriteEndAddr(snapShot.data().savedEndFull);
+
+      /*
+      snapShot.data().savedStartCompact;
+      snapShot.data().savedStartLat;
+      snapShot.data().savedStartLon;
+
+      snapShot.data().savedEndCompact;
+      snapShot.data().savedEndLat;
+      snapShot.data().savedEndLon;
+      */
+
+      console.log(snapShot.data().savedStartCompact);
+    });
+  }
+
+  const setStartFavoriteToStartAddr = () => {
+    firestore().collection('owners').doc(user.uid).get()
+    .then(function(snapShot){
+      setStartAddrFull(snapShot.data().savedStartFull)
+      setStartAddrCompact(snapShot.data().savedStartCompact);
+      setStartAddr_lat(snapShot.data().savedStartLat);
+      setStartAddr_lon(snapShot.data().savedStartLon);
+    });
+    setmodalStartAddrVisible(false);
+  }
+
+  const setEndFavoriteToStartAddr = () => {
+    firestore().collection('owners').doc(user.uid).get()
+    .then(function(snapShot){
+      setEndAddrFull(snapShot.data().savedEndFull)
+      setEndAddrCompact(snapShot.data().savedEndCompact);
+      setEndAddr_lat(snapShot.data().savedEndLat);
+      setEndAddr_lon(snapShot.data().savedEndLon);
+    });
+    setmodalEndAddrVisible(false);
   }
 
   function is_integer(v){
@@ -259,6 +305,9 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               appearance='outline' 
               size='small'
               onPress={() => {
+                const toastLoading = Toast.showLoading('Loading...');
+                loadStartNEndFavoriteAddr();
+                Toast.hide(toastLoading);
                 setmodalStartAddrVisible(true);
               }}
             >변경</Button>
@@ -451,7 +500,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           <View style ={{flex : 1}}>
             <View style = {styles.modalContainer}>
               <Text style = {styles.subTitle}>자주쓰는 상차지로 설정하기 </Text>
-              <Text style = {styles.textHyperlink} onPress = {() => setmodalStartAddrVisible(false)}>{favoriteStartAddr}</Text>
+              <Text style = {styles.textHyperlink} onPress = {setStartFavoriteToStartAddr}>{favoriteStartAddr}</Text>
             </View>
             <Postcode
               style={styles.postcodeContainer}
@@ -513,7 +562,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           <View style ={{flex : 1}}>
             <View style = {styles.modalContainer}>
               <Text style = {styles.subTitle}>자주쓰는 하차지로 설정하기 </Text>
-              <Text style = {styles.textHyperlink} onPress = {() => setmodalEndAddrVisible(false)}>{favoriteEndAddr}</Text>
+              <Text style = {styles.textHyperlink} onPress = {setEndFavoriteToStartAddr}>{favoriteEndAddr}</Text>
             </View>
 
             <Postcode
