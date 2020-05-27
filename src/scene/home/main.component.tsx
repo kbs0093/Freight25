@@ -38,20 +38,19 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
           />
         </TouchableOpacity>
       </View>
+
       <View style={{backgroundColor: 'white'}}>
-        <Text style={styles.adtitle}>  </Text>
-        <ViewPager selectedIndex={selectedIndex} onSelect={index => setSelectedIndex(index)}>
-          <View>
-            <Image style={styles.adImage} source={require('../../assets/AD/ad1.jpg')}/>
-          </View>
-          <View>
-            <Image style={styles.adImage} source={require('../../assets/AD/ad2.jpg')}/>
-          </View>
-          <View>
-            <Image style={styles.adImage} source={require('../../assets/AD/ad3.jpg')}/>
-          </View>
-        </ViewPager>
+        <Text style={styles.adtitle}> 스폰서 광고  </Text>             
       </View>
+
+      
+        <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+          <Image style={styles.adImage} source={require('../../assets/AD/ad.jpg')}/>
+        </View>
+      
+      
+      
+           
 
     </React.Fragment>
   );
@@ -83,20 +82,10 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
         </TouchableOpacity>
       </View>
 
-      <View style={{backgroundColor: 'white'}}>
-        <Text style={styles.adtitle}>  </Text>
-        <ViewPager selectedIndex={selectedIndex} onSelect={index => setSelectedIndex(index)}>
-          <View>
-            <Image style={styles.adImage} source={require('../../assets/AD/ad1.jpg')}/>
-          </View>
-          <View>
-            <Image style={styles.adImage} source={require('../../assets/AD/ad2.jpg')}/>
-          </View>
-          <View>
-            <Image style={styles.adImage} source={require('../../assets/AD/ad3.jpg')}/>
-          </View>
-        </ViewPager>
+      <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+        <Image style={styles.adImage} source={require('../../assets/AD/ad.jpg')}/>
       </View>
+
     </React.Fragment>
   );
 };
@@ -104,7 +93,8 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
 const styles = StyleSheet.create({
   adImage: {
     width: '100%',
-    margin: 5, 
+    height: '100%',
+    alignItems: 'center',
     borderRadius: 15
   },
   adtitle: {
@@ -113,7 +103,7 @@ const styles = StyleSheet.create({
     margin: 5
   },
   viewForm: {
-    flex: 1,
+    flex: 2,
     backgroundColor: 'white',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -122,7 +112,7 @@ const styles = StyleSheet.create({
     width: 355,
     height: 150,
     margin: 10,
-    borderRadius: 5,
+    borderRadius: 15,
   },
   IconButton: {
     width: 355,

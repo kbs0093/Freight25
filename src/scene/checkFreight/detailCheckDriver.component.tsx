@@ -129,6 +129,7 @@ export class DetailCheckDriverScreen extends React.Component<
   };
 
   _renderItem = ({item}) => (
+
     <View>
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>화물 내역</Text>

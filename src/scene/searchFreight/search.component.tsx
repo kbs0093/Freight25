@@ -33,6 +33,7 @@ import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
 import Geolocation from 'react-native-geolocation-service';
 
+
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS === 'android';
 
@@ -62,6 +63,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {             
         Geolocation.getCurrentPosition(
           (position) => {
+            
             let latitude = JSON.stringify(position.coords.latitude);
             let longitude = JSON.stringify(position.coords.longitude);
    
@@ -71,6 +73,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
             fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
             .then(response => response.json())
             .then(response => {
+              
               const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
               const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
               const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
@@ -80,7 +83,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
               this.setState({gu});
               this.setState({myeon});
               this.setState({dong});
-              this.FirebaseRequest();          
+              this.FirebaseRequest();                   
             })   
             .catch(err => console.log(err));     
           },
@@ -128,16 +131,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
     );
   };
 
-  FirebaseRequest = async() => {
+  FirebaseRequest = async() => {    
     var user = auth().currentUser;
     const that = this;
-    if(user != null){  
+    
+    if(user != null){      
       try {
         firestore().collection('freights').where("state", "==", 0)
         .get()
         .then(async function(querySnapshot){
           var list =[];
-
+          
           for(var docCnt in querySnapshot.docs){
               
             const doc = querySnapshot.docs[docCnt].data();
@@ -170,8 +174,6 @@ export class SearchScreen extends Component <SearchScreenProps> {
               .then(response =>{
                 return response.features[0].properties.totalDistance/1000 + "";                
             })
-
-
             list.push({
               id: doc.id,
               startAddress: startArr,
@@ -195,12 +197,14 @@ export class SearchScreen extends Component <SearchScreenProps> {
               
             });                 
           }
-          that.setState({data: list});
-        })     
+          
+          that.setState({data: list});          
+        })
+
       } 
       catch (error) {
         console.log(error);
-      }
+      }      
     }      
   }
 
@@ -208,7 +212,9 @@ export class SearchScreen extends Component <SearchScreenProps> {
 
 
   componentDidMount = () => {
-    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()    
+    
+    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()
+    
   }
 
    ClickList = item => () => {
@@ -217,7 +223,8 @@ export class SearchScreen extends Component <SearchScreenProps> {
       this.props.navigation.navigate(AppRoute.ALONE_DETAIL);
     } else {
       this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
-    }    
+    }
+
   };
 
   moneySort(a, b) {
@@ -273,14 +280,16 @@ export class SearchScreen extends Component <SearchScreenProps> {
           <View style={styles.geoInfo12}></View>
           <View style={styles.geoInfo21}><Text style={styles.endType}>{item.endType}</Text></View>
         </View>
-        <View style={styles.geoInfo3}>  
-                      
-          </View>
-          <View style={styles.freightType}><Text style={styles.freightTypeText}>{item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text></View>
-        </View>
+
+          <View style={styles.geoInfo3}/>                        
+            <View style={styles.freightType}>
+              <Text style={styles.freightTypeText}> {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text>
+            </View>
+      </View>
+
       <View style={styles.driveInfo}>
         <View style={styles.driveInfo1}>
-            <Text style={styles.driveText}></Text>
+            <Text style={{fontSize: 8}}></Text>
             <Text style={styles.driveText2}>{item.distanceY} Km</Text>
             <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
@@ -365,17 +374,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
 const styles = StyleSheet.create({
   startType: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
     color: '#2F80ED'
   },
   endType: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
     color: '#EB5757'
   },
   Type: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
     color: '#9B51E0',
   },
   container: {
@@ -394,25 +403,25 @@ const styles = StyleSheet.create({
   geoText:{
     textAlign: 'center', 
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 16,
     margin: 2,  
   },
   geoTitleText: {    
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 15,
     margin: 2,    
   },
   timeText: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
   },
   driveText: {
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 18,
   },
   driveText2: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 18,
     justifyContent: 'flex-start',
   },
   geoInfo11: {
@@ -454,17 +463,17 @@ const styles = StyleSheet.create({
     flex: 3,
   },
   icon: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
   },
   distance: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
     color: '#E5E5E5',
   },
   freightTypeText: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
     color: '#219653'
   },
   freightType: {
