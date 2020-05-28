@@ -87,12 +87,18 @@ export class DetailCheckOwnerScreen extends React.Component<
           var freightState = '';
           var startAddrArray = docs.startAddr.split(' ');
           var endAddrArray = docs.endAddr.split(' ');
+          var docStartDate = '';
 
-          if (docs.state == 0) freightState = '배송전';
-          else if (docs.state == 1) freightState = '배송중';
-          else if (docs.sttate == 2) freightState = '배송완료';
-          var docStartDate = new Date(docs.startDay._seconds * 1000);
-          var docEndDate = new Date(docs.endDay._seconds * 1000);
+          if (docs.state == 0) {
+            freightState = '배송전';
+            docStartDate = new Date(docs.startDay._seconds * 1000);
+          } else if (docs.state == 1) {
+            freightState = '배송중';
+            docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+          } else if (docs.state == 2) {
+            freightState = '배송완료';
+            docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+          }
 
           list.push({
             key: docs.id,
@@ -107,15 +113,15 @@ export class DetailCheckOwnerScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            //regDate: docs.timeStampCreated,
-            startMonth: docStartDate.getMonth() + 1,
-            startDay: docStartDate.getDate(),
-            endMonth: docEndDate.getMonth() + 1,
-            endDay: docEndDate.getDate(),
-            startDayLabel: doc.startDayLabel,
-            endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
             desc: docs.desc,
+
+            startMonth: docStartDate.getMonth() + 1,
+            startDay: docStartDate.getDate(),
+            //endMonth: docEndDate.getMonth() + 1,
+            //endDay: docEndDate.getDate(),
+            startDayLabel: doc.startDayLabel,
+            endDayLabel: doc.endDayLabel,
           });
 
           var addiData = {
@@ -233,6 +239,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
+          status="success"
           disabled={true}>
           화물차 기사에게 전화
         </Button>
@@ -247,7 +254,10 @@ export class DetailCheckOwnerScreen extends React.Component<
       );
     } else if (this.state.addiData.lastState == '배송중') {
       callButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
+        <Button
+          style={styles.button}
+          status="success"
+          textStyle={styles.buttonText}>
           화물차 기사에게 전화
         </Button>
       );
@@ -261,7 +271,10 @@ export class DetailCheckOwnerScreen extends React.Component<
       );
     } else if (this.state.addiData.lastState == '배송완료') {
       callButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
+        <Button
+          style={styles.button}
+          status="success"
+          textStyle={styles.buttonText}>
           화물차 기사에게 전화
         </Button>
       );
@@ -275,6 +288,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
+          status="success"
           disabled={true}>
           화물차 기사에게 전화
         </Button>
@@ -312,7 +326,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         </View>
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{callButton}</View>
-          <View style={styles.ButtonHalfContainer}>{reviewButton}</View>
+          {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
         </View>
       </React.Fragment>
     );
@@ -329,12 +343,13 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(1.5),
   },
   button: {
-    width: RFPercentage(18),
-    height: RFPercentage(6),
+    width: RFPercentage(30),
+    height: RFPercentage(8),
     borderRadius: 8,
   },
   buttonText: {
-    fontSize: RFPercentage(1.6),
+    fontSize: RFPercentage(2),
+    color: 'black',
   },
   titleStyles: {
     paddingHorizontal: 20,

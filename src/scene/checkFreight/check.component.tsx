@@ -222,6 +222,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           data={this.state.data}
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
+          showsVerticalScrollIndicator={false}
         />
         {/* </ScrollView> */}
       </React.Fragment>
