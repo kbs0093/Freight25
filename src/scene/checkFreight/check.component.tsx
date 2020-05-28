@@ -74,6 +74,9 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           var docStartDate = new Date(doc.startDay._seconds * 1000);
           var docEndDate = new Date(doc.endDay._seconds * 1000);
 
+          var startAddrArray = doc.startAddr.split(' ');
+          var endAddrArray = doc.endAddr.split(' ');
+
           list.push({
             id: doc.id, // Freight key?
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -85,6 +88,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             startDay: docStartDate.getDate(),
             endMonth: docEndDate.getMonth() + 1,
             endDay: docEndDate.getDate(),
+            startAddrArray: startAddrArray,
+            endAddrArray: endAddrArray,
             startDayLabel: doc.startDayLabel,
             endDayLabel: doc.endDayLabel,
           });
@@ -132,9 +137,23 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           </View>
         </View>
         <View style={styles.statusInfo}>
-          <Button style={styles.Badge} textStyle={styles.badgeText}>
-            {item.lastState}
-          </Button>
+          {item.lastState == '배송전' ? (
+            <Button
+              style={styles.Badge}
+              appearance="ghost"
+              status="primary"
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
+          ) : (
+            <Button
+              style={styles.Badge}
+              appearance="ghost"
+              status="danger"
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -159,7 +178,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
 const styles = StyleSheet.create({
   Badge: {
-    width: RFPercentage(10),
+    width: RFPercentage(12),
     height: RFPercentage(4),
     borderRadius: 8,
   },
@@ -172,7 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   geoContainer: {
-    flex: 4,
+    flex: 3.5,
     flexDirection: 'column',
   },
   geoInfo1: {

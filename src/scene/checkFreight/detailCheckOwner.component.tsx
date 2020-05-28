@@ -136,9 +136,21 @@ export class DetailCheckOwnerScreen extends React.Component<
     <View>
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>화물 내역</Text>
-        <Button style={styles.Badge} textStyle={styles.badgeText}>
-          {item.lastState}
-        </Button>
+        {item.lastState == '배송중' ? (
+          <Button
+            style={styles.Badge}
+            appearance="outline"
+            textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
+        ) : (
+          <Button
+            style={styles.Badge}
+            appearance="outline"
+            textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
+        )}
       </View>
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>

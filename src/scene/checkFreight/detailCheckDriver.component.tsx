@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   LayoutElement,
@@ -33,6 +34,7 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-tiny-toast';
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -45,7 +47,7 @@ export class DetailCheckDriverScreen extends React.Component<
       FreightID: null,
       data: [],
       addiData: {
-        lastState: null, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+        lastState: null, // 0 -> 배송중, 1 -> 배송완료
         dist: null,
         expense: null,
         ownerId: null,
@@ -129,13 +131,57 @@ export class DetailCheckDriverScreen extends React.Component<
     }
   };
 
+  setComplete = () => {
+    console.log('운송 완료');
+    try {
+      var ref = firestore().collection('freights').doc(this.state.FreightID);
+      ref.update({
+        state: 2,
+      });
+    } catch (error) {}
+    Toast.showSuccess('운송 완료');
+    this.props.navigation.navigate(AppRoute.HOME);
+  };
+
+  _twoOptionAlertHandler = () => {
+    //function to make two option alert
+    Alert.alert(
+      //title
+      '운송 완료',
+      //body
+      '운송 완료 하시겠습니까?',
+      [
+        {text: '네', onPress: () => this.setComplete()},
+        {
+          text: '취소',
+          onPress: () => console.log('No Pressed'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+      //clicking out side of alert will not cancel
+    );
+  };
+
   _renderItem = ({item}) => (
     <View>
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>화물 내역</Text>
-        <Button style={styles.Badge} textStyle={styles.badgeText}>
-          {item.lastState}
-        </Button>
+        {item.lastState == '배송전' ? (
+          <Button
+            style={styles.Badge}
+            appearance="outline"
+            textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
+        ) : (
+          <Button
+            style={styles.Badge}
+            appearance="outline"
+            textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
+        )}
       </View>
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
@@ -228,7 +274,12 @@ export class DetailCheckDriverScreen extends React.Component<
         </Button>
       );
       completeButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
+        <Button
+          onPress={() => {
+            this._twoOptionAlertHandler();
+          }}
+          style={styles.button}
+          textStyle={styles.buttonText}>
           운송 완료하기
         </Button>
       );
