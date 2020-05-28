@@ -53,6 +53,7 @@ export class DetailCheckDriverScreen extends React.Component<
         expense: null,
         ownerId: null,
       },
+      dualFreight: null,
     };
   }
 
@@ -87,10 +88,14 @@ export class DetailCheckDriverScreen extends React.Component<
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.state == 2) freightState = '배송완료';
-          var docStartDate = new Date(docs.startDay._seconds * 1000);
-          var docEndDate = new Date(docs.endDay._seconds * 1000);
 
-          console.log('Document data:', docs.endDate);
+          var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+          //var docEndDate = new Date(docs.endDay._seconds * 1000);
+
+          if (docs.stopover) {
+            this.state.dualFreight = true;
+          }
+
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -104,14 +109,15 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            //regDate: docs.timeStampCreated,
+
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
-            endMonth: docEndDate.getMonth() + 1,
-            endDay: docEndDate.getDate(),
+            // endMonth: docEndDate.getMonth() + 1,
+            // endDay: docEndDate.getDate(),
             startDayLabel: doc.startDayLabel,
-            endDayLabel: doc.endDayLabel,
+            // endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
+
             ownerTel: docs.ownerTel,
             ownerName: docs.ownerName,
             desc: docs.desc,
@@ -210,16 +216,20 @@ export class DetailCheckDriverScreen extends React.Component<
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
-
-      <ViewPager
-        initialPage={0}
-        style={styles.freightInfoContainer}
-        showPageIndicator={true}>
+      {this.state.dualFreight == null ? (
         <View style={styles.freightInfoTotalContainer}>
           <View style={styles.freightInfoHalfContainer} key="1">
             <Text style={styles.infoTitle}>배차 날짜</Text>
             <Text style={styles.infoTitle}>운행 거리</Text>
             <Text style={styles.infoTitle}>운행 운임</Text>
+            <Text style={styles.infoTitle}>상차지 주소</Text>
+            <Text style={styles.infoTitle}></Text>
+            <Text style={styles.infoTitle}></Text>
+            <Text style={styles.infoTitle}>하차지 주소</Text>
+            <Text style={styles.infoTitle}></Text>
+            <Text style={styles.infoTitle}>화주 이름</Text>
+            <Text style={styles.infoTitle}>화주 연락처</Text>
+            <Text style={styles.infoTitle}>화물 설명</Text>
           </View>
           <View style={styles.freightInfoHalfContainer}>
             <Text style={styles.infoRightTitle}>
@@ -227,36 +237,63 @@ export class DetailCheckDriverScreen extends React.Component<
             </Text>
             <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
             <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          </View>
-        </View>
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="2">
-            <Text style={styles.infoTitle}>상차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}>하차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
             <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
             <Text style={styles.infoRightTitle}></Text>
             <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
             <Text style={styles.infoRightTitle}></Text>
-          </View>
-        </View>
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="3">
-            <Text style={styles.infoTitle}>화주 이름</Text>
-            <Text style={styles.infoTitle}>화주 연락처</Text>
-            <Text style={styles.infoTitle}>화물 설명</Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
             <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
             <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
             <Text style={styles.infoRightTitle}>{item.desc}</Text>
           </View>
         </View>
-      </ViewPager>
+      ) : (
+        <ViewPager
+          initialPage={0}
+          style={styles.freightInfoContainer}
+          showPageIndicator={true}>
+          <View style={styles.freightInfoTotalContainer}>
+            <View style={styles.freightInfoHalfContainer} key="1">
+              <Text style={styles.infoTitle}>배차 날짜</Text>
+              <Text style={styles.infoTitle}>운행 거리</Text>
+              <Text style={styles.infoTitle}>운행 운임</Text>
+            </View>
+            <View style={styles.freightInfoHalfContainer}>
+              <Text style={styles.infoRightTitle}>
+                {item.startMonth}월 {item.startDay}일
+              </Text>
+              <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
+              <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
+            </View>
+          </View>
+          <View style={styles.freightInfoTotalContainer}>
+            <View style={styles.freightInfoHalfContainer} key="2">
+              <Text style={styles.infoTitle}>상차지 주소</Text>
+              <Text style={styles.infoTitle}></Text>
+              <Text style={styles.infoTitle}></Text>
+              <Text style={styles.infoTitle}>하차지 주소</Text>
+              <Text style={styles.infoTitle}></Text>
+            </View>
+            <View style={styles.freightInfoHalfContainer}>
+              <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
+              <Text style={styles.infoRightTitle}></Text>
+              <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
+              <Text style={styles.infoRightTitle}></Text>
+            </View>
+          </View>
+          <View style={styles.freightInfoTotalContainer}>
+            <View style={styles.freightInfoHalfContainer} key="3">
+              <Text style={styles.infoTitle}>화주 이름</Text>
+              <Text style={styles.infoTitle}>화주 연락처</Text>
+              <Text style={styles.infoTitle}>화물 설명</Text>
+            </View>
+            <View style={styles.freightInfoHalfContainer}>
+              <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
+              <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
+              <Text style={styles.infoRightTitle}>{item.desc}</Text>
+            </View>
+          </View>
+        </ViewPager>
+      )}
       <Divider style={{backgroundColor: 'black'}} />
     </View>
   );
