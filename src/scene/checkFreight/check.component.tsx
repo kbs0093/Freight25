@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
+  Platform,
   ScrollView,
 } from 'react-native';
 import {Icon, LayoutElement, Divider, Button} from '@ui-kitten/components';
@@ -25,6 +26,9 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import RNPickerSelect from 'react-native-picker-select';
+
+const isAndroid = Platform.OS === 'android';
 
 export class CheckScreen extends React.Component<CheckScreenProps> {
   constructor(props) {
@@ -71,6 +75,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           if (doc.state == 0) freightState = '배송전';
           else if (doc.state == 1) freightState = '배송중';
           else if (doc.state == 2) freightState = '배송완료';
+
           var docStartDate = new Date(doc.startDay._seconds * 1000);
           var docEndDate = new Date(doc.endDay._seconds * 1000);
 
@@ -84,12 +89,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             endAddress: doc.endAddr,
             distance: doc.dist,
             lastRefresh: 'null',
+            startAddrArray: startAddrArray,
+            endAddrArray: endAddrArray,
+
+            // Registered Date
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
             endMonth: docEndDate.getMonth() + 1,
             endDay: docEndDate.getDate(),
-            startAddrArray: startAddrArray,
-            endAddrArray: endAddrArray,
             startDayLabel: doc.startDayLabel,
             endDayLabel: doc.endDayLabel,
           });
@@ -109,6 +116,21 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
       console.log('undefined usertype');
     }
   };
+
+  dateSort(a, b) {
+    if (a.money == b.money) {
+      return 0;
+    }
+    return a.money < b.money ? 1 : -1;
+  }
+
+  statusSort(a, b) {
+    return Number(a.distanceY) > Number(b.distanceY)
+      ? -1
+      : Number(a.distanceY) < Number(b.distanceY)
+      ? 1
+      : 0;
+  }
 
   _renderItem = ({item}) => (
     <TouchableOpacity onPress={this.ClickList(item)}>
@@ -137,15 +159,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           </View>
         </View>
         <View style={styles.statusInfo}>
-          {item.lastState == '배송전' ? (
-            <Button
-              style={styles.Badge}
-              appearance="ghost"
-              status="primary"
-              textStyle={styles.badgeText}>
-              {item.lastState}
-            </Button>
-          ) : (
+          {item.lastState == '배송중' ? (
             <Button
               style={styles.Badge}
               appearance="ghost"
@@ -153,9 +167,18 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
               textStyle={styles.badgeText}>
               {item.lastState}
             </Button>
+          ) : (
+            <Button
+              style={styles.Badge}
+              appearance="ghost"
+              status="primary"
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
           )}
         </View>
       </View>
+      <Divider style={{backgroundColor: 'black'}} />
     </TouchableOpacity>
   );
 
@@ -163,7 +186,37 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        {/* <ScrollView> */}
+        <View
+          style={{
+            height: '8%',
+            flexDirection: 'row',
+            backgroundColor: 'white',
+          }}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+              검색 조건 :
+            </Text>
+          </View>
+          <View
+            style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+            <RNPickerSelect
+              onValueChange={(value) => {
+                this.setState({value});
+              }}
+              placeholder={{
+                label: '정렬 순서',
+                value: null,
+              }}
+              useNativeAndroidPickerStyle={isAndroid ? true : false}
+              items={[
+                {label: '최근 날짜 순', value: '2'},
+                {label: '상태별 정렬', value: '1'},
+              ]}
+            />
+          </View>
+        </View>
+        <Divider style={{backgroundColor: 'black'}} />
+
         <FlatList
           style={{backgroundColor: 'white'}}
           data={this.state.data}
@@ -229,5 +282,10 @@ const styles = StyleSheet.create({
   icon: {
     width: 32,
     height: 32,
+  },
+  lineStyle: {
+    borderWidth: 0.5,
+    borderColor: 'black',
+    margin: 10,
   },
 });

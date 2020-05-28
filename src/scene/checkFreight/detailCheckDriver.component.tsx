@@ -16,6 +16,7 @@ import {
   OverflowMenu,
   Icon,
   Button,
+  Divider,
 } from '@ui-kitten/components';
 import {DetailCheckDriverScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
@@ -167,10 +168,11 @@ export class DetailCheckDriverScreen extends React.Component<
     <View>
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>화물 내역</Text>
-        {item.lastState == '배송전' ? (
+        {item.lastState == '배송중' ? (
           <Button
             style={styles.Badge}
             appearance="outline"
+            status="danger"
             textStyle={styles.badgeText}>
             {item.lastState}
           </Button>
@@ -183,6 +185,7 @@ export class DetailCheckDriverScreen extends React.Component<
           </Button>
         )}
       </View>
+      {/* <Divider style={{backgroundColor: 'black'}} /> */}
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -206,6 +209,7 @@ export class DetailCheckDriverScreen extends React.Component<
           <Text style={styles.geoSubText}>{item.endDate}</Text>
         </View>
       </View>
+      <Divider style={{backgroundColor: 'black'}} />
 
       <ViewPager
         initialPage={0}
@@ -253,7 +257,7 @@ export class DetailCheckDriverScreen extends React.Component<
           </View>
         </View>
       </ViewPager>
-      <View style={styles.lineStyle} />
+      <Divider style={{backgroundColor: 'black'}} />
     </View>
   );
 
@@ -341,6 +345,7 @@ export class DetailCheckDriverScreen extends React.Component<
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
         />
+        <Divider style={{backgroundColor: 'black'}} />
         <View style={styles.totalInfoContainer}>
           <View style={styles.totalInfoHalfContainer}>
             <Text style={styles.infoTitle}>총 운행 거리</Text>

@@ -15,6 +15,7 @@ import {
   OverflowMenu,
   Icon,
   Button,
+  Divider,
 } from '@ui-kitten/components';
 import {DetailCheckOwnerScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
@@ -114,6 +115,7 @@ export class DetailCheckOwnerScreen extends React.Component<
             startDayLabel: doc.startDayLabel,
             endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
+            desc: docs.desc,
           });
 
           var addiData = {
@@ -140,6 +142,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Button
             style={styles.Badge}
             appearance="outline"
+            status="danger"
             textStyle={styles.badgeText}>
             {item.lastState}
           </Button>
@@ -175,6 +178,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.geoSubText}>{item.endDate}</Text>
         </View>
       </View>
+      <Divider style={{backgroundColor: 'black'}} />
 
       <View style={styles.freightInfoTotalContainer}>
         <View style={styles.freightInfoHalfContainer} key="1">
@@ -196,6 +200,9 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.infoTitle}>하차지 주소</Text>
           <Text style={styles.infoTitle}></Text>
           <Text style={styles.infoTitle}></Text>
+          <Text style={styles.infoTitle}>화물 설명</Text>
+          <Text style={styles.infoTitle}></Text>
+          <Text style={styles.infoTitle}></Text>
         </View>
         <View style={styles.freightInfoHalfContainer}>
           <Text style={styles.infoRightTitle}>
@@ -208,9 +215,12 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.infoRightTitle}></Text>
           <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
           <Text style={styles.infoRightTitle}></Text>
+          <Text style={styles.infoRightTitle}>{item.desc}</Text>
+          <Text style={styles.infoRightTitle}></Text>
+          <Text style={styles.infoRightTitle}></Text>
         </View>
       </View>
-      <View style={styles.lineStyle} />
+      <Divider style={{backgroundColor: 'black'}} />
     </View>
   );
 
