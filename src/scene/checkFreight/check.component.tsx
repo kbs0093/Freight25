@@ -138,7 +138,10 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
         <View style={styles.geoContainer}>
           <View style={styles.geoInfo1}>
             <View style={styles.geoInfo11}>
-              <Text style={styles.geoText}>{item.startAddress}</Text>
+              <Text style={styles.geoText}>
+                {item.startAddrArray[0]} {item.startAddrArray[1]}
+              </Text>
+              <Text style={styles.geoText}>{item.startAddrArray[2]}</Text>
             </View>
             <View style={styles.geoInfo12}>
               <Icon
@@ -148,7 +151,10 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
               />
             </View>
             <View style={styles.geoInfo11}>
-              <Text style={styles.geoText}>{item.endAddress}</Text>
+              <Text style={styles.geoText}>
+                {item.endAddrArray[0]} {item.endAddrArray[1]}
+              </Text>
+              <Text style={styles.geoText}>{item.endAddrArray[2]}</Text>
             </View>
           </View>
           <View style={styles.geoInfo1}>
@@ -272,7 +278,7 @@ const styles = StyleSheet.create({
   geoInfo12: {
     justifyContent: 'flex-end',
     alignItems: 'center',
-    flex: 1,
+    flex: 0.5,
   },
   statusInfo: {
     paddingVertical: 15,
