@@ -182,7 +182,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
 
   onRegionChange =(region) => {
     this.setState({region});
-  }
+  };
 
   ClickApply = async() => {
     const user = auth().currentUser;
@@ -209,7 +209,7 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
         }
       }
     }
-  }
+  };
   
   
 

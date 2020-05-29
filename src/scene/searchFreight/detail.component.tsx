@@ -198,18 +198,6 @@ export class DetailScreen extends React.Component <DetailScreenProps> {
     }
   }
 
-  ClickStopover1 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER1);
-  }
-  
-  ClickStopover2 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER2);
-  }
-
-  ClickStopover3 = () => {
-    this.props.navigation.navigate(AppRoute.STOPOVER3);
-  }
-
   onRegionChange =(region) => {
     this.setState({region});
   }
