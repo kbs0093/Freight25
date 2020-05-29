@@ -653,6 +653,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   infoContainer: {
+    backgroundColor: 'white',
     paddingHorizontal: 25,
     paddingVertical: 10,
     alignItems: 'flex-start',
