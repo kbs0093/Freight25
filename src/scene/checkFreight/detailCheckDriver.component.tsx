@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   LayoutElement,
@@ -15,6 +16,7 @@ import {
   OverflowMenu,
   Icon,
   Button,
+  Divider,
 } from '@ui-kitten/components';
 import {DetailCheckDriverScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
@@ -33,6 +35,7 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-tiny-toast';
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -45,11 +48,12 @@ export class DetailCheckDriverScreen extends React.Component<
       FreightID: null,
       data: [],
       addiData: {
-        lastState: null, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+        lastState: null, // 0 -> 배송중, 1 -> 배송완료
         dist: null,
         expense: null,
         ownerId: null,
       },
+      dualFreight: null,
     };
   }
 
@@ -84,10 +88,14 @@ export class DetailCheckDriverScreen extends React.Component<
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.state == 2) freightState = '배송완료';
-          var docStartDate = new Date(docs.startDay._seconds * 1000);
-          var docEndDate = new Date(docs.endDay._seconds * 1000);
 
-          console.log('Document data:', docs.endDate);
+          var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+          //var docEndDate = new Date(docs.endDay._seconds * 1000);
+
+          if (docs.stopover) {
+            this.state.dualFreight = true;
+          }
+
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -101,16 +109,17 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            //regDate: docs.timeStampCreated,
+
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
-            endMonth: docEndDate.getMonth() + 1,
-            endDay: docEndDate.getDate(),
+            // endMonth: docEndDate.getMonth() + 1,
+            // endDay: docEndDate.getDate(),
             startDayLabel: doc.startDayLabel,
-            endDayLabel: doc.endDayLabel,
+            // endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
+
             ownerTel: docs.ownerTel,
-            ownerName: docs.owenerName,
+            ownerName: docs.ownerName,
             desc: docs.desc,
           });
 
@@ -129,14 +138,60 @@ export class DetailCheckDriverScreen extends React.Component<
     }
   };
 
+  setComplete = () => {
+    console.log('운송 완료');
+    try {
+      var ref = firestore().collection('freights').doc(this.state.FreightID);
+      ref.update({
+        state: 2,
+      });
+    } catch (error) {}
+    Toast.showSuccess('운송 완료');
+    this.props.navigation.navigate(AppRoute.HOME);
+  };
+
+  _twoOptionAlertHandler = () => {
+    //function to make two option alert
+    Alert.alert(
+      //title
+      '운송 완료',
+      //body
+      '운송 완료 하시겠습니까?',
+      [
+        {text: '네', onPress: () => this.setComplete()},
+        {
+          text: '취소',
+          onPress: () => console.log('No Pressed'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+      //clicking out side of alert will not cancel
+    );
+  };
+
   _renderItem = ({item}) => (
     <View>
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>화물 내역</Text>
-        <Button style={styles.Badge} textStyle={styles.badgeText}>
-          {item.lastState}
-        </Button>
+        {item.lastState == '배송중' ? (
+          <Button
+            style={styles.Badge}
+            appearance="outline"
+            status="danger"
+            textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
+        ) : (
+          <Button
+            style={styles.Badge}
+            appearance="outline"
+            textStyle={styles.badgeText}>
+            {item.lastState}
+          </Button>
+        )}
       </View>
+      {/* <Divider style={{backgroundColor: 'black'}} /> */}
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -160,16 +215,21 @@ export class DetailCheckDriverScreen extends React.Component<
           <Text style={styles.geoSubText}>{item.endDate}</Text>
         </View>
       </View>
-
-      <ViewPager
-        initialPage={0}
-        style={styles.freightInfoContainer}
-        showPageIndicator={true}>
+      <Divider style={{backgroundColor: 'black'}} />
+      {this.state.dualFreight == null ? (
         <View style={styles.freightInfoTotalContainer}>
           <View style={styles.freightInfoHalfContainer} key="1">
             <Text style={styles.infoTitle}>배차 날짜</Text>
             <Text style={styles.infoTitle}>운행 거리</Text>
             <Text style={styles.infoTitle}>운행 운임</Text>
+            <Text style={styles.infoTitle}>상차지 주소</Text>
+            <Text style={styles.infoTitle}></Text>
+            <Text style={styles.infoTitle}></Text>
+            <Text style={styles.infoTitle}>하차지 주소</Text>
+            <Text style={styles.infoTitle}></Text>
+            <Text style={styles.infoTitle}>화주 이름</Text>
+            <Text style={styles.infoTitle}>화주 연락처</Text>
+            <Text style={styles.infoTitle}>화물 설명</Text>
           </View>
           <View style={styles.freightInfoHalfContainer}>
             <Text style={styles.infoRightTitle}>
@@ -177,38 +237,64 @@ export class DetailCheckDriverScreen extends React.Component<
             </Text>
             <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
             <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          </View>
-        </View>
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="2">
-            <Text style={styles.infoTitle}>상차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}>하차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
             <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
             <Text style={styles.infoRightTitle}></Text>
             <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
             <Text style={styles.infoRightTitle}></Text>
-          </View>
-        </View>
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="3">
-            <Text style={styles.infoTitle}>화주 이름</Text>
-            <Text style={styles.infoTitle}>화주 연락처</Text>
-            <Text style={styles.infoTitle}>화물 설명</Text>
-            <Text style={styles.infoTitle}></Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
             <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
             <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
             <Text style={styles.infoRightTitle}>{item.desc}</Text>
           </View>
         </View>
-      </ViewPager>
-      <View style={styles.lineStyle} />
+      ) : (
+        <ViewPager
+          initialPage={0}
+          style={styles.freightInfoContainer}
+          showPageIndicator={true}>
+          <View style={styles.freightInfoTotalContainer}>
+            <View style={styles.freightInfoHalfContainer} key="1">
+              <Text style={styles.infoTitle}>배차 날짜</Text>
+              <Text style={styles.infoTitle}>운행 거리</Text>
+              <Text style={styles.infoTitle}>운행 운임</Text>
+            </View>
+            <View style={styles.freightInfoHalfContainer}>
+              <Text style={styles.infoRightTitle}>
+                {item.startMonth}월 {item.startDay}일
+              </Text>
+              <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
+              <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
+            </View>
+          </View>
+          <View style={styles.freightInfoTotalContainer}>
+            <View style={styles.freightInfoHalfContainer} key="2">
+              <Text style={styles.infoTitle}>상차지 주소</Text>
+              <Text style={styles.infoTitle}></Text>
+              <Text style={styles.infoTitle}></Text>
+              <Text style={styles.infoTitle}>하차지 주소</Text>
+              <Text style={styles.infoTitle}></Text>
+            </View>
+            <View style={styles.freightInfoHalfContainer}>
+              <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
+              <Text style={styles.infoRightTitle}></Text>
+              <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
+              <Text style={styles.infoRightTitle}></Text>
+            </View>
+          </View>
+          <View style={styles.freightInfoTotalContainer}>
+            <View style={styles.freightInfoHalfContainer} key="3">
+              <Text style={styles.infoTitle}>화주 이름</Text>
+              <Text style={styles.infoTitle}>화주 연락처</Text>
+              <Text style={styles.infoTitle}>화물 설명</Text>
+            </View>
+            <View style={styles.freightInfoHalfContainer}>
+              <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
+              <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
+              <Text style={styles.infoRightTitle}>{item.desc}</Text>
+            </View>
+          </View>
+        </ViewPager>
+      )}
+      <Divider style={{backgroundColor: 'black'}} />
     </View>
   );
 
@@ -229,7 +315,12 @@ export class DetailCheckDriverScreen extends React.Component<
         </Button>
       );
       completeButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
+        <Button
+          onPress={() => {
+            this._twoOptionAlertHandler();
+          }}
+          style={styles.button}
+          textStyle={styles.buttonText}>
           운송 완료하기
         </Button>
       );
@@ -291,6 +382,7 @@ export class DetailCheckDriverScreen extends React.Component<
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
         />
+        <Divider style={{backgroundColor: 'black'}} />
         <View style={styles.totalInfoContainer}>
           <View style={styles.totalInfoHalfContainer}>
             <Text style={styles.infoTitle}>총 운행 거리</Text>
