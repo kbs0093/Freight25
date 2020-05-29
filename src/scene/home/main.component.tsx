@@ -1,15 +1,6 @@
 import React, {useState} from 'react';
-import {
-  Image,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  LayoutElement,
-  Text,
-  ViewPager
-} from '@ui-kitten/components';
+import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
+import {LayoutElement, Text, ViewPager} from '@ui-kitten/components';
 import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -29,7 +20,10 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
     <React.Fragment>
       <View style={styles.viewForm}>
         <TouchableOpacity onPress={clickButtonType}>
-          <Image style={styles.Button} source={require('../../assets/SearchButton-round.png')} />
+          <Image
+            style={styles.Button}
+            source={require('../../assets/SearchButton-round.png')}
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={clickCheck}>
           <Image
@@ -40,39 +34,36 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
       </View>
 
       <View style={{backgroundColor: 'white'}}>
-        <Text style={styles.adtitle}> 스폰서 광고  </Text>             
+        <Text style={styles.adtitle}> 스폰서 광고 </Text>
       </View>
 
-      
-        <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
-          <Image style={styles.adImage} source={require('../../assets/AD/ad.jpg')}/>
-        </View>
-      
-      
-      
-           
-
+      <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+        <Image
+          style={styles.adImage}
+          source={require('../../assets/AD/ad.jpg')}
+        />
+      </View>
     </React.Fragment>
   );
-  
-  
 };
 
 export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
   const [selectedIndex, setSelectedIndex] = React.useState(1);
   const clickButtonType = () => {
-    props.navigation.navigate(AppRoute.APPLY)
+    props.navigation.navigate(AppRoute.APPLY);
   };
   const clickCheck = () => {
     props.navigation.navigate(AppRoute.CHECK);
   };
 
- 
   return (
     <React.Fragment>
       <View style={styles.viewForm}>
         <TouchableOpacity onPress={clickButtonType}>
-          <Image style={styles.Button} source={require('../../assets/ApplyButton.png')} />
+          <Image
+            style={styles.Button}
+            source={require('../../assets/ApplyButton.png')}
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={clickCheck}>
           <Image
@@ -82,10 +73,16 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
         </TouchableOpacity>
       </View>
 
-      <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
-        <Image style={styles.adImage} source={require('../../assets/AD/ad.jpg')}/>
+      <View style={{backgroundColor: 'white'}}>
+        <Text style={styles.adtitle}> 스폰서 광고 </Text>
       </View>
 
+      <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+        <Image
+          style={styles.adImage}
+          source={require('../../assets/AD/ad.jpg')}
+        />
+      </View>
     </React.Fragment>
   );
 };
@@ -95,12 +92,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     alignItems: 'center',
-    borderRadius: 15
+    borderRadius: 15,
   },
   adtitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    margin: 5
+    margin: 5,
   },
   viewForm: {
     flex: 2,
