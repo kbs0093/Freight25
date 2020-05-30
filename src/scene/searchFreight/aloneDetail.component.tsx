@@ -208,6 +208,25 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
           console.log("Failed assign to "+freightRef.id);
         }
       }
+      //트랜잭션 추가
+      var transRef = firestore().collection('transactions').doc();
+      try{
+        transRef.set({
+          transactionId: transRef.id,
+          driverId: user.uid,
+          driverTel: driverTel,
+          driveOption:"독차",
+          originalFreightId: value,
+          stopoverFreightId: "",   
+          totalExpense: "",
+          totalDistance: "",
+          timeStampAssigned: new Date()
+        })
+        AsyncStorage.setItem('tsActId',transRef.id);
+      }
+      catch{
+        console.log("Failed transaction to "+value);
+      }
     }
   };
   
@@ -324,8 +343,8 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
         
         <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
           <View style={{flex:5, justifyContent: 'center'}}>
-            <Text style={styles.freightTitle}>      총 운행거리 : {this.state.data.distanceY}km </Text>
-            <Text style={styles.freightTitle}>      총 운행운임 : {this.state.data.moneyPrint}원 </Text>
+            <Text style={styles.freightTitle}>      운행거리 : {this.state.data.distanceY}km </Text>
+            <Text style={styles.freightTitle}>      운행운임 : {this.state.data.moneyPrint}원 </Text>
           </View>
           <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
             <Button style={styles.button} status='success' onPress={this.ClickApply}>수 락</Button>

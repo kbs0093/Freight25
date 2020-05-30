@@ -253,6 +253,25 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
         } catch {
           console.log('Failed assign to ' + freightRef.id);
         }
+        //트랜잭션 추가
+        var transRef = firestore().collection('transactions').doc();
+        try{
+          transRef.set({
+            transactionId: transRef.id,
+            driverId: user.uid,
+            driverTel: driverTel,
+            driveOption:"혼적",
+            originalFreightId: value,
+            stopoverFreightId: "",   
+            totalExpense: "",
+            totalDistance: "",
+            timeStampAssigned: new Date()
+          })
+          AsyncStorage.setItem('tsActId',transRef.id);
+        }
+        catch{
+          console.log("Failed transaction to "+value);
+        }
       }
     }
   };
@@ -471,11 +490,11 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
           <View style={{flex: 5, justifyContent: 'center'}}>
             <Text style={styles.freightTitle}>
               {' '}
-              총 운행거리 : {this.state.data.distanceY}km{' '}
+              운행거리 : {this.state.data.distanceY}km{' '}
             </Text>
             <Text style={styles.freightTitle}>
               {' '}
-              총 운행운임 : {this.state.data.moneyPrint}원{' '}
+              운행운임 : {this.state.data.moneyPrint}원{' '}
             </Text>
           </View>
           <View
