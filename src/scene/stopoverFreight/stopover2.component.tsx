@@ -458,11 +458,11 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
           <View style={{flex: 5, justifyContent: 'center'}}>
             <Text style={styles.freightTitle}>
               {' '}
-              총 운행거리 : {this.state.data.distanceY}km{' '}
+              운행거리 :   {this.state.data.distanceY}km{' '}
             </Text>
             <Text style={styles.freightTitle}>
               {' '}
-              총 운행운임 : {this.state.data.moneyPrint}원{' '}
+              운행운임 :   {this.state.data.moneyPrint}원{' '}
             </Text>
           </View>
           <View
