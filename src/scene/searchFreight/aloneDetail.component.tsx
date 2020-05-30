@@ -343,8 +343,8 @@ export class aloneDetailScreen extends React.Component <aloneDetailScreenProps> 
         
         <View style={{backgroundColor: 'white', flexDirection: 'row'}}>          
           <View style={{flex:5, justifyContent: 'center'}}>
-            <Text style={styles.freightTitle}>      운행거리 : {this.state.data.distanceY}km </Text>
-            <Text style={styles.freightTitle}>      운행운임 : {this.state.data.moneyPrint}원 </Text>
+            <Text style={styles.freightTitle}>      운행거리 :   {this.state.data.distanceY}km </Text>
+            <Text style={styles.freightTitle}>      운행운임 :   {this.state.data.moneyPrint}원 </Text>
           </View>
           <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
             <Button style={styles.button} status='success' onPress={this.ClickApply}>수 락</Button>

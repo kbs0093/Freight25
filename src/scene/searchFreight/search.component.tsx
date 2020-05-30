@@ -50,7 +50,9 @@ export class SearchScreen extends Component <SearchScreenProps> {
       myeon: '',
       dong: '',
       value: '1',
+      value2: '1',
       data: [],
+      data2: [],
       distance: []
     };
   }
@@ -152,28 +154,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
             var endArr = parseEnd.split(" ");
             var moneyprint = doc.expense + "";
             var distance;
-            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");                     
-                             
-            distance = await fetch('https://apis.openapi.sk.com/tmap/routes?version=1&format=json&callback=response',{
-              method: 'POST',
-              headers:{
-                "appKey" : "l7xxce3558ee38884b2da0da786de609a5be",
-              },
-              body: JSON.stringify({
-                "startX" : that.state.longitude,
-                "startY" : that.state.latitude,
-                "endX" : doc.startAddr_lon,
-                "endY" : doc.startAddr_lat,
-                "reqCoordType" : "WGS84GEO",
-                "resCoordType" : "WGS84GEO",
-                "searchOption" : '0',
-                "totalValue" : '2',
-                "trafficInfo" : 'N'
-              })})
-              .then(response => response.json())
-              .then(response =>{
-                return response.features[0].properties.totalDistance/1000 + "";                
-            })
+            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            var distance = 100 * (Math.acos(Math.sin(that.state.latitude)*Math.sin(doc.startAddr_lat) + Math.cos(that.state.latitude)*Math.cos(doc.startAddr_lat)*Math.cos(that.state.longitude - doc.startAddr_lon)));;
+            distance = Math.floor(distance);
+
             list.push({
               id: doc.id,
               startAddress: startArr,
@@ -196,25 +181,22 @@ export class SearchScreen extends Component <SearchScreenProps> {
               moneyPrint: moneyprint,
               
             });                 
-          }
-          
-          that.setState({data: list});          
+          }          
+          that.setState({data: list});
+          that.setState({data2: list});
         })
 
       } 
       catch (error) {
         console.log(error);
       }      
-    }      
+    }   
   }
 
-  
 
 
   componentDidMount = () => {
-    
     isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()
-    
   }
 
    ClickList = item => () => {
@@ -241,6 +223,36 @@ export class SearchScreen extends Component <SearchScreenProps> {
 
   smartSort(a, b) {
     if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
+  };
+
+  filtering(value) {
+    var temp = [];
+    temp = JSON.parse(JSON.stringify(this.state.data));
+     
+    if(value == '1'){        
+      let result = temp.filter(element => {
+        return element.distanceX <= 100
+      });
+      this.setState({data2: result})    
+    }
+    else if(value == '2'){
+      let result = temp.filter(element => {
+        return element.distanceX <= 50
+      });
+      this.setState({data2: result})   
+    }
+    else if(value == '3'){
+      let result = temp.filter(element => {
+        return element.distanceX <= 30
+      });
+      this.setState({data2: result})   
+    }
+    else if(value == '4'){
+      let result = temp.filter(element => {
+        return element.distanceX <= 10
+      });
+      this.setState({data2: result})   
+    }    
   };
   
   _renderItem = ({item}) => (   
@@ -303,7 +315,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
   );
   
   render(){
-
+      
     if(this.state.value == '1'){  
       this.state.data.sort(this.smartSort);
     }
@@ -315,8 +327,9 @@ export class SearchScreen extends Component <SearchScreenProps> {
     }
     else if(this.state.value == '4'){
       this.state.data.sort(this.distanceSort2);
-    }   
-
+    }
+    
+    
     return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -355,11 +368,37 @@ export class SearchScreen extends Component <SearchScreenProps> {
       
             />
         </View>      
+      </View>
+      <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+            검색 반경 : 
+          </Text>
+        </View>
+        <View style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+          <RNPickerSelect
+              onValueChange={(value) => {
+                this.filtering(value) 
+              }}
+              placeholder={{
+                label: '검색 반경 Km를 선택하세요',
+                value: null,
+              }}
+              useNativeAndroidPickerStyle={isAndroid? true: false}
+              items={[
+                {label: '10Km', value: '4'},
+                {label: '30Km', value: '3'},
+                {label: '50Km', value: '2'},
+                {label: '100Km', value: '1'},
+              ]}
+      
+            />
+        </View>      
       </View>     
       <Divider style={{backgroundColor: 'black'}}/>     
         <FlatList 
           style={{backgroundColor : 'white'}}
-          data={this.state.value? this.state.data : this.state.data}
+          data={this.state.value? this.state.data2 : this.state.data2}
           renderItem={this._renderItem}
           keyExtractor={item => item.id}
         />                             
