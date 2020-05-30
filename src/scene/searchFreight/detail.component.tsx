@@ -248,7 +248,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
           console.log(
             'StopOver X ' + freightRef.id + ' was assigned to ' + user.uid,
           );
-          Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+          //Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
           this.props.navigation.navigate(AppRoute.STOPOVERAD);
         } catch {
           console.log('Failed assign to ' + freightRef.id);

@@ -14,6 +14,7 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
 
   componentDidMount = async () => {
     try {      
+      const succesToast = Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
         var freightID = value + '';
@@ -25,9 +26,11 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
         )
           .then((response) => response.json())
           .then((response) => {
-            let length = response.length
+            let length = response.length;
+            Toast.hide(succesToast);
             if(length == undefined){
               Toast.showSuccess(`경유지 화물이 없습니다 홈으로 이동합니다`);
+              this.props.navigation.navigate(AppRoute.HOME);
             } else {
               Toast.showSuccess(`${length}개의 경유지 화물이 있습니다`);
               for(let i=0; i<=response.length; i++){
