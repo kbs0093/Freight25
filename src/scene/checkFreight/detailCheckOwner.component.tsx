@@ -312,7 +312,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           renderItem={this._renderItem}
           //keyExtractor={(item) => item.key}
         />
-        <View style={styles.totalInfoContainer}>
+        {/* <View style={styles.totalInfoContainer}>
           <View style={styles.totalInfoHalfContainer}>
             <Text style={styles.infoTitle}>총 운행 거리</Text>
             <Text style={styles.infoTitle}>총 운행 운임</Text>
@@ -323,7 +323,7 @@ export class DetailCheckOwnerScreen extends React.Component<
               {this.state.addiData.expense} 원
             </Text>
           </View>
-        </View>
+        </View> */}
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{callButton}</View>
           {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
   ButtonContainter: {
     backgroundColor: 'white',
     flexDirection: 'row',
-    flex: 1,
+    flex: 3,
     justifyContent: 'space-between',
   },
   ButtonHalfContainer: {
