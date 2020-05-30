@@ -47,6 +47,7 @@ export class DetailCheckDriverScreen extends React.Component<
     this.state = {
       FreightID: null,
       data: [],
+      data2: [],
       addiData: {
         lastState: null, // 0 -> 배송중, 1 -> 배송완료
         dist: null,
@@ -109,6 +110,7 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
+            oppositeFreightId: docs.oppositeFreightId,
 
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
@@ -378,12 +380,14 @@ export class DetailCheckDriverScreen extends React.Component<
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
         <FlatList
           style={{backgroundColor: 'white'}}
+          //data={this.state.data.concat(this.state.data)}
           data={this.state.data}
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
         />
-        <Divider style={{backgroundColor: 'black'}} />
-        <View style={styles.totalInfoContainer}>
+
+        {/* <Divider style={{backgroundColor: 'black'}} /> */}
+        {/* <View style={styles.totalInfoContainer}>
           <View style={styles.totalInfoHalfContainer}>
             <Text style={styles.infoTitle}>총 운행 거리</Text>
             <Text style={styles.infoTitle}>총 운행 운임</Text>
@@ -394,7 +398,7 @@ export class DetailCheckDriverScreen extends React.Component<
               {this.state.addiData.expense} 원
             </Text>
           </View>
-        </View>
+        </View> */}
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{navButton}</View>
           <View style={styles.ButtonHalfContainer}>{callButton}</View>
@@ -510,7 +514,7 @@ const styles = StyleSheet.create({
   ButtonContainter: {
     backgroundColor: 'white',
     flexDirection: 'row',
-    flex: 1,
+    flex: 3,
     justifyContent: 'space-between',
   },
   ButtonHalfContainer: {

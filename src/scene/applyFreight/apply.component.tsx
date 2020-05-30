@@ -165,7 +165,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             startDayLabel: startDayLabel,
             endDayLabel: endDayLabel,
             state: 0,
-            driverId: ""
+            driverId: "",
+            oppoisteFreightId: ""
             });
             firestore().collection('owners').doc(user.uid).get()
             .then(function(snapShot){
@@ -445,7 +446,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         <View style={styles.infoContainer}>
           <Text style={styles.subTitle}>요금 정보</Text>
           <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>총 운행거리 : </Text>
+            <Text style={styles.infoTitle}>운행거리 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
                 placeholder='수동입력'

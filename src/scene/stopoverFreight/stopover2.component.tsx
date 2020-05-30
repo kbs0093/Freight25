@@ -216,33 +216,58 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
     this.setState({region});
   };
 
-  ClickApply = async () => {
+  ClickApply = async() => {
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('Stopover2');
-    if (user != null) {
-      if (value != null) {
+    const originalFreightId = await AsyncStorage.getItem('FreightID');
+    const tsActId = await AsyncStorage.getItem('tsActId');
+    if(user != null){
+      if (value != null && originalFreightId != null) {
         var freightRef = firestore().collection('freights').doc(value);
+        var originalFrieghtRef = firestore().collection('freights').doc(originalFreightId);
         var driverRef = firestore().collection('drivers').doc(user.uid);
         var driverTel = (await driverRef.get()).data().tel;
-        console.log('target Freight ID:' + freightRef.id);
-        try {
-          freightRef.update({
+        console.log("target Freight ID:"+ freightRef.id);
+        try{
+          let batch = firestore().batch();
+          batch.update(freightRef,{
             state: 1,
             driverId: user.uid,
             driverTel: driverTel,
-            timeStampAssigned: new Date(),
+            oppositeFreightId: originalFreightId
           });
-          console.log(
-            'StopOver X ' + freightRef.id + ' was assigned to ' + user.uid,
-          );
+          batch.update(originalFrieghtRef,{
+            oppositeFreightId: value
+          });
+          batch.commit()
+          .then(function(){
+            console.log("Stopover2 "+value+" was assigned to "+ user.uid);
+          });
+          
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
           this.props.navigation.navigate(AppRoute.HOME);
-        } catch {
-          console.log('Failed assign to ' + freightRef.id);
+        }
+        catch{
+          console.log("Failed assign to "+value);
+        }
+        //트랜잭션 추가
+        if(tsActId != null){
+          var transRef = firestore().collection('transactions').doc(tsActId);
+          try{
+            transRef.update({
+              stopoverFreightId: value,   
+              totalExpense: "",
+              totalDistance: "",
+              timeStampAssigned: new Date()
+            })
+          }
+          catch{
+            console.log("Failed transaction to "+originalFreightId+" and "+value);
+          }
         }
       }
     }
-  };
+  }
 
   render() {
     return (
@@ -458,11 +483,11 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
           <View style={{flex: 5, justifyContent: 'center'}}>
             <Text style={styles.freightTitle}>
               {' '}
-              총 운행거리 : {this.state.data.distanceY}km{' '}
+              운행거리 : {this.state.data.distanceY}km{' '}
             </Text>
             <Text style={styles.freightTitle}>
               {' '}
-              총 운행운임 : {this.state.data.moneyPrint}원{' '}
+              운행운임 : {this.state.data.moneyPrint}원{' '}
             </Text>
           </View>
           <View

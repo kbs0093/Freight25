@@ -37,6 +37,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     this.state = {
       data: [],
       userType: null,
+      value: '1',
     };
   }
 
@@ -118,10 +119,11 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
   };
 
   dateSort(a, b) {
-    if (a.money == b.money) {
-      return 0;
+    if (a.startMonth == b.startMonth) {
+      return a.startDay < b.startDay ? 1 : -1;
+    } else {
+      return a.startMonth < b.startMonth ? 1 : -1;
     }
-    return a.money < b.money ? 1 : -1;
   }
 
   statusSort(a, b) {
@@ -189,6 +191,12 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
   );
 
   render() {
+    //this.state.data.sort(this.dateSort);
+    if (this.state.value == '1') {
+      this.state.data.sort(this.dateSort);
+    } else if (this.state.value == '2') {
+      this.state.data.sort(this.statusSort);
+    }
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -215,8 +223,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
               }}
               useNativeAndroidPickerStyle={isAndroid ? true : false}
               items={[
-                {label: '최근 날짜 순', value: '2'},
-                {label: '상태별 정렬', value: '1'},
+                {label: '상태별 정렬', value: '2'},
+                {label: '최근 날짜 순', value: '1'},
               ]}
             />
           </View>
