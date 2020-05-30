@@ -4,6 +4,7 @@ import {Button, LayoutElement} from '@ui-kitten/components';
 import {StopoverADScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import AsyncStorage from '@react-native-community/async-storage';
+import Toast from 'react-native-tiny-toast';
 
 export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
   constructor(props) {
@@ -12,27 +13,32 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
   }
 
   componentDidMount = async () => {
-    try {
+    try {      
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
         var freightID = value + '';
         //const freightID = {FrightID: value + ''};
-        console.log('value is' + value);
         var url = '49.50.172.39:8000/stopover?freightId=' + value;
-        console.log(url);
         var data = fetch(
           'http://49.50.172.39:8000/stopover?freightId=' + value,
           {},
         )
           .then((response) => response.json())
           .then((response) => {
-            console.log(response);
-            // AsyncStorage.setItem('stopover1', response[0].id);
-            // AsyncStorage.setItem('stopover2', response[1].id);
-            // AsyncStorage.setItem('stopover3', response[2].id);
+            let length = response.length
+            if(length == undefined){
+              Toast.showSuccess(`경유지 화물이 없습니다 홈으로 이동합니다`);
+            } else {
+              Toast.showSuccess(`${length}개의 경유지 화물이 있습니다`);
+              for(let i=0; i<=response.length; i++){
+                AsyncStorage.setItem(`Stopover${i+1}`, response[i].id);          
+              }
+            }
           });
       }
     } catch (error) {}
+
+
   };
 
   ApplyButton = () => {
@@ -46,7 +52,7 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
   render() {
     return (
       <React.Fragment>
-        <View style={{backgroundColor: 'white', alignItems: 'center', flex: 3}}>
+        <View style={{backgroundColor: 'white', alignItems: 'center', flex: 4}}>
           <Image
             style={styles.adImage}
             source={require('../../assets/StopoverAD.jpg')}

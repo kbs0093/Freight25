@@ -356,7 +356,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
               </View>
               <View style={{flex: 5, alignItems: 'center'}}>
                 <Text style={styles.freightTitle}>
-                  {this.state.data.distanceY}
+                  {this.state.data.distanceY} Km
                 </Text>
               </View>
             </View>
