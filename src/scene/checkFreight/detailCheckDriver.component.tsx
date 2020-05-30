@@ -171,7 +171,6 @@ export class DetailCheckDriverScreen extends React.Component<
   };
 
   _renderItem = ({item}) => (
-
     <View>
       <View style={styles.freightContainer}>
         <Text style={styles.Subtitle}>화물 내역</Text>
@@ -307,12 +306,12 @@ export class DetailCheckDriverScreen extends React.Component<
     if (this.state.addiData.lastState == '배송중') {
       navButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
-          내비게이션 연결
+          내비 연결
         </Button>
       );
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
-          화주에게 전화
+          화주 전화
         </Button>
       );
       completeButton = (
@@ -322,7 +321,7 @@ export class DetailCheckDriverScreen extends React.Component<
           }}
           style={styles.button}
           textStyle={styles.buttonText}>
-          운송 완료하기
+          운송 완료
         </Button>
       );
     } else if (this.state.addiData.lastState == '배송완료') {
@@ -331,12 +330,12 @@ export class DetailCheckDriverScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          내비게이션 연결
+          내비 연결
         </Button>
       );
       callButton = (
         <Button style={styles.button} textStyle={styles.buttonText}>
-          화주에게 전화
+          화주 전화
         </Button>
       );
       completeButton = (
@@ -344,7 +343,7 @@ export class DetailCheckDriverScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          운송 완료하기
+          운송 완료
         </Button>
       );
     } else {
@@ -353,7 +352,7 @@ export class DetailCheckDriverScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          내비게이션 연결
+          내비 연결
         </Button>
       );
       callButton = (
@@ -361,7 +360,7 @@ export class DetailCheckDriverScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           disabled={true}>
-          화주에게 전화
+          화주 전화
         </Button>
       );
       completeButton = (
@@ -408,7 +407,7 @@ export class DetailCheckDriverScreen extends React.Component<
 
 const styles = StyleSheet.create({
   Badge: {
-    width: RFPercentage(10),
+    width: RFPercentage(12),
     height: RFPercentage(4),
     borderRadius: 8,
   },
@@ -421,7 +420,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: {
-    fontSize: RFPercentage(1.6),
+    fontSize: RFPercentage(1.5),
   },
   titleStyles: {
     paddingHorizontal: 20,
