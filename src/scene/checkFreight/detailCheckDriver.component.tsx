@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 import {
   LayoutElement,
@@ -42,6 +43,7 @@ const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
 const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
 const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
+const carIcon = (style) => <Icon {...style} name="car-outline" />;
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -53,18 +55,13 @@ export class DetailCheckDriverScreen extends React.Component<
       FreightID: null,
       OppoFreightID: null,
       data: [],
-      dataStopover: [],
       addiData: {
         lastState: null, // 0 -> 배송중, 1 -> 배송완료
         dist: null,
         expense: null,
         ownerId: null,
-      },
-      addiDataStopover: {
-        lastState: null, // 0 -> 배송중, 1 -> 배송완료
-        dist: null,
-        expense: null,
-        ownerId: null,
+        ownerTel: null,
+        oppositeFreightId: null,
       },
     };
   }
@@ -100,6 +97,19 @@ export class DetailCheckDriverScreen extends React.Component<
           var freightState = '';
           var startAddrArray = docs.startAddr.split(' ');
           var endAddrArray = docs.endAddr.split(' ');
+          var startAddrFullArray = docs.startAddr_Full.split(' ');
+          var endAddrFullArray = docs.endAddr_Full.split(' ');
+
+          var i = 2,
+            j = 2;
+          var startAddrDetail = '';
+          var endAddrDetail = '';
+          for (i = 3; i < startAddrFullArray.length; i++) {
+            startAddrDetail += startAddrFullArray[i] + ' ';
+          }
+          for (j = 3; j < endAddrFullArray.length; j++) {
+            endAddrDetail += endAddrFullArray[j] + ' ';
+          }
 
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
@@ -117,11 +127,12 @@ export class DetailCheckDriverScreen extends React.Component<
             expense: docs.expense,
             startAddress: docs.startAddr,
             endAddress: docs.endAddr,
-            startAddrFull: docs.startAddr_Full,
-            endAddrFull: docs.endAddr_Full,
+            startAddrFullArray: startAddrFullArray,
+            endAddrFullArray: endAddrFullArray,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            oppositeFreightId: docs.oppositeFreightId,
+            startAddrDetail: startAddrDetail,
+            endAddrDetail: endAddrDetail,
 
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
@@ -141,6 +152,8 @@ export class DetailCheckDriverScreen extends React.Component<
             dist: docs.dist,
             expense: docs.expense,
             ownerId: docs.ownerId,
+            ownerTel: docs.ownerTel,
+            oppositeFreightId: docs.oppositeFreightId,
           };
           that.setState({addiData: addiData});
           that.setState({data: list});
@@ -149,6 +162,12 @@ export class DetailCheckDriverScreen extends React.Component<
         }
       });
     }
+  };
+
+  callOwner = () => {
+    console.log('Call to the owner');
+    console.log(this.state.addiData.ownerTel);
+    Linking.openURL(`tel:${this.state.addiData.ownerTel}`);
   };
 
   setComplete = () => {
@@ -184,10 +203,10 @@ export class DetailCheckDriverScreen extends React.Component<
   };
 
   _showStopoverFreight = () => {
-    if (this.state.data.oppositeFreightId != '') {
+    if (this.state.addiData.oppositeFreightId != null) {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_STOPOVER);
     } else {
-      Toast.showSuccess('경유지 화물이 없습니다');
+      Toast.show('경유지 화물이 없습니다');
     }
   };
 
@@ -200,6 +219,7 @@ export class DetailCheckDriverScreen extends React.Component<
             style={styles.Badge}
             appearance="outline"
             status="danger"
+            icon={carIcon}
             textStyle={styles.badgeText}>
             {item.lastState}
           </Button>
@@ -212,7 +232,6 @@ export class DetailCheckDriverScreen extends React.Component<
           </Button>
         )}
       </View>
-      {/* <Divider style={{backgroundColor: 'black'}} /> */}
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -239,30 +258,31 @@ export class DetailCheckDriverScreen extends React.Component<
       <Divider style={{backgroundColor: 'black'}} />
       <View style={styles.freightInfoTotalContainer}>
         <View style={styles.freightInfoHalfContainer}>
-          <Text style={styles.infoTitle}>배차 날짜</Text>
-          <Text style={styles.infoTitle}>운행 거리</Text>
-          <Text style={styles.infoTitle}>운행 운임</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}>하차지 주소</Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}>화주 이름</Text>
-          <Text style={styles.infoTitle}>화주 연락처</Text>
-          <Text style={styles.infoTitle}>화물 설명</Text>
+          <Text style={styles.infoTitle}>배차 날짜:</Text>
+          <Text style={styles.infoTitle}>운행 거리:</Text>
+          <Text style={styles.infoTitle}>운행 운임:</Text>
+          <Text style={styles.infoTitle}>상차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>하차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>화주 이름:</Text>
+          <Text style={styles.infoTitle}>화주 연락처:</Text>
+          <Text style={styles.infoTitle}>화물 설명:</Text>
         </View>
-        <View style={styles.freightInfoHalfContainer}>
+        <View style={styles.freightInfoHalfRightContainer}>
           <Text style={styles.infoRightTitle}>
             {item.startMonth}월 {item.startDay}일
           </Text>
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
-          <Text style={styles.infoRightTitle}></Text>
-          <Text style={styles.infoRightTitle}></Text>
-          <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
-          <Text style={styles.infoRightTitle}></Text>
+          <Text style={styles.infoRightTitle}>
+            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
+            {item.startAddrFullArray[2]} {'\n'}
+            {item.startAddrDetail}
+          </Text>
+          <Text style={styles.infoRightTitle}>
+            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
+            {item.endAddrFullArray[2]} {'\n'}
+            {item.endAddrDetail}
+          </Text>
           <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
           <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
           <Text style={styles.infoRightTitle}>{item.desc}</Text>
@@ -274,29 +294,22 @@ export class DetailCheckDriverScreen extends React.Component<
 
   render() {
     let navButton;
-    let callButton;
     let completeButton;
     let showStopoverButton;
+    let callButton = (
+      <Button
+        onPress={() => {
+          this.callOwner();
+        }}
+        style={styles.callButton}
+        status="success"
+        icon={phoneIcon}
+        textStyle={styles.callButtonText}>
+        화주 전화
+      </Button>
+    );
 
-    if (this.state.addiData.lastState == '배송중') {
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={naviIcon}>
-          내비연결
-        </Button>
-      );
-      callButton = (
-        <Button
-          style={styles.callButton}
-          textStyle={styles.callButtonText}
-          status="success"
-          icon={phoneIcon}>
-          화주에게 전화
-        </Button>
-      );
+    if (this.state.addiData.oppositeFreightId != null) {
       showStopoverButton = (
         <Button
           onPress={() => {
@@ -307,6 +320,31 @@ export class DetailCheckDriverScreen extends React.Component<
           status="info"
           icon={cartIcon}>
           경유지
+        </Button>
+      );
+    } else {
+      showStopoverButton = (
+        <Button
+          onPress={() => {
+            this._showStopoverFreight();
+          }}
+          style={styles.button}
+          textStyle={styles.buttonText}
+          disabled={true}
+          status="info"
+          icon={cartIcon}>
+          경유지
+        </Button>
+      );
+    }
+    if (this.state.addiData.lastState == '배송중') {
+      navButton = (
+        <Button
+          style={styles.button}
+          textStyle={styles.buttonText}
+          status="info"
+          icon={naviIcon}>
+          내비 연결
         </Button>
       );
       completeButton = (
@@ -327,34 +365,16 @@ export class DetailCheckDriverScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           status="info"
-          disabled={true}>
-          내비연결
-        </Button>
-      );
-      callButton = (
-        <Button
-          style={styles.callButton}
-          status="success"
-          textStyle={styles.buttonText}>
-          화주 전화
-        </Button>
-      );
-      showStopoverButton = (
-        <Button
-          onPress={() => {
-            this._showStopoverFreight();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={cartIcon}>
-          경유지
+          disabled={true}
+          icon={naviIcon}>
+          내비 연결
         </Button>
       );
       completeButton = (
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
+          status="danger"
           icon={homeIcon}
           disabled={true}>
           운송 완료
@@ -387,7 +407,7 @@ export class DetailCheckDriverScreen extends React.Component<
 
 const styles = StyleSheet.create({
   Badge: {
-    width: RFPercentage(12),
+    width: RFPercentage(14),
     height: RFPercentage(4),
     borderRadius: 8,
   },
@@ -395,7 +415,6 @@ const styles = StyleSheet.create({
     width: RFPercentage(8),
     height: RFPercentage(2),
   },
-
   badgeText: {
     fontSize: RFPercentage(1.5),
   },
@@ -404,6 +423,9 @@ const styles = StyleSheet.create({
     height: RFPercentage(6),
     borderRadius: 8,
   },
+  buttonText: {
+    fontSize: RFPercentage(1.5),
+  },
   callButton: {
     width: RFPercentage(30),
     height: RFPercentage(6),
@@ -411,9 +433,6 @@ const styles = StyleSheet.create({
   },
   callButtonText: {
     fontSize: RFPercentage(2.2),
-  },
-  buttonText: {
-    fontSize: RFPercentage(1.5),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -445,12 +464,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
   },
   freightInfoHalfContainer: {
     flex: 1,
-    //borderWidth: 0.5,
-    alignItems: 'center',
+    paddingRight: 15,
+    alignItems: 'flex-end',
+  },
+  freightInfoHalfRightContainer: {
+    flex: 1,
+    paddingLeft: 15,
+    alignItems: 'flex-start',
   },
   geoContainer: {
     paddingVertical: 15,
@@ -476,17 +499,15 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   infoTitle: {
-    //paddingHorizontal: 40,
+    paddingVertical: 3,
     fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
     justifyContent: 'space-between',
   },
   infoRightTitle: {
-    //paddingHorizontal: 40,
+    paddingVertical: 3,
     fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
-    //alignSelf: 'flex-end',
-    //alignSelf: 'stretch',
   },
   totalInfoContainer: {
     backgroundColor: 'white',
