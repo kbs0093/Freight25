@@ -42,6 +42,7 @@ const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
 const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
 const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
+const carIcon = (style) => <Icon {...style} name="car-outline" />;
 
 export class DetailCheckStopoverScreen extends React.Component<
   DetailCheckStopoverScreenProps
@@ -109,10 +110,6 @@ export class DetailCheckStopoverScreen extends React.Component<
           var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           //var docEndDate = new Date(docs.endDay._seconds * 1000);
 
-          if (docs.stopover) {
-            this.state.dualFreight = true;
-          }
-
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
@@ -120,8 +117,6 @@ export class DetailCheckStopoverScreen extends React.Component<
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: docs.endDate,
             expense: docs.expense,
-            startAddress: docs.startAddr,
-            endAddress: docs.endAddr,
             startAddrFullArray: startAddrFullArray,
             endAddrFullArray: endAddrFullArray,
             startAddrArray: startAddrArray,
@@ -201,6 +196,7 @@ export class DetailCheckStopoverScreen extends React.Component<
             style={styles.Badge}
             appearance="outline"
             status="danger"
+            icon={carIcon}
             textStyle={styles.badgeText}>
             {item.lastState}
           </Button>
@@ -213,7 +209,6 @@ export class DetailCheckStopoverScreen extends React.Component<
           </Button>
         )}
       </View>
-      {/* <Divider style={{backgroundColor: 'black'}} /> */}
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -400,9 +395,6 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
-  container: {
-    flex: 1,
-  },
   freightContainer: {
     paddingHorizontal: 20,
     alignItems: 'flex-start',
@@ -410,12 +402,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  freightInfoContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 70,
-    alignItems: 'flex-start',
   },
   freightInfoTotalContainer: {
     paddingVertical: 10,

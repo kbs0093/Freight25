@@ -42,6 +42,7 @@ const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
 const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
 const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
+const carIcon = (style) => <Icon {...style} name="car-outline" />;
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -196,8 +197,7 @@ export class DetailCheckDriverScreen extends React.Component<
     if (this.state.addiData.oppositeFreightId != null) {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_STOPOVER);
     } else {
-      console.log('Stopover is not exists');
-      Toast.showSuccess('경유지 화물이 없습니다');
+      Toast.show('경유지 화물이 없습니다');
     }
   };
 
@@ -210,6 +210,7 @@ export class DetailCheckDriverScreen extends React.Component<
             style={styles.Badge}
             appearance="outline"
             status="danger"
+            icon={carIcon}
             textStyle={styles.badgeText}>
             {item.lastState}
           </Button>
@@ -222,7 +223,6 @@ export class DetailCheckDriverScreen extends React.Component<
           </Button>
         )}
       </View>
-      {/* <Divider style={{backgroundColor: 'black'}} /> */}
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
