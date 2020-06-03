@@ -13,7 +13,7 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   };
 
   const clickCheck = () => {
-    props.navigation.navigate(AppRoute.CHECK);
+    props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
 
   return (
@@ -53,7 +53,7 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
     props.navigation.navigate(AppRoute.APPLY);
   };
   const clickCheck = () => {
-    props.navigation.navigate(AppRoute.CHECK);
+    props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
 
   return (
