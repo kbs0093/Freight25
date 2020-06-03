@@ -4,13 +4,17 @@ import {AuthNavigator} from './auth.navigator';
 import {HomeNavigator} from './home.navigator';
 import {OwnerNavigator} from './owner.navigator';
 import {
-  CheckNavigator,
   CheckDetailDriverNavigator,
   CheckDetailOwnerNavigator,
+  CheckDetailStopoverNavigator,
+  CheckNavigator,
 } from './check.navigator';
 import {SearchNavigator} from './search.navigator';
-import { searchDetailNavigator, aloneDetailNavigator } from './searchDetail.navigator'
-import { StopoverADNavigator, StopoverNavigator } from './stopover.navigator'
+import {
+  searchDetailNavigator,
+  aloneDetailNavigator,
+} from './searchDetail.navigator';
+import {StopoverADNavigator, StopoverNavigator} from './stopover.navigator';
 import {ApplyNavigator} from './apply.navigator';
 import {AppRoute} from './app-routes';
 import {
@@ -28,11 +32,17 @@ export const AppNavigator = (props): React.ReactElement => (
     <Stack.Screen name={AppRoute.HOME} component={HomeNavigator} />
     <Stack.Screen name={AppRoute.OWNER} component={OwnerNavigator} />
     <Stack.Screen name={AppRoute.SEARCH} component={SearchNavigator} />
-    <Stack.Screen name={AppRoute.SEARCH_DETAIL} component={searchDetailNavigator}/>
-    <Stack.Screen name={AppRoute.ALONE_DETAIL} component={aloneDetailNavigator}/>
-    <Stack.Screen name={AppRoute.STOPOVERAD} component={StopoverADNavigator}/>
-    <Stack.Screen name={AppRoute.STOPOVER} component={StopoverNavigator}/>
-    <Stack.Screen name={AppRoute.CHECK} component={CheckNavigator} />
+    <Stack.Screen
+      name={AppRoute.SEARCH_DETAIL}
+      component={searchDetailNavigator}
+    />
+    <Stack.Screen
+      name={AppRoute.ALONE_DETAIL}
+      component={aloneDetailNavigator}
+    />
+    <Stack.Screen name={AppRoute.STOPOVERAD} component={StopoverADNavigator} />
+    <Stack.Screen name={AppRoute.STOPOVER} component={StopoverNavigator} />
+    <Stack.Screen name={AppRoute.CHECK_MAIN} component={CheckNavigator} />
     <Stack.Screen
       name={AppRoute.CHECK_DETAIL_OWNER}
       component={CheckDetailOwnerNavigator}
@@ -41,6 +51,11 @@ export const AppNavigator = (props): React.ReactElement => (
       name={AppRoute.CHECK_DETAIL_DRIVER}
       component={CheckDetailDriverNavigator}
     />
+    <Stack.Screen
+      name={AppRoute.CHECK_DETAIL_STOPOVER}
+      component={CheckDetailStopoverNavigator}
+    />
+
     <Stack.Screen name={AppRoute.APPLY} component={ApplyNavigator} />
     <Stack.Screen
       name={AppRoute.PROFILE_OWNER}

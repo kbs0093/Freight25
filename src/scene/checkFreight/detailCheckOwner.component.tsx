@@ -35,11 +35,8 @@ import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-let userType;
-
-AsyncStorage.getItem('userType', (err, result) => {
-  userType = result;
-});
+const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
+const heartIcon = (style) => <Icon {...style} name="heart-outline" />;
 
 export class DetailCheckOwnerScreen extends React.Component<
   DetailCheckOwnerScreenProps
@@ -246,7 +243,8 @@ export class DetailCheckOwnerScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           status="success"
-          disabled={true}>
+          disabled={true}
+          icon={phoneIcon}>
           화물차 기사에게 전화
         </Button>
       );
@@ -263,7 +261,8 @@ export class DetailCheckOwnerScreen extends React.Component<
         <Button
           style={styles.button}
           status="success"
-          textStyle={styles.buttonText}>
+          textStyle={styles.buttonText}
+          icon={phoneIcon}>
           화물차 기사에게 전화
         </Button>
       );
@@ -280,7 +279,8 @@ export class DetailCheckOwnerScreen extends React.Component<
         <Button
           style={styles.button}
           status="success"
-          textStyle={styles.buttonText}>
+          textStyle={styles.buttonText}
+          icon={phoneIcon}>
           화물차 기사에게 전화
         </Button>
       );
@@ -355,7 +355,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: RFPercentage(2),
-    color: 'black',
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -399,7 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(2.8),
+    fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
   geoSubText: {

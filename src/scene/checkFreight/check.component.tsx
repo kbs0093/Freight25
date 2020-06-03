@@ -73,6 +73,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           console.log(docCnt + '번째 화물 id: ' + doc.id);
 
           var freightState = '';
+          var isMixed = false;
 
           if (doc.state == 0) {
             freightState = '배송전';
@@ -97,8 +98,14 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           var startAddrArray = doc.startAddr.split(' ');
           var endAddrArray = doc.endAddr.split(' ');
 
+          var oppositeFreightId = '';
+          if (doc.oppositeFreightId != null) {
+            oppositeFreightId = doc.oppositeFreightId;
+          }
+
           list.push({
             id: doc.id, // Freight key?
+            oppositeFreightId: oppositeFreightId,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
             stateNum: doc.state,
             startAddress: doc.startAddr,
@@ -123,6 +130,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
   ClickList = (item) => () => {
     AsyncStorage.setItem('FreightID', item.id);
+    AsyncStorage.setItem('OppoFreightID', item.oppositeFreightId);
     if (this.state.userType == 'owner') {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
     } else if (this.state.userType == 'driver') {
@@ -195,6 +203,9 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             // </Button>
             <Text style={styles.badgeText}>{item.lastState}</Text>
           )}
+          {item.oppositeFreightId != '' ? (
+            <Text style={styles.badgeTextMixed}>혼적</Text>
+          ) : null}
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
@@ -266,6 +277,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'blue',
   },
+  badgeTextMixed: {
+    fontSize: RFPercentage(1.8),
+    fontWeight: 'bold',
+    color: 'green',
+  },
+
   badgeTextRed: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
@@ -309,7 +326,7 @@ const styles = StyleSheet.create({
   statusInfo: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     //borderWidth: 0.5,
   },
   icon: {

@@ -4,6 +4,7 @@ import {AppRoute} from './app-routes';
 import {CheckScreen} from '../scene/checkFreight';
 import {DetailCheckOwnerScreen} from '../scene/checkFreight';
 import {DetailCheckDriverScreen} from '../scene/checkFreight';
+import {DetailCheckStopoverScreen} from '../scene/checkFreight';
 import {TopTapBar} from '../component/toptabbar';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
@@ -28,6 +29,14 @@ export const CheckDetailDriverNavigator = (): React.ReactElement => (
     <Stack.Screen
       name={AppRoute.CHECK_DETAIL_DRIVER}
       component={DetailCheckDriverScreen}
+    />
+  </TopTab.Navigator>
+);
+export const CheckDetailStopoverNavigator = (): React.ReactElement => (
+  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
+    <Stack.Screen
+      name={AppRoute.CHECK_DETAIL_DRIVER}
+      component={DetailCheckStopoverScreen}
     />
   </TopTab.Navigator>
 );
