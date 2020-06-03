@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 import {
   LayoutElement,
@@ -59,6 +60,7 @@ export class DetailCheckStopoverScreen extends React.Component<
         dist: null,
         expense: null,
         ownerId: null,
+        ownerTel: null,
       },
     };
   }
@@ -143,6 +145,7 @@ export class DetailCheckStopoverScreen extends React.Component<
             dist: docs.dist,
             expense: docs.expense,
             ownerId: docs.ownerId,
+            ownerTel: docs.ownerTel,
           };
           that.setState({addiData: addiData});
           that.setState({data: list});
@@ -151,6 +154,12 @@ export class DetailCheckStopoverScreen extends React.Component<
         }
       });
     }
+  };
+
+  callOwner = () => {
+    console.log('Call to the owner');
+    console.log(this.state.addiData.ownerTel);
+    Linking.openURL(`tel:${this.state.addiData.ownerTel}`);
   };
 
   setComplete = () => {
@@ -271,8 +280,19 @@ export class DetailCheckStopoverScreen extends React.Component<
 
   render() {
     let navButton;
-    let callButton;
     let completeButton;
+    let callButton = (
+      <Button
+        onPress={() => {
+          this.callOwner();
+        }}
+        style={styles.callButton}
+        status="success"
+        icon={phoneIcon}
+        textStyle={styles.callButtonText}>
+        화주 전화
+      </Button>
+    );
 
     if (this.state.addiData.lastState == '배송중') {
       navButton = (
@@ -282,15 +302,6 @@ export class DetailCheckStopoverScreen extends React.Component<
           status="info"
           icon={naviIcon}>
           내비 연결
-        </Button>
-      );
-      callButton = (
-        <Button
-          style={styles.callButton}
-          textStyle={styles.callButtonText}
-          status="success"
-          icon={phoneIcon}>
-          화주에게 전화
         </Button>
       );
       completeButton = (
@@ -316,15 +327,6 @@ export class DetailCheckStopoverScreen extends React.Component<
           내비 연결
         </Button>
       );
-      callButton = (
-        <Button
-          style={styles.callButton}
-          textStyle={styles.callButtonText}
-          status="success"
-          icon={phoneIcon}>
-          화주 전화
-        </Button>
-      );
       completeButton = (
         <Button
           style={styles.button}
@@ -337,6 +339,7 @@ export class DetailCheckStopoverScreen extends React.Component<
       );
     } else {
     }
+
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />

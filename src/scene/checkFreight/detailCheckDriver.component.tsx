@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 import {
   LayoutElement,
@@ -59,6 +60,7 @@ export class DetailCheckDriverScreen extends React.Component<
         dist: null,
         expense: null,
         ownerId: null,
+        ownerTel: null,
         oppositeFreightId: null,
       },
     };
@@ -150,6 +152,7 @@ export class DetailCheckDriverScreen extends React.Component<
             dist: docs.dist,
             expense: docs.expense,
             ownerId: docs.ownerId,
+            ownerTel: docs.ownerTel,
             oppositeFreightId: docs.oppositeFreightId,
           };
           that.setState({addiData: addiData});
@@ -159,6 +162,12 @@ export class DetailCheckDriverScreen extends React.Component<
         }
       });
     }
+  };
+
+  callOwner = () => {
+    console.log('Call to the owner');
+    console.log(this.state.addiData.ownerTel);
+    Linking.openURL(`tel:${this.state.addiData.ownerTel}`);
   };
 
   setComplete = () => {
@@ -289,6 +298,9 @@ export class DetailCheckDriverScreen extends React.Component<
     let showStopoverButton;
     let callButton = (
       <Button
+        onPress={() => {
+          this.callOwner();
+        }}
         style={styles.callButton}
         status="success"
         icon={phoneIcon}

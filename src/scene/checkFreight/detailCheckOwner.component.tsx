@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
+  Linking,
 } from 'react-native';
 import {
   LayoutElement,
@@ -56,6 +57,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         dist: null,
         expense: null,
         ownerID: null,
+        driverTel: null,
       },
     };
   }
@@ -152,6 +154,7 @@ export class DetailCheckOwnerScreen extends React.Component<
             dist: docs.dist,
             expense: docs.expense,
             ownerId: docs.ownerId,
+            driverTel: docs.driverTel,
           };
 
           that.setState({addiData: addiData});
@@ -161,6 +164,12 @@ export class DetailCheckOwnerScreen extends React.Component<
         }
       });
     }
+  };
+
+  callDriver = () => {
+    console.log('Call to the driver');
+    console.log(this.state.addiData.driverTel);
+    Linking.openURL(`tel:${this.state.addiData.driverTel}`);
   };
 
   _renderItem = ({item}) => (
@@ -265,6 +274,9 @@ export class DetailCheckOwnerScreen extends React.Component<
     if (this.state.addiData.lastState == '배송전') {
       callButton = (
         <Button
+          onPress={() => {
+            this.callDriver();
+          }}
           style={styles.callButton}
           textStyle={styles.callButtonText}
           status="success"
@@ -284,6 +296,9 @@ export class DetailCheckOwnerScreen extends React.Component<
     } else if (this.state.addiData.lastState == '배송중') {
       callButton = (
         <Button
+          onPress={() => {
+            this.callDriver();
+          }}
           style={styles.callButton}
           status="success"
           textStyle={styles.callButtonText}
@@ -302,6 +317,9 @@ export class DetailCheckOwnerScreen extends React.Component<
     } else if (this.state.addiData.lastState == '배송완료') {
       callButton = (
         <Button
+          onPress={() => {
+            this.callDriver();
+          }}
           style={styles.callButton}
           status="success"
           textStyle={styles.callButtonText}
