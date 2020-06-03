@@ -94,10 +94,16 @@ export class DetailCheckOwnerScreen extends React.Component<
             docStartDate = new Date(docs.startDay._seconds * 1000);
           } else if (docs.state == 1) {
             freightState = '배송중';
-            docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+            if (docs.timeStampAssigned == null) {
+              docStartDate = new Date(docs.startDay._seconds * 1000);
+            } else
+              docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           } else if (docs.state == 2) {
             freightState = '배송완료';
-            docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+            if (docs.timeStampAssigned == null) {
+              docStartDate = new Date(docs.startDay._seconds * 1000);
+            } else
+              docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           }
 
           list.push({
