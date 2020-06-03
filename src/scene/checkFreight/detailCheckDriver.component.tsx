@@ -285,29 +285,19 @@ export class DetailCheckDriverScreen extends React.Component<
 
   render() {
     let navButton;
-    let callButton;
     let completeButton;
     let showStopoverButton;
+    let callButton = (
+      <Button
+        style={styles.callButton}
+        status="success"
+        icon={phoneIcon}
+        textStyle={styles.callButtonText}>
+        화주 전화
+      </Button>
+    );
 
-    if (this.state.addiData.lastState == '배송중') {
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={naviIcon}>
-          내비 연결
-        </Button>
-      );
-      callButton = (
-        <Button
-          style={styles.callButton}
-          textStyle={styles.callButtonText}
-          status="success"
-          icon={phoneIcon}>
-          화주에게 전화
-        </Button>
-      );
+    if (this.state.addiData.oppositeFreightId != null) {
       showStopoverButton = (
         <Button
           onPress={() => {
@@ -318,6 +308,31 @@ export class DetailCheckDriverScreen extends React.Component<
           status="info"
           icon={cartIcon}>
           경유지
+        </Button>
+      );
+    } else {
+      showStopoverButton = (
+        <Button
+          onPress={() => {
+            this._showStopoverFreight();
+          }}
+          style={styles.button}
+          textStyle={styles.buttonText}
+          disabled={true}
+          status="info"
+          icon={cartIcon}>
+          경유지
+        </Button>
+      );
+    }
+    if (this.state.addiData.lastState == '배송중') {
+      navButton = (
+        <Button
+          style={styles.button}
+          textStyle={styles.buttonText}
+          status="info"
+          icon={naviIcon}>
+          내비 연결
         </Button>
       );
       completeButton = (
@@ -341,27 +356,6 @@ export class DetailCheckDriverScreen extends React.Component<
           disabled={true}
           icon={naviIcon}>
           내비 연결
-        </Button>
-      );
-      callButton = (
-        <Button
-          style={styles.callButton}
-          status="success"
-          icon={phoneIcon}
-          textStyle={styles.buttonText}>
-          화주 전화
-        </Button>
-      );
-      showStopoverButton = (
-        <Button
-          onPress={() => {
-            this._showStopoverFreight();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={cartIcon}>
-          경유지
         </Button>
       );
       completeButton = (

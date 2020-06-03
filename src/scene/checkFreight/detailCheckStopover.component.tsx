@@ -311,7 +311,8 @@ export class DetailCheckStopoverScreen extends React.Component<
           style={styles.button}
           textStyle={styles.buttonText}
           status="info"
-          disabled={true}>
+          disabled={true}
+          icon={naviIcon}>
           내비 연결
         </Button>
       );
