@@ -37,6 +37,12 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 
+const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
+const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
+const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
+const homeIcon = (style) => <Icon {...style} name="home-outline" />;
+const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
+
 export class DetailCheckStopoverScreen extends React.Component<
   DetailCheckStopoverScreenProps
 > {
@@ -47,31 +53,16 @@ export class DetailCheckStopoverScreen extends React.Component<
       FreightID: null,
       OppoFreightID: null,
       data: [],
-      dataStopover: [],
       addiData: {
         lastState: null, // 0 -> 배송중, 1 -> 배송완료
         dist: null,
         expense: null,
         ownerId: null,
       },
-      addiDataStopover: {
-        lastState: null, // 0 -> 배송중, 1 -> 배송완료
-        dist: null,
-        expense: null,
-        ownerId: null,
-      },
-
-      dualFreight: null,
     };
   }
 
   componentDidMount = async () => {
-    try {
-      const value = await AsyncStorage.getItem('FreightID');
-      if (value !== null) {
-        this.setState({FreightID: value});
-      }
-    } catch (error) {}
     try {
       const value = await AsyncStorage.getItem('OppoFreightID');
       if (value !== null) {
@@ -83,12 +74,10 @@ export class DetailCheckStopoverScreen extends React.Component<
     const that = this;
 
     if (user != null) {
-      var docRef = firestore().collection('freights').doc(this.state.FreightID);
-      var docOppoRef = firestore()
+      var docRef = firestore()
         .collection('freights')
         .doc(this.state.OppoFreightID);
 
-      // Get the selected(original) freight info from Firebase.
       docRef.get().then(function (doc) {
         var list = [];
 
@@ -99,6 +88,19 @@ export class DetailCheckStopoverScreen extends React.Component<
           var freightState = '';
           var startAddrArray = docs.startAddr.split(' ');
           var endAddrArray = docs.endAddr.split(' ');
+          var startAddrFullArray = docs.startAddr_Full.split(' ');
+          var endAddrFullArray = docs.endAddr_Full.split(' ');
+
+          var i = 2,
+            j = 2;
+          var startAddrDetail = '';
+          var endAddrDetail = '';
+          for (i = 3; i < startAddrFullArray.length; i++) {
+            startAddrDetail += startAddrFullArray[i] + ' ';
+          }
+          for (j = 3; j < endAddrFullArray.length; j++) {
+            endAddrDetail += endAddrFullArray[j] + ' ';
+          }
 
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
@@ -120,10 +122,12 @@ export class DetailCheckStopoverScreen extends React.Component<
             expense: docs.expense,
             startAddress: docs.startAddr,
             endAddress: docs.endAddr,
-            startAddrFull: docs.startAddr_Full,
-            endAddrFull: docs.endAddr_Full,
+            startAddrFullArray: startAddrFullArray,
+            endAddrFullArray: endAddrFullArray,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
+            startAddrDetail: startAddrDetail,
+            endAddrDetail: endAddrDetail,
             oppositeFreightId: docs.oppositeFreightId,
 
             startMonth: docStartDate.getMonth() + 1,
@@ -151,77 +155,15 @@ export class DetailCheckStopoverScreen extends React.Component<
           console.log('No such document!');
         }
       });
-
-      // Get the stopover(additional) freight info from Firebase.
-      docOppoRef.get().then(function (doc) {
-        var list = [];
-
-        if (doc.exists) {
-          const docs = doc.data();
-          console.log('Stopover Frieght ID:', docs.id);
-
-          var freightState = '';
-          var startAddrArray = docs.startAddr.split(' ');
-          var endAddrArray = docs.endAddr.split(' ');
-
-          if (docs.state == 0) freightState = '배송전';
-          else if (docs.state == 1) freightState = '배송중';
-          else if (docs.state == 2) freightState = '배송완료';
-
-          var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
-          //var docEndDate = new Date(docs.endDay._seconds * 1000);
-
-          if (docs.stopover) {
-            this.state.dualFreight = true;
-          }
-
-          list.push({
-            key: docs.id,
-            lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-            dist: docs.dist,
-            startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
-            endDate: docs.endDate,
-            expense: docs.expense,
-            startAddress: docs.startAddr,
-            endAddress: docs.endAddr,
-            startAddrFull: docs.startAddr_Full,
-            endAddrFull: docs.endAddr_Full,
-            startAddrArray: startAddrArray,
-            endAddrArray: endAddrArray,
-            oppositeFreightId: docs.oppositeFreightId,
-
-            startMonth: docStartDate.getMonth() + 1,
-            startDay: docStartDate.getDate(),
-            // endMonth: docEndDate.getMonth() + 1,
-            // endDay: docEndDate.getDate(),
-            startDayLabel: doc.startDayLabel,
-            // endDayLabel: doc.endDayLabel,
-            driveOption: docs.driveOption,
-
-            ownerTel: docs.ownerTel,
-            ownerName: docs.ownerName,
-            desc: docs.desc,
-          });
-
-          var addiData = {
-            lastState: freightState,
-            dist: docs.dist,
-            expense: docs.expense,
-            ownerId: docs.ownerId,
-          };
-          that.setState({addiDataStopover: addiData});
-          that.setState({dataStopover: list});
-        } else {
-          console.log('No Stopover Freight');
-        }
-      });
     }
   };
 
   setComplete = () => {
     console.log('운송 완료');
     try {
-      var ref = firestore().collection('freights').doc(this.state.FreightID);
+      var ref = firestore()
+        .collection('freights')
+        .doc(this.state.OppoFreightID);
       ref.update({
         state: 2,
       });
@@ -253,7 +195,7 @@ export class DetailCheckStopoverScreen extends React.Component<
   _renderItem = ({item}) => (
     <View>
       <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>경유지(추가) 화물 내역</Text>
+        <Text style={styles.Subtitle}>경유지 화물 내역</Text>
         {item.lastState == '배송중' ? (
           <Button
             style={styles.Badge}
@@ -296,85 +238,38 @@ export class DetailCheckStopoverScreen extends React.Component<
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
-      {this.state.dualFreight == null ? (
-        <View style={styles.freightInfoTotalContainer}>
-          <View style={styles.freightInfoHalfContainer} key="1">
-            <Text style={styles.infoTitle}>배차 날짜</Text>
-            <Text style={styles.infoTitle}>운행 거리</Text>
-            <Text style={styles.infoTitle}>운행 운임</Text>
-            <Text style={styles.infoTitle}>상차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}>하차지 주소</Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}></Text>
-            <Text style={styles.infoTitle}>화주 이름</Text>
-            <Text style={styles.infoTitle}>화주 연락처</Text>
-            <Text style={styles.infoTitle}>화물 설명</Text>
-          </View>
-          <View style={styles.freightInfoHalfContainer}>
-            <Text style={styles.infoRightTitle}>
-              {item.startMonth}월 {item.startDay}일
-            </Text>
-            <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
-            <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-            <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
-            <Text style={styles.infoRightTitle}></Text>
-            <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
-            <Text style={styles.infoRightTitle}></Text>
-            <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
-            <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
-            <Text style={styles.infoRightTitle}>{item.desc}</Text>
-          </View>
+      <View style={styles.freightInfoTotalContainer}>
+        <View style={styles.freightInfoHalfContainer}>
+          <Text style={styles.infoTitle}>배차 날짜:</Text>
+          <Text style={styles.infoTitle}>운행 거리:</Text>
+          <Text style={styles.infoTitle}>운행 운임:</Text>
+          <Text style={styles.infoTitle}>상차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>하차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>화주 이름:</Text>
+          <Text style={styles.infoTitle}>화주 연락처:</Text>
+          <Text style={styles.infoTitle}>화물 설명:</Text>
         </View>
-      ) : (
-        <ViewPager
-          initialPage={0}
-          style={styles.freightInfoContainer}
-          showPageIndicator={true}>
-          <View style={styles.freightInfoTotalContainer}>
-            <View style={styles.freightInfoHalfContainer} key="1">
-              <Text style={styles.infoTitle}>배차 날짜</Text>
-              <Text style={styles.infoTitle}>운행 거리</Text>
-              <Text style={styles.infoTitle}>운행 운임</Text>
-            </View>
-            <View style={styles.freightInfoHalfContainer}>
-              <Text style={styles.infoRightTitle}>
-                {item.startMonth}월 {item.startDay}일
-              </Text>
-              <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
-              <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-            </View>
-          </View>
-          <View style={styles.freightInfoTotalContainer}>
-            <View style={styles.freightInfoHalfContainer} key="2">
-              <Text style={styles.infoTitle}>상차지 주소</Text>
-              <Text style={styles.infoTitle}></Text>
-              <Text style={styles.infoTitle}></Text>
-              <Text style={styles.infoTitle}>하차지 주소</Text>
-              <Text style={styles.infoTitle}></Text>
-            </View>
-            <View style={styles.freightInfoHalfContainer}>
-              <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
-              <Text style={styles.infoRightTitle}></Text>
-              <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
-              <Text style={styles.infoRightTitle}></Text>
-            </View>
-          </View>
-          <View style={styles.freightInfoTotalContainer}>
-            <View style={styles.freightInfoHalfContainer} key="3">
-              <Text style={styles.infoTitle}>화주 이름</Text>
-              <Text style={styles.infoTitle}>화주 연락처</Text>
-              <Text style={styles.infoTitle}>화물 설명</Text>
-            </View>
-            <View style={styles.freightInfoHalfContainer}>
-              <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
-              <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
-              <Text style={styles.infoRightTitle}>{item.desc}</Text>
-            </View>
-          </View>
-        </ViewPager>
-      )}
+        <View style={styles.freightInfoHalfRightContainer}>
+          <Text style={styles.infoRightTitle}>
+            {item.startMonth}월 {item.startDay}일
+          </Text>
+          <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
+          <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
+          <Text style={styles.infoRightTitle}>
+            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
+            {item.startAddrFullArray[2]} {'\n'}
+            {item.startAddrDetail}
+          </Text>
+          <Text style={styles.infoRightTitle}>
+            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
+            {item.endAddrFullArray[2]} {'\n'}
+            {item.endAddrDetail}
+          </Text>
+          <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
+          <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
+          <Text style={styles.infoRightTitle}>{item.desc}</Text>
+        </View>
+      </View>
       <Divider style={{backgroundColor: 'black'}} />
     </View>
   );
@@ -386,13 +281,21 @@ export class DetailCheckStopoverScreen extends React.Component<
 
     if (this.state.addiData.lastState == '배송중') {
       navButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
+        <Button
+          style={styles.button}
+          textStyle={styles.buttonText}
+          status="info"
+          icon={naviIcon}>
           내비 연결
         </Button>
       );
       callButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
-          화주 전화
+        <Button
+          style={styles.callButton}
+          textStyle={styles.callButtonText}
+          status="success"
+          icon={phoneIcon}>
+          화주에게 전화
         </Button>
       );
       completeButton = (
@@ -401,6 +304,8 @@ export class DetailCheckStopoverScreen extends React.Component<
             this._twoOptionAlertHandler();
           }}
           style={styles.button}
+          status="danger"
+          icon={homeIcon}
           textStyle={styles.buttonText}>
           운송 완료
         </Button>
@@ -410,12 +315,17 @@ export class DetailCheckStopoverScreen extends React.Component<
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
+          status="info"
           disabled={true}>
           내비 연결
         </Button>
       );
       callButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
+        <Button
+          style={styles.callButton}
+          textStyle={styles.callButtonText}
+          status="success"
+          icon={phoneIcon}>
           화주 전화
         </Button>
       );
@@ -423,37 +333,14 @@ export class DetailCheckStopoverScreen extends React.Component<
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
+          icon={homeIcon}
+          status="danger"
           disabled={true}>
           운송 완료
         </Button>
       );
     } else {
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          내비 연결
-        </Button>
-      );
-      callButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          화주 전화
-        </Button>
-      );
-      completeButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          운송 완료
-        </Button>
-      );
     }
-
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -463,30 +350,12 @@ export class DetailCheckStopoverScreen extends React.Component<
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
         />
-
-        {/* <ViewPager
-          initialPage={0}
-          showPageIndicator={true}
-          style={styles.container}>
-                  </ViewPager> */}
-
-        {/* <Divider style={{backgroundColor: 'black'}} /> */}
-        {/* <View style={styles.totalInfoContainer}>
-          <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>총 운행 거리</Text>
-            <Text style={styles.infoTitle}>총 운행 운임</Text>
-          </View>
-          <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{this.state.addiData.dist} KM</Text>
-            <Text style={styles.infoTitle}>
-              {this.state.addiData.expense} 원
-            </Text>
-          </View>
-        </View> */}
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{navButton}</View>
-          <View style={styles.ButtonHalfContainer}>{callButton}</View>
           <View style={styles.ButtonHalfContainer}>{completeButton}</View>
+        </View>
+        <View style={styles.ButtonContainter}>
+          <View style={styles.ButtonHalfContainer}>{callButton}</View>
         </View>
       </React.Fragment>
     );
@@ -495,9 +364,13 @@ export class DetailCheckStopoverScreen extends React.Component<
 
 const styles = StyleSheet.create({
   Badge: {
-    width: RFPercentage(12),
+    width: RFPercentage(14),
     height: RFPercentage(4),
     borderRadius: 8,
+  },
+  smallBadge: {
+    width: RFPercentage(8),
+    height: RFPercentage(2),
   },
   badgeText: {
     fontSize: RFPercentage(1.5),
@@ -509,6 +382,14 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: RFPercentage(1.5),
+  },
+  callButton: {
+    width: RFPercentage(30),
+    height: RFPercentage(6),
+    borderRadius: 8,
+  },
+  callButtonText: {
+    fontSize: RFPercentage(2.2),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -525,7 +406,6 @@ const styles = StyleSheet.create({
   freightContainer: {
     paddingHorizontal: 20,
     alignItems: 'flex-start',
-    borderColor: '#20232a',
     paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
@@ -536,16 +416,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 70,
     alignItems: 'flex-start',
-    borderColor: '#20232a',
   },
   freightInfoTotalContainer: {
     paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
   },
   freightInfoHalfContainer: {
     flex: 1,
+    paddingRight: 15,
+    alignItems: 'flex-end',
+  },
+  freightInfoHalfRightContainer: {
+    flex: 1,
+    paddingLeft: 15,
+    alignItems: 'flex-start',
   },
   geoContainer: {
     paddingVertical: 15,
@@ -562,30 +447,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(2.8),
+    fontSize: RFPercentage(3.5),
     fontWeight: 'bold',
   },
   geoSubText: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
   },
   infoTitle: {
-    paddingVertical: 2,
-    paddingHorizontal: 40,
-    fontSize: RFPercentage(2),
+    paddingVertical: 4,
+    fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
-    fontStyle: 'normal',
-    justifyContent: 'space-between',
   },
   infoRightTitle: {
-    paddingVertical: 2,
-    paddingHorizontal: 40,
-    fontSize: RFPercentage(2),
+    paddingVertical: 4,
+    fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
-    fontStyle: 'normal',
-    //alignSelf: 'flex-end',
-    alignSelf: 'stretch',
   },
   totalInfoContainer: {
     backgroundColor: 'white',
@@ -601,7 +479,7 @@ const styles = StyleSheet.create({
   ButtonContainter: {
     backgroundColor: 'white',
     flexDirection: 'row',
-    flex: 3,
+    flex: 2,
     justifyContent: 'space-between',
   },
   ButtonHalfContainer: {

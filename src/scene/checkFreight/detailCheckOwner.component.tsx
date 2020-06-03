@@ -36,7 +36,10 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
-const heartIcon = (style) => <Icon {...style} name="heart-outline" />;
+const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
+const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
+const homeIcon = (style) => <Icon {...style} name="home-outline" />;
+const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
 
 export class DetailCheckOwnerScreen extends React.Component<
   DetailCheckOwnerScreenProps
@@ -316,20 +319,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           style={{backgroundColor: 'white'}}
           data={this.state.data}
           renderItem={this._renderItem}
-          //keyExtractor={(item) => item.key}
         />
-        {/* <View style={styles.totalInfoContainer}>
-          <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>총 운행 거리</Text>
-            <Text style={styles.infoTitle}>총 운행 운임</Text>
-          </View>
-          <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{this.state.addiData.dist} KM</Text>
-            <Text style={styles.infoTitle}>
-              {this.state.addiData.expense} 원
-            </Text>
-          </View>
-        </View> */}
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{callButton}</View>
           {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
@@ -341,10 +331,15 @@ export class DetailCheckOwnerScreen extends React.Component<
 
 const styles = StyleSheet.create({
   Badge: {
-    width: RFPercentage(12),
+    width: RFPercentage(14),
     height: RFPercentage(4),
     borderRadius: 8,
   },
+  smallBadge: {
+    width: RFPercentage(8),
+    height: RFPercentage(2),
+  },
+
   badgeText: {
     fontSize: RFPercentage(1.5),
   },
