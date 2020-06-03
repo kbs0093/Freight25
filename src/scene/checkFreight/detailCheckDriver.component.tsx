@@ -45,7 +45,7 @@ export class DetailCheckDriverScreen extends React.Component<
     super(props);
     this.state = {
       FreightID: null,
-      tsActID: null,
+      OppoFreightID: null,
       data: [],
       dataStopover: [],
       addiData: {
@@ -54,6 +54,13 @@ export class DetailCheckDriverScreen extends React.Component<
         expense: null,
         ownerId: null,
       },
+      addiDataStopover: {
+        lastState: null, // 0 -> 배송중, 1 -> 배송완료
+        dist: null,
+        expense: null,
+        ownerId: null,
+      },
+
       dualFreight: null,
     };
   }
@@ -66,36 +73,23 @@ export class DetailCheckDriverScreen extends React.Component<
       }
     } catch (error) {}
     try {
-      const tsActValue = await AsyncStorage.getItem('tsActId');
-      if (tsActValue !== null) {
-        this.setState({tsActId: tsActValue});
+      const value = await AsyncStorage.getItem('OppoFreightID');
+      if (value !== null) {
+        this.setState({OppoFreightID: value});
       }
     } catch (error) {}
 
     var user = auth().currentUser;
     const that = this;
-    if (user != null) {
-      var transActRef = firestore()
-        .collection('transactions')
-        .doc(this.state.tsActValue);
-
-      transActRef.get().then(function (doc) {
-        var list = [];
-
-        if (doc.exists) {
-          const docs = doc.data();
-          console.log('transaction ID:', docs.transactionId);
-        }
-      });
-    }
 
     if (user != null) {
       var docRef = firestore().collection('freights').doc(this.state.FreightID);
+      var docOppoRef = firestore()
+        .collection('freights')
+        .doc(this.state.OppoFreightID);
 
+      // Get the selected(original) freight info from Firebase.
       docRef.get().then(function (doc) {
-        //doc.data()에 상세정보 저장되어 있습니다.
-        //화물의 배정 기사 변수: driverId
-        //화물 배정 상태 변수: state
         var list = [];
 
         if (doc.exists) {
@@ -155,6 +149,70 @@ export class DetailCheckDriverScreen extends React.Component<
           that.setState({data: list});
         } else {
           console.log('No such document!');
+        }
+      });
+
+      // Get the stopover(additional) freight info from Firebase.
+      docOppoRef.get().then(function (doc) {
+        var list = [];
+
+        if (doc.exists) {
+          const docs = doc.data();
+          console.log('Stopover Frieght ID:', docs.id);
+
+          var freightState = '';
+          var startAddrArray = docs.startAddr.split(' ');
+          var endAddrArray = docs.endAddr.split(' ');
+
+          if (docs.state == 0) freightState = '배송전';
+          else if (docs.state == 1) freightState = '배송중';
+          else if (docs.state == 2) freightState = '배송완료';
+
+          var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+          //var docEndDate = new Date(docs.endDay._seconds * 1000);
+
+          if (docs.stopover) {
+            this.state.dualFreight = true;
+          }
+
+          list.push({
+            key: docs.id,
+            lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+            dist: docs.dist,
+            startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
+            endDate: docs.endDate,
+            expense: docs.expense,
+            startAddress: docs.startAddr,
+            endAddress: docs.endAddr,
+            startAddrFull: docs.startAddr_Full,
+            endAddrFull: docs.endAddr_Full,
+            startAddrArray: startAddrArray,
+            endAddrArray: endAddrArray,
+            oppositeFreightId: docs.oppositeFreightId,
+
+            startMonth: docStartDate.getMonth() + 1,
+            startDay: docStartDate.getDate(),
+            // endMonth: docEndDate.getMonth() + 1,
+            // endDay: docEndDate.getDate(),
+            startDayLabel: doc.startDayLabel,
+            // endDayLabel: doc.endDayLabel,
+            driveOption: docs.driveOption,
+
+            ownerTel: docs.ownerTel,
+            ownerName: docs.ownerName,
+            desc: docs.desc,
+          });
+
+          var addiData = {
+            lastState: freightState,
+            dist: docs.dist,
+            expense: docs.expense,
+            ownerId: docs.ownerId,
+          };
+          that.setState({addiDataStopover: addiData});
+          that.setState({dataStopover: list});
+        } else {
+          console.log('No Stopover Freight');
         }
       });
     }
@@ -401,11 +459,16 @@ export class DetailCheckDriverScreen extends React.Component<
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
         <FlatList
           style={{backgroundColor: 'white'}}
-          //data={this.state.data.concat(this.state.data)}
           data={this.state.data}
           renderItem={this._renderItem}
           keyExtractor={(item) => item.key}
         />
+
+        {/* <ViewPager
+          initialPage={0}
+          showPageIndicator={true}
+          style={styles.container}>
+                  </ViewPager> */}
 
         {/* <Divider style={{backgroundColor: 'black'}} /> */}
         {/* <View style={styles.totalInfoContainer}>
@@ -455,6 +518,9 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
+  },
+  container: {
+    flex: 1,
   },
   freightContainer: {
     paddingHorizontal: 20,
