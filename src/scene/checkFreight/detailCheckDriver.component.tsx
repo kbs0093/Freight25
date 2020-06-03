@@ -43,11 +43,11 @@ export class DetailCheckDriverScreen extends React.Component<
   // The number of frieght information from 'driver' could be more than one.
   constructor(props) {
     super(props);
-
     this.state = {
       FreightID: null,
+      tsActID: null,
       data: [],
-      data2: [],
+      dataStopover: [],
       addiData: {
         lastState: null, // 0 -> 배송중, 1 -> 배송완료
         dist: null,
@@ -65,9 +65,29 @@ export class DetailCheckDriverScreen extends React.Component<
         this.setState({FreightID: value});
       }
     } catch (error) {}
+    try {
+      const tsActValue = await AsyncStorage.getItem('tsActId');
+      if (tsActValue !== null) {
+        this.setState({tsActId: tsActValue});
+      }
+    } catch (error) {}
 
     var user = auth().currentUser;
     const that = this;
+    if (user != null) {
+      var transActRef = firestore()
+        .collection('transactions')
+        .doc(this.state.tsActValue);
+
+      transActRef.get().then(function (doc) {
+        var list = [];
+
+        if (doc.exists) {
+          const docs = doc.data();
+          console.log('transaction ID:', docs.transactionId);
+        }
+      });
+    }
 
     if (user != null) {
       var docRef = firestore().collection('freights').doc(this.state.FreightID);
@@ -228,6 +248,7 @@ export class DetailCheckDriverScreen extends React.Component<
             <Text style={styles.infoTitle}></Text>
             <Text style={styles.infoTitle}></Text>
             <Text style={styles.infoTitle}>하차지 주소</Text>
+            <Text style={styles.infoTitle}></Text>
             <Text style={styles.infoTitle}></Text>
             <Text style={styles.infoTitle}>화주 이름</Text>
             <Text style={styles.infoTitle}>화주 연락처</Text>

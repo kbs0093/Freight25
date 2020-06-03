@@ -234,7 +234,8 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
             state: 1,
             driverId: user.uid,
             driverTel: driverTel,
-            oppositeFreightId: originalFreightId
+            oppositeFreightId: originalFreightId,
+            timeStampAssigned: new Date(),
           });
           batch.update(originalFrieghtRef,{
             oppositeFreightId: value
