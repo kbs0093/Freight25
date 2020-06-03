@@ -59,6 +59,7 @@ export class DetailCheckDriverScreen extends React.Component<
         dist: null,
         expense: null,
         ownerId: null,
+        oppositeFreightId: null,
       },
       addiDataStopover: {
         lastState: null, // 0 -> 배송중, 1 -> 배송완료
@@ -121,7 +122,6 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrFull: docs.endAddr_Full,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
-            oppositeFreightId: docs.oppositeFreightId,
 
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
@@ -141,6 +141,7 @@ export class DetailCheckDriverScreen extends React.Component<
             dist: docs.dist,
             expense: docs.expense,
             ownerId: docs.ownerId,
+            oppositeFreightId: docs.oppositeFreightId,
           };
           that.setState({addiData: addiData});
           that.setState({data: list});
@@ -184,9 +185,10 @@ export class DetailCheckDriverScreen extends React.Component<
   };
 
   _showStopoverFreight = () => {
-    if (this.state.data.oppositeFreightId != '') {
+    if (this.state.addiData.oppositeFreightId != null) {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_STOPOVER);
     } else {
+      console.log('Stopover is not exists');
       Toast.showSuccess('경유지 화물이 없습니다');
     }
   };
