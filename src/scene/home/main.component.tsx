@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
-import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Image, StyleSheet, View, TouchableOpacity, Alert, AppRegistry} from 'react-native';
 import {LayoutElement, Text, ViewPager} from '@ui-kitten/components';
 import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
+import messaging from '@react-native-firebase/messaging'
 
 export const MainScreen = (props: MainScreenProps): LayoutElement => {
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -15,6 +16,20 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   const clickCheck = () => {
     props.navigation.navigate(AppRoute.CHECK);
   };
+
+  // Push Notification part (background)
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+  });
+  
+  // Push Notification part (foreground)
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <React.Fragment>

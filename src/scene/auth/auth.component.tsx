@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
@@ -7,6 +7,7 @@ import {
   View,
   Linking,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import {
   Input,
@@ -24,7 +25,7 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
-
+import messaging from '@react-native-firebase/messaging'
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
 }
@@ -42,7 +43,34 @@ const PROFILE_EMPTY = {
   profile_image_url: '',
 };
 
+const isAndroid = (Platform.OS === 'android')
+
 export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
+
+  useEffect(() => {
+    messaging()
+    .hasPermission()
+    .then(enabled => {       
+      if (enabled) {
+      } else {
+        messaging()
+        .requestPermission()
+        .then()
+        .catch(err => {
+          if (!isAndroid) {
+            Linking.canOpenURL('app-settings:')
+              .then(supported => {
+                Linking.openURL('app-settings:');
+              })
+              .catch(error => {});
+          }
+        });
+      }
+      messaging().getToken().then(token => {console.log('메세지토큰 :',token)})
+    })
+    .catch();
+  }, []);
+
   const [token, setToken] = useState(TOKEN_EMPTY);
   const [profile, setProfile] = useState(PROFILE_EMPTY);
 
