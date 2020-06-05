@@ -27,6 +27,7 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
       mapVisible: true,
       stopoverVisible: true,
       FreightID: null,
+      totalTime: null,
       data: {
         startAddress: [],
         endAddress: [],
@@ -143,7 +144,7 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
                 truckWidth: '100',
                 truckHeight: '100',
                 truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
-                truckTotalWeight: '35000', // 화물 무게도 불러올 것
+                truckTotalWeight: '20000', // 화물 무게도 불러올 것
                 truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
               }),
             },
@@ -193,6 +194,41 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
           console.log('No such document!');
         }
       });
+
+      var data2 = fetch(
+        'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
+        {
+          method: 'POST',
+          headers: {
+            appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
+          },
+          body: JSON.stringify({
+            startX: doc.data().startAddr_lon,
+            startY: doc.data().startAddr_lat,
+            endX: doc.data().endAddr_lon,
+            endY: doc.data().endAddr_lat,
+            reqCoordType: 'WGS84GEO',
+            resCoordType: 'WGS84GEO',
+            angle: '172',
+            searchOption: '1',
+            passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
+            trafficInfo: 'Y',
+            truckType: '1',
+            truckWidth: '100',
+            truckHeight: '100',
+            truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+            truckTotalWeight: '20000', // 화물 무게도 불러올 것
+            truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+            totalValue: '2'
+          }),
+        },
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (jsonData) {                         
+          that.setState({totalTime: jsonData.features[0].properties.totalTime});
+        });
     }
   };
   
@@ -210,6 +246,8 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
 
 
   ClickApply = async() => {
+    let date = new Date()
+    date.setSeconds(date.getSeconds() + this.state.totalTime);
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('Stopover1');
     const originalFreightId = await AsyncStorage.getItem('FreightID');
@@ -229,6 +267,7 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
             driverTel: driverTel,
             oppositeFreightId: originalFreightId,
             timeStampAssigned: new Date(),
+            totalTime: date
           });
           batch.update(originalFrieghtRef,{
             oppositeFreightId: value
@@ -332,15 +371,7 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
                 onRegionChange={this.onRegionChange}>
                 <Polyline
                   coordinates={this.state.apiInfo}
-                  strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-                  strokeColors={[
-                    '#7F0000',
-                    '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                    '#B24112',
-                    '#E5845C',
-                    '#238C23',
-                    '#7F0000',
-                  ]}
+                  strokeColor="#2F80ED" // fallback for when `strokeColors` is not supported by the map-provider
                   strokeWidth={6}
                 />
               </MapView>

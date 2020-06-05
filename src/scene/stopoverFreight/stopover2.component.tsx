@@ -27,6 +27,7 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
       mapVisible: true,
       stopoverVisible: true,
       FreightID: null,
+      totalTime: null,
       data: {
         startAddress: [],
         endAddress: [],
@@ -61,11 +62,11 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
 
   componentDidMount = async () => {
     try {
-      const value = await AsyncStorage.getItem('Stopover2');
+      const value = await AsyncStorage.getItem('Stopover1');
       if (value !== null) {
-        this.setState({FreightID: value});
+        this.setState({FreightID: value})        
       }
-    } catch (error) {}
+    } catch (error){}
 
     // 이 시점부터 this.state.FreightID로 화물 ID에 접근이 가능합니다 바로 사용하시면 됩니다.
 
@@ -143,7 +144,7 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
                 truckWidth: '100',
                 truckHeight: '100',
                 truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
-                truckTotalWeight: '35000', // 화물 무게도 불러올 것
+                truckTotalWeight: '20000', // 화물 무게도 불러올 것
                 truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
               }),
             },
@@ -193,22 +194,49 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
           console.log('No such document!');
         }
       });
+
+      var data2 = fetch(
+        'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
+        {
+          method: 'POST',
+          headers: {
+            appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
+          },
+          body: JSON.stringify({
+            startX: doc.data().startAddr_lon,
+            startY: doc.data().startAddr_lat,
+            endX: doc.data().endAddr_lon,
+            endY: doc.data().endAddr_lat,
+            reqCoordType: 'WGS84GEO',
+            resCoordType: 'WGS84GEO',
+            angle: '172',
+            searchOption: '1',
+            passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
+            trafficInfo: 'Y',
+            truckType: '1',
+            truckWidth: '100',
+            truckHeight: '100',
+            truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+            truckTotalWeight: '20000', // 화물 무게도 불러올 것
+            truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+            totalValue: '2'
+          }),
+        },
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (jsonData) {                         
+          that.setState({totalTime: jsonData.features[0].properties.totalTime});
+        });
     }
   };
-
+  
   hideMap = () => {
-    if (this.state.mapVisible) {
-      this.setState({mapVisible: false});
-    } else {
-      this.setState({mapVisible: true});
-    }
-  };
-
-  hideStopvoer = () => {
-    if (this.state.stopoverVisible) {
-      this.setState({stopoverVisible: false});
-    } else {
-      this.setState({stopoverVisible: true});
+    if(this.state.mapVisible){
+      this.setState({mapVisible: false})
+    } else{
+      this.setState({mapVisible: true})
     }
   };
 
@@ -216,9 +244,12 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
     this.setState({region});
   };
 
+
   ClickApply = async() => {
+    let date = new Date()
+    date.setSeconds(date.getSeconds() + this.state.totalTime);
     const user = auth().currentUser;
-    const value = await AsyncStorage.getItem('Stopover2');
+    const value = await AsyncStorage.getItem('Stopover1');
     const originalFreightId = await AsyncStorage.getItem('FreightID');
     const tsActId = await AsyncStorage.getItem('tsActId');
     if(user != null){
@@ -236,13 +267,14 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
             driverTel: driverTel,
             oppositeFreightId: originalFreightId,
             timeStampAssigned: new Date(),
+            totalTime: date
           });
           batch.update(originalFrieghtRef,{
             oppositeFreightId: value
           });
           batch.commit()
           .then(function(){
-            console.log("Stopover2 "+value+" was assigned to "+ user.uid);
+            console.log("StopOver1 "+value+" was assigned to "+ user.uid);
           });
           
           Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
@@ -269,6 +301,8 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
       }
     }
   }
+
+  
 
   render() {
     return (
@@ -337,15 +371,7 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
                 onRegionChange={this.onRegionChange}>
                 <Polyline
                   coordinates={this.state.apiInfo}
-                  strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-                  strokeColors={[
-                    '#7F0000',
-                    '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                    '#B24112',
-                    '#E5845C',
-                    '#238C23',
-                    '#7F0000',
-                  ]}
+                  strokeColor="#2F80ED" // fallback for when `strokeColors` is not supported by the map-provider
                   strokeWidth={6}
                 />
               </MapView>
@@ -507,9 +533,9 @@ export class StopoverScreen2 extends React.Component <StopoverScreen2Props> {
 }
 
 const styles = StyleSheet.create({
-  Title: {
+  Title:{
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 16,   
     margin: 5,
   },
   MainInfo: {
@@ -519,40 +545,40 @@ const styles = StyleSheet.create({
   MainInfoGeo: {
     justifyContent: 'flex-end',
     alignItems: 'center',
-    flex: 2,
-    flexDirection: 'column',
+    flex : 2,
+    flexDirection: 'column'
   },
   MainInfoGeo2: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    flex: 2,
-    flexDirection: 'row',
+    flex : 2,
+    flexDirection: 'row'
   },
   MainInfoType: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 2,
+    flex : 2,
   },
   MainInfoIcon: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    flex : 1,    
   },
   MainInfoType2: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    flex : 1,    
   },
-  geoText: {
-    textAlign: 'center',
+  geoText:{
+    textAlign: 'center', 
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 20,    
   },
   icon: {
     width: 32,
     height: 24,
   },
-  icon2: {
+  icon2:{
     justifyContent: 'center',
     width: 20,
     height: 15,
@@ -560,24 +586,24 @@ const styles = StyleSheet.create({
   startType: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: '#2F80ED',
+    color: '#2F80ED'
   },
-  Type: {
+  Type:{
     fontWeight: 'bold',
     fontSize: 14,
-    color: '#9B51E0',
+    color: '#9B51E0'
   },
   endType: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: '#EB5757',
+    color: '#EB5757'
   },
   freightTitle: {
     fontWeight: 'bold',
     fontSize: 16,
-    margin: 5,
+    margin: 5
   },
-  button: {
-    margin: 5,
-  },
+  button:{
+    margin: 5
+  }
 });

@@ -40,6 +40,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
       mapVisible: true,
       stopoverVisible: true,
       FreightID: null,
+      totalTime: null,
       data: {
         startAddress: [],
         endAddress: [],
@@ -79,8 +80,6 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
         this.setState({FreightID: value});
       }
     } catch (error) {}
-
-    // 이 시점부터 this.state.FreightID로 화물 ID에 접근이 가능합니다 바로 사용하시면 됩니다.
 
     var user = auth().currentUser;
     const that = this;
@@ -156,7 +155,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 truckWidth: '100',
                 truckHeight: '100',
                 truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
-                truckTotalWeight: '35000', // 화물 무게도 불러올 것
+                truckTotalWeight: '20000', // 화물 무게도 불러올 것
                 truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
               }),
             },
@@ -166,7 +165,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             })
             .then(function (jsonData) {
               var coordinates = [];
-              for (let i = 0; i < Object(jsonData.features).length; i++) {
+               for (let i = 0; i < Object(jsonData.features).length; i++) {
                 if (
                   typeof jsonData.features[i].geometry.coordinates[0] ===
                   'object'
@@ -202,6 +201,43 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
               that.setState({apiInfo: coordinates});
               return JSON.stringify(jsonData);
             });
+
+            var data2 = fetch(
+              'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
+              {
+                method: 'POST',
+                headers: {
+                  appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
+                },
+                body: JSON.stringify({
+                  startX: doc.data().startAddr_lon,
+                  startY: doc.data().startAddr_lat,
+                  endX: doc.data().endAddr_lon,
+                  endY: doc.data().endAddr_lat,
+                  reqCoordType: 'WGS84GEO',
+                  resCoordType: 'WGS84GEO',
+                  angle: '172',
+                  searchOption: '1',
+                  passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
+                  trafficInfo: 'Y',
+                  truckType: '1',
+                  truckWidth: '100',
+                  truckHeight: '100',
+                  truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+                  truckTotalWeight: '20000', // 화물 무게도 불러올 것
+                  truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+                  totalValue: '2'
+                }),
+              },
+            )
+              .then(function (response) {
+                return response.json();
+              })
+              .then(function (jsonData) {                         
+                that.setState({totalTime: jsonData.features[0].properties.totalTime});
+              });
+
+
         } else {
           console.log('No such document!');
         }
@@ -230,8 +266,12 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
   };
 
   ClickApply = async () => {
+    let date = new Date()
+    date.setSeconds(date.getSeconds() + this.state.totalTime);
+
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('FreightID');
+     
     if (user != null) {
       if (value != null) {
         var freightRef = firestore().collection('freights').doc(value);
@@ -244,12 +284,19 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             driverId: user.uid,
             driverTel: driverTel,
             timeStampAssigned: new Date(),
+            totalTime: date
           });
           console.log(
             'StopOver X ' + freightRef.id + ' was assigned to ' + user.uid,
           );
-          //Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
-          this.props.navigation.navigate(AppRoute.STOPOVERAD);
+          
+          if(this.state.data.Type == '혼적'){
+            this.props.navigation.navigate(AppRoute.STOPOVERAD);
+          } else{
+            Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+            this.props.navigation.navigate(AppRoute.HOME);
+          }
+          
         } catch {
           console.log('Failed assign to ' + freightRef.id);
         }
@@ -260,12 +307,12 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             transactionId: transRef.id,
             driverId: user.uid,
             driverTel: driverTel,
-            driveOption:"혼적",
             originalFreightId: value,
             stopoverFreightId: "",   
             totalExpense: "",
             totalDistance: "",
-            timeStampAssigned: new Date()
+            timeStampAssigned: new Date(),
+            totalTime: date
           })
           AsyncStorage.setItem('tsActId',transRef.id);
         }
@@ -343,15 +390,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 onRegionChange={this.onRegionChange}>
                 <Polyline
                   coordinates={this.state.apiInfo}
-                  strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-                  strokeColors={[
-                    '#7F0000',
-                    '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                    '#B24112',
-                    '#E5845C',
-                    '#238C23',
-                    '#7F0000',
-                  ]}
+                  strokeColor="#2F80ED" // fallback for when `strokeColors` is not supported by the map-provider
                   strokeWidth={6}
                 />
               </MapView>

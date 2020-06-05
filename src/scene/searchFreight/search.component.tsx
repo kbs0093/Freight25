@@ -201,12 +201,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
 
    ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
-    if(item.Type == '독차'){
-      this.props.navigation.navigate(AppRoute.ALONE_DETAIL);
-    } else {
-      this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
-    }
-
+    this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
 
   moneySort(a, b) {
@@ -315,7 +310,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
   );
   
   render(){
-      
+    console.log(new Date())
     if(this.state.value == '1'){  
       this.state.data2.sort(this.smartSort);
     }

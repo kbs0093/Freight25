@@ -32,14 +32,7 @@ export const AppNavigator = (props): React.ReactElement => (
     <Stack.Screen name={AppRoute.HOME} component={HomeNavigator} />
     <Stack.Screen name={AppRoute.OWNER} component={OwnerNavigator} />
     <Stack.Screen name={AppRoute.SEARCH} component={SearchNavigator} />
-    <Stack.Screen
-      name={AppRoute.SEARCH_DETAIL}
-      component={searchDetailNavigator}
-    />
-    <Stack.Screen
-      name={AppRoute.ALONE_DETAIL}
-      component={aloneDetailNavigator}
-    />
+    <Stack.Screen name={AppRoute.SEARCH_DETAIL} component={searchDetailNavigator}/>
     <Stack.Screen name={AppRoute.STOPOVERAD} component={StopoverADNavigator} />
     <Stack.Screen name={AppRoute.STOPOVER} component={StopoverNavigator} />
     <Stack.Screen name={AppRoute.CHECK_MAIN} component={CheckNavigator} />

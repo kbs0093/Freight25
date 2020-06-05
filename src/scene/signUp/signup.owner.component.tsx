@@ -30,6 +30,12 @@ import Modal from 'react-native-modal'
 import Postcode from 'react-native-daum-postcode'
 import Toast from 'react-native-tiny-toast';
 
+
+const OwnerNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.OWNER}],
+});
+
 const serverUrl = 'http://49.50.162.128:8000/';
 const DirectSms = NativeModules.DirectSms;
 
@@ -126,7 +132,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                   Toast.showSuccess('회원가입이 완료되었습니다.');
                   AsyncStorage.setItem('userType', 'owner');
                   console.log(user.uid+" succeeded in loging / signup Stage");
-                  props.navigation.push(AppRoute.OWNER);
+                  props.navigation.dispatch(OwnerNavigate);
                 } 
                 catch (error) {
                   //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.

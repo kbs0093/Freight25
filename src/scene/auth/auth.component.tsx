@@ -24,6 +24,7 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
+import {CommonActions} from '@react-navigation/native';
 
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
@@ -41,6 +42,23 @@ const PROFILE_EMPTY = {
   email: 'profile has not fetched',
   profile_image_url: '',
 };
+
+const HomeNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.HOME}],
+});
+
+const OwnerNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.OWNER}],
+});
+
+const SignupNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.SIGNUP}],
+});
+
+
 
 export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
   const [token, setToken] = useState(TOKEN_EMPTY);
@@ -78,7 +96,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                         console.log(user.uid+" succeeded in loging / auth Stage");
                       });
                       Toast.hide(toastLoading);
-                      props.navigation.navigate(AppRoute.HOME);
+                      props.navigation.dispatch(HomeNavigate);
                     }
                     else{
                       AsyncStorage.setItem('userType', 'owner')
@@ -87,7 +105,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                         console.log(user.uid+" succeeded in loging / auth Stage");
                       });
                       Toast.hide(toastLoading);
-                      props.navigation.navigate(AppRoute.OWNER);
+                      props.navigation.dispatch(OwnerNavigate);
                     } 
                   })
                 }
@@ -102,7 +120,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
               //분기에 대한 변수도 같이 주고 서버에서 기사와 화주 collection을 구분하여 만들도록 함 
               AsyncStorage.setItem('accessToken', JSON.stringify(result.accessToken));
               //여기서 분기가 발생해야 합니다
-              props.navigation.navigate(AppRoute.SIGNUP);
+              props.navigation.dispatch(SignupNavigate);
             }
           })
           .catch((error) => {
