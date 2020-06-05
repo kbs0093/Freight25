@@ -303,7 +303,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
         <View style={styles.driveInfo1}>
             <Text style={{fontSize: 8}}></Text>
             <Text style={styles.driveText2}>{item.distanceY} Km</Text>
-            <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
+            <Text style={styles.timeText}>스마트 랭킹 : {item.smart} %</Text>
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
         </View>
         <View style={styles.moneyInfo}>
@@ -317,16 +317,16 @@ export class SearchScreen extends Component <SearchScreenProps> {
   render(){
       
     if(this.state.value == '1'){  
-      this.state.data.sort(this.smartSort);
+      this.state.data2.sort(this.smartSort);
     }
     else if(this.state.value == '2'){
-      this.state.data.sort(this.moneySort);
+      this.state.data2.sort(this.moneySort);
     }
     else if(this.state.value == '3'){
-      this.state.data.sort(this.distanceSort);
+      this.state.data2.sort(this.distanceSort);
     }
     else if(this.state.value == '4'){
-      this.state.data.sort(this.distanceSort2);
+      this.state.data2.sort(this.distanceSort2);
     }
     
     
@@ -365,6 +365,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
                 {label: '운임 순', value: '2'},
                 {label: '스마트 확률 순', value: '1'},
               ]}
+              style={{
+                placeholder: {
+                  color: 'orange'
+                },
+              }}
       
             />
         </View>      
@@ -391,7 +396,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
                 {label: '50Km', value: '2'},
                 {label: '100Km', value: '1'},
               ]}
-      
+              style={{
+                placeholder: {
+                  color: 'orange'
+                },
+              }}
             />
         </View>      
       </View>     
