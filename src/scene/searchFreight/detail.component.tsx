@@ -79,24 +79,31 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
       if (value !== null) {
         this.setState({FreightID: value});
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
 
     var user = auth().currentUser;
     const that = this;
+    var week = new Array('일요일','월요일', '화요일', '수요일', '목요일', '금요일', '토요일');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+
     if (user != null) {
       var docRef = firestore().collection('freights').doc(this.state.FreightID);
 
-      docRef.get().then(function (doc) {
+      docRef.get().then(async function (doc) {
         if (doc.exists) {
           var parseStart = doc.data().startAddr + '';
           var startArr = parseStart.split(' ');
-
           var parseEnd = doc.data().endAddr + '';
           var endArr = parseEnd.split(' ');
           var moneyprint = doc.data().expense + '';
           moneyprint = moneyprint
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          var smart;
+          await that.RegionCode(endArr[0]).then((result)=>{smart = result});
 
           var detaildata = {
             startAddress: startArr,
@@ -115,13 +122,14 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             loadType: doc.data().freightLoadType,
             distanceY: doc.data().dist,
             time: null,
-            smart: null,
+            smart: smart,
             money: doc.data().expense,
             moneyPrint: moneyprint,
             startFull: doc.data().startAddr_Full,
             endFull: doc.data().endAddr_Full,
             isShowLocation: true,
             desc: doc.data().desc,
+            day: dayName,
           };
 
           var region = {
@@ -323,6 +331,54 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
     }
   };
 
+  RegionCode = async(address) =>{
+    var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+    let smart;
+
+    var data = await firestore().collection('probability').doc(dayName)
+    .get()
+    .then(function(doc){
+      if(address == '강원'){
+        smart = doc.data().gw;
+      } else if (address == '경기'){
+        smart = doc.data().gg;
+      } else if (address == '경남'){
+        smart = doc.data().gn;
+      } else if (address == '경북'){
+        smart = doc.data().gb;
+      } else if (address == '광주'){
+        smart = doc.data().gj;
+      } else if (address == '대구'){
+        smart = doc.data().dg;
+      } else if (address == '대전'){
+        smart = doc.data().dj;
+      } else if (address == '부산'){
+        smart = doc.data().bs;
+      } else if (address == '서울'){
+        smart = doc.data().se;
+      } else if (address == '세종특별자치시'){
+        smart = doc.data().sj;
+      } else if (address == '울산'){
+        smart = doc.data().us;
+      } else if (address == '인천'){
+        smart = doc.data().ic;
+      } else if (address == '전남'){
+        smart = doc.data().jn;
+      } else if (address == '전북'){
+        smart = doc.data().jb;
+      } else if (address == '제주특별자치도'){
+        smart = doc.data().jj;
+      } else if (address == '충남'){
+        smart = doc.data().cn;
+      } else if (address == '충북'){
+        smart = doc.data().cb;
+      }
+    })  
+    return smart;
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -507,7 +563,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                     color: '#BDBDBD',
                   }}>
                   {' '}
-                  하차지 서울 성북에서 화물이 있을 확률{' '}
+                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 평균 화물 개수{' '}
                 </Text>
               </View>
             </View>
@@ -517,7 +573,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 alignItems: 'center',
                 justifyContent: 'flex-end',
               }}>
-              <Text style={{fontSize: 26, fontWeight: 'bold'}}>87%</Text>
+              <Text style={{fontSize: 26, fontWeight: 'bold'}}>{this.state.data.smart}개</Text>
             </View>
             <Divider style={{backgroundColor: 'black'}} />
           </View>

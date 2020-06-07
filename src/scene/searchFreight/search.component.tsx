@@ -133,11 +133,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
     );
   };
 
-  FirebaseRequest = async() => {    
+  FirebaseRequest = async() => {
     var user = auth().currentUser;
     const that = this;
     
-    if(user != null){      
+    if(user != null){
       try {
         firestore().collection('freights').where("state", "==", 0)
         .get()
@@ -145,19 +145,19 @@ export class SearchScreen extends Component <SearchScreenProps> {
           var list =[];
           
           for(var docCnt in querySnapshot.docs){
-              
             const doc = querySnapshot.docs[docCnt].data();
             var parseStart = doc.startAddr + "";
             var startArr = parseStart.split(" ");
-
+            var smart;
             var parseEnd = doc.endAddr + "";
             var endArr = parseEnd.split(" ");
             var moneyprint = doc.expense + "";
             var distance;
-            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
             var distance = 100 * (Math.acos(Math.sin(that.state.latitude)*Math.sin(doc.startAddr_lat) + Math.cos(that.state.latitude)*Math.cos(doc.startAddr_lat)*Math.cos(that.state.longitude - doc.startAddr_lon)));;
+            
             distance = Math.floor(distance);
+            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            await that.RegionCode(endArr[0]).then((result)=>{smart = result});
 
             list.push({
               id: doc.id,
@@ -176,7 +176,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
               distanceX: distance,              
               distanceY: doc.dist,
               time: null,
-              smart: null,
+              smart: smart,
               money: doc.expense,
               moneyPrint: moneyprint,
               
@@ -193,10 +193,58 @@ export class SearchScreen extends Component <SearchScreenProps> {
     }   
   }
 
+  RegionCode = async(address) =>{
+    var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+    let smart;
+
+    var data = await firestore().collection('probability').doc(dayName)
+    .get()
+    .then(function(doc){
+      if(address == '강원'){
+        smart = doc.data().gw;
+      } else if (address == '경기'){
+        smart = doc.data().gg;
+      } else if (address == '경남'){
+        smart = doc.data().gn;
+      } else if (address == '경북'){
+        smart = doc.data().gb;
+      } else if (address == '광주'){
+        smart = doc.data().gj;
+      } else if (address == '대구'){
+        smart = doc.data().dg;
+      } else if (address == '대전'){
+        smart = doc.data().dj;
+      } else if (address == '부산'){
+        smart = doc.data().bs;
+      } else if (address == '서울'){
+        smart = doc.data().se;
+      } else if (address == '세종특별자치시'){
+        smart = doc.data().sj;
+      } else if (address == '울산'){
+        smart = doc.data().us;
+      } else if (address == '인천'){
+        smart = doc.data().ic;
+      } else if (address == '전남'){
+        smart = doc.data().jn;
+      } else if (address == '전북'){
+        smart = doc.data().jb;
+      } else if (address == '제주특별자치도'){
+        smart = doc.data().jj;
+      } else if (address == '충남'){
+        smart = doc.data().cn;
+      } else if (address == '충북'){
+        smart = doc.data().cb;
+      }
+    })  
+    return smart;
+  }
 
 
   componentDidMount = () => {
     isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()
+
   }
 
    ClickList = item => () => {
@@ -298,7 +346,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
         <View style={styles.driveInfo1}>
             <Text style={{fontSize: 8}}></Text>
             <Text style={styles.driveText2}>{item.distanceY} Km</Text>
-            <Text style={styles.timeText}>스마트 랭킹 : {item.smart} %</Text>
+            <Text style={styles.timeText}>스마트 화물 : {item.smart} 개</Text>
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
         </View>
         <View style={styles.moneyInfo}>
@@ -310,7 +358,6 @@ export class SearchScreen extends Component <SearchScreenProps> {
   );
   
   render(){
-    console.log(new Date())
     if(this.state.value == '1'){  
       this.state.data2.sort(this.smartSort);
     }

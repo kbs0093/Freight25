@@ -62,30 +62,35 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
 
   componentDidMount = async () => {
     try {
-      const value = await AsyncStorage.getItem('Stopover1');
+      const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
-        this.setState({FreightID: value})        
+        this.setState({FreightID: value});
       }
-    } catch (error){}
-
-    // 이 시점부터 this.state.FreightID로 화물 ID에 접근이 가능합니다 바로 사용하시면 됩니다.
+    } catch (error) {
+      console.log(error)
+    }
 
     var user = auth().currentUser;
     const that = this;
+    var week = new Array('일요일','월요일', '화요일', '수요일', '목요일', '금요일', '토요일');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+
     if (user != null) {
       var docRef = firestore().collection('freights').doc(this.state.FreightID);
 
-      docRef.get().then(function (doc) {
+      docRef.get().then(async function (doc) {
         if (doc.exists) {
           var parseStart = doc.data().startAddr + '';
           var startArr = parseStart.split(' ');
-
           var parseEnd = doc.data().endAddr + '';
           var endArr = parseEnd.split(' ');
           var moneyprint = doc.data().expense + '';
           moneyprint = moneyprint
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          var smart;
+          await that.RegionCode(endArr[0]).then((result)=>{smart = result});
 
           var detaildata = {
             startAddress: startArr,
@@ -104,13 +109,14 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
             loadType: doc.data().freightLoadType,
             distanceY: doc.data().dist,
             time: null,
-            smart: null,
+            smart: smart,
             money: doc.data().expense,
             moneyPrint: moneyprint,
             startFull: doc.data().startAddr_Full,
             endFull: doc.data().endAddr_Full,
             isShowLocation: true,
             desc: doc.data().desc,
+            day: dayName,
           };
 
           var region = {
@@ -154,7 +160,7 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
             })
             .then(function (jsonData) {
               var coordinates = [];
-              for (let i = 0; i < Object(jsonData.features).length; i++) {
+               for (let i = 0; i < Object(jsonData.features).length; i++) {
                 if (
                   typeof jsonData.features[i].geometry.coordinates[0] ===
                   'object'
@@ -190,53 +196,63 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
               that.setState({apiInfo: coordinates});
               return JSON.stringify(jsonData);
             });
+
+            var data2 = fetch(
+              'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
+              {
+                method: 'POST',
+                headers: {
+                  appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
+                },
+                body: JSON.stringify({
+                  startX: doc.data().startAddr_lon,
+                  startY: doc.data().startAddr_lat,
+                  endX: doc.data().endAddr_lon,
+                  endY: doc.data().endAddr_lat,
+                  reqCoordType: 'WGS84GEO',
+                  resCoordType: 'WGS84GEO',
+                  angle: '172',
+                  searchOption: '1',
+                  passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
+                  trafficInfo: 'Y',
+                  truckType: '1',
+                  truckWidth: '100',
+                  truckHeight: '100',
+                  truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+                  truckTotalWeight: '20000', // 화물 무게도 불러올 것
+                  truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+                  totalValue: '2'
+                }),
+              },
+            )
+              .then(function (response) {
+                return response.json();
+              })
+              .then(function (jsonData) {                         
+                that.setState({totalTime: jsonData.features[0].properties.totalTime});
+              });
+
+
         } else {
           console.log('No such document!');
         }
       });
-
-      var data2 = fetch(
-        'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
-        {
-          method: 'POST',
-          headers: {
-            appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
-          },
-          body: JSON.stringify({
-            startX: doc.data().startAddr_lon,
-            startY: doc.data().startAddr_lat,
-            endX: doc.data().endAddr_lon,
-            endY: doc.data().endAddr_lat,
-            reqCoordType: 'WGS84GEO',
-            resCoordType: 'WGS84GEO',
-            angle: '172',
-            searchOption: '1',
-            passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
-            trafficInfo: 'Y',
-            truckType: '1',
-            truckWidth: '100',
-            truckHeight: '100',
-            truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
-            truckTotalWeight: '20000', // 화물 무게도 불러올 것
-            truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
-            totalValue: '2'
-          }),
-        },
-      )
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (jsonData) {                         
-          that.setState({totalTime: jsonData.features[0].properties.totalTime});
-        });
     }
   };
-  
+
   hideMap = () => {
-    if(this.state.mapVisible){
-      this.setState({mapVisible: false})
-    } else{
-      this.setState({mapVisible: true})
+    if (this.state.mapVisible) {
+      this.setState({mapVisible: false});
+    } else {
+      this.setState({mapVisible: true});
+    }
+  };
+
+  hideStopvoer = () => {
+    if (this.state.stopoverVisible) {
+      this.setState({stopoverVisible: false});
+    } else {
+      this.setState({stopoverVisible: true});
     }
   };
 
@@ -244,65 +260,111 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
     this.setState({region});
   };
 
-
-  ClickApply = async() => {
+  ClickApply = async () => {
     let date = new Date()
     date.setSeconds(date.getSeconds() + this.state.totalTime);
+
     const user = auth().currentUser;
-    const value = await AsyncStorage.getItem('Stopover1');
-    const originalFreightId = await AsyncStorage.getItem('FreightID');
-    const tsActId = await AsyncStorage.getItem('tsActId');
-    if(user != null){
-      if (value != null && originalFreightId != null) {
+    const value = await AsyncStorage.getItem('FreightID');
+     
+    if (user != null) {
+      if (value != null) {
         var freightRef = firestore().collection('freights').doc(value);
-        var originalFrieghtRef = firestore().collection('freights').doc(originalFreightId);
         var driverRef = firestore().collection('drivers').doc(user.uid);
         var driverTel = (await driverRef.get()).data().tel;
-        console.log("target Freight ID:"+ freightRef.id);
-        try{
-          let batch = firestore().batch();
-          batch.update(freightRef,{
+        console.log('target Freight ID:' + freightRef.id);
+        try {
+          freightRef.update({
             state: 1,
             driverId: user.uid,
             driverTel: driverTel,
-            oppositeFreightId: originalFreightId,
             timeStampAssigned: new Date(),
             totalTime: date
           });
-          batch.update(originalFrieghtRef,{
-            oppositeFreightId: value
-          });
-          batch.commit()
-          .then(function(){
-            console.log("StopOver1 "+value+" was assigned to "+ user.uid);
-          });
+          console.log(
+            'StopOver X ' + freightRef.id + ' was assigned to ' + user.uid,
+          );
           
-          Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
-          this.props.navigation.navigate(AppRoute.HOME);
-        }
-        catch{
-          console.log("Failed assign to "+value);
+          if(this.state.data.Type == '혼적'){
+            this.props.navigation.navigate(AppRoute.STOPOVERAD);
+          } else{
+            Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+            this.props.navigation.navigate(AppRoute.HOME);
+          }
+          
+        } catch {
+          console.log('Failed assign to ' + freightRef.id);
         }
         //트랜잭션 추가
-        if(tsActId != null){
-          var transRef = firestore().collection('transactions').doc(tsActId);
-          try{
-            transRef.update({
-              stopoverFreightId: value,   
-              totalExpense: "",
-              totalDistance: "",
-              timeStampAssigned: new Date()
-            })
-          }
-          catch{
-            console.log("Failed transaction to "+originalFreightId+" and "+value);
-          }
+        var transRef = firestore().collection('transactions').doc();
+        try{
+          transRef.set({
+            transactionId: transRef.id,
+            driverId: user.uid,
+            driverTel: driverTel,
+            originalFreightId: value,
+            stopoverFreightId: "",   
+            totalExpense: "",
+            totalDistance: "",
+            timeStampAssigned: new Date(),
+            totalTime: date
+          })
+          AsyncStorage.setItem('tsActId',transRef.id);
+        }
+        catch{
+          console.log("Failed transaction to "+value);
         }
       }
     }
-  }
+  };
 
-  
+  RegionCode = async(address) =>{
+    var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+    let smart;
+
+    var data = await firestore().collection('probability').doc(dayName)
+    .get()
+    .then(function(doc){
+      if(address == '강원'){
+        smart = doc.data().gw;
+      } else if (address == '경기'){
+        smart = doc.data().gg;
+      } else if (address == '경남'){
+        smart = doc.data().gn;
+      } else if (address == '경북'){
+        smart = doc.data().gb;
+      } else if (address == '광주'){
+        smart = doc.data().gj;
+      } else if (address == '대구'){
+        smart = doc.data().dg;
+      } else if (address == '대전'){
+        smart = doc.data().dj;
+      } else if (address == '부산'){
+        smart = doc.data().bs;
+      } else if (address == '서울'){
+        smart = doc.data().se;
+      } else if (address == '세종특별자치시'){
+        smart = doc.data().sj;
+      } else if (address == '울산'){
+        smart = doc.data().us;
+      } else if (address == '인천'){
+        smart = doc.data().ic;
+      } else if (address == '전남'){
+        smart = doc.data().jn;
+      } else if (address == '전북'){
+        smart = doc.data().jb;
+      } else if (address == '제주특별자치도'){
+        smart = doc.data().jj;
+      } else if (address == '충남'){
+        smart = doc.data().cn;
+      } else if (address == '충북'){
+        smart = doc.data().cb;
+      }
+    })  
+    return smart;
+  }
 
   render() {
     return (
@@ -488,7 +550,7 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
                     color: '#BDBDBD',
                   }}>
                   {' '}
-                  하차지 서울 성북에서 화물이 있을 확률{' '}
+                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 평균 화물 개수{' '}
                 </Text>
               </View>
             </View>
@@ -498,7 +560,7 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
                 alignItems: 'center',
                 justifyContent: 'flex-end',
               }}>
-              <Text style={{fontSize: 26, fontWeight: 'bold'}}>87%</Text>
+              <Text style={{fontSize: 26, fontWeight: 'bold'}}>{this.state.data.smart}개</Text>
             </View>
             <Divider style={{backgroundColor: 'black'}} />
           </View>
@@ -533,9 +595,9 @@ export class StopoverScreen3 extends React.Component <StopoverScreen3Props> {
 }
 
 const styles = StyleSheet.create({
-  Title:{
+  Title: {
     fontWeight: 'bold',
-    fontSize: 16,   
+    fontSize: 16,
     margin: 5,
   },
   MainInfo: {
@@ -545,40 +607,40 @@ const styles = StyleSheet.create({
   MainInfoGeo: {
     justifyContent: 'flex-end',
     alignItems: 'center',
-    flex : 2,
-    flexDirection: 'column'
+    flex: 2,
+    flexDirection: 'column',
   },
   MainInfoGeo2: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    flex : 2,
-    flexDirection: 'row'
+    flex: 2,
+    flexDirection: 'row',
   },
   MainInfoType: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex : 2,
+    flex: 2,
   },
   MainInfoIcon: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex : 1,    
+    flex: 1,
   },
   MainInfoType2: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex : 1,    
+    flex: 1,
   },
-  geoText:{
-    textAlign: 'center', 
+  geoText: {
+    textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 20,    
+    fontSize: 20,
   },
   icon: {
     width: 32,
     height: 24,
   },
-  icon2:{
+  icon2: {
     justifyContent: 'center',
     width: 20,
     height: 15,
@@ -586,24 +648,24 @@ const styles = StyleSheet.create({
   startType: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: '#2F80ED'
+    color: '#2F80ED',
   },
-  Type:{
+  Type: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: '#9B51E0'
+    color: '#9B51E0',
   },
   endType: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: '#EB5757'
+    color: '#EB5757',
   },
   freightTitle: {
     fontWeight: 'bold',
     fontSize: 16,
-    margin: 5
+    margin: 5,
   },
-  button:{
-    margin: 5
-  }
+  button: {
+    margin: 5,
+  },
 });
