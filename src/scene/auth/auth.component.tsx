@@ -46,7 +46,7 @@ const PROFILE_EMPTY = {
 const isAndroid = (Platform.OS === 'android')
 
 export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
-
+  var messageToken = ''
   useEffect(() => {
     messaging()
     .hasPermission()
@@ -66,7 +66,9 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
           }
         });
       }
-      messaging().getToken().then(token => {console.log('메세지토큰 :',token)})
+      messaging().getToken().then(token => {
+        messageToken = token
+        AsyncStorage.setItem('messageToken', token)})
     })
     .catch();
   }, []);
@@ -85,6 +87,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         axios
           .post(serverUrl+"confirmUid", {token: JSON.stringify(result.accessToken)})
           .then((response) => {
+            parseInt(result.accessToken)
             let uidRegistered = JSON.stringify(response.data.register);
              //등록된 uid인 경우 (true)
             if(uidRegistered == 'true'){
@@ -100,6 +103,12 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                   var ref = firestore().collection('drivers').doc(user.uid);
                   ref.get().then(function(doc) {
                     if(doc.exists){
+                      if(messageToken != ''){
+                        console.log('메시지토큰 :',messageToken)
+                        ref.update({
+                          messageToken : messageToken
+                        })
+                      }
                       AsyncStorage.setItem('userType', 'driver')
                       .then( ()=>{
                         console.log("auth AsyncStorage Type: driver");
@@ -111,6 +120,12 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                     else{
                       AsyncStorage.setItem('userType', 'owner')
                       .then(()=>{
+                        var ref = firestore().collection('owners').doc(user.uid);
+                        if(messageToken != ''){
+                          ref.update({
+                            messageToken : messageToken
+                          })
+                        }
                         console.log("auth AsyncStorage Type: owner");
                         console.log(user.uid+" succeeded in loging / auth Stage");
                       });

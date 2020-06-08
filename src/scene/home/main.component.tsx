@@ -5,6 +5,7 @@ import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import messaging from '@react-native-firebase/messaging'
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const MainScreen = (props: MainScreenProps): LayoutElement => {
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -24,6 +25,33 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   
   // Push Notification part (foreground)
   useEffect(() => {
+    AsyncStorage.getItem('messageToken', (error,result)=>{
+      if(error){
+        console.log('Message token is not valid', error);
+      }
+      else{
+        let targetToken = 'eq6h4QiGQxWd2jlGpmWWPD:APA91bFbaEkrHfc-cOr7Hd81bFEMZdH-3uF3iICMEBiWllGuwJauhh8r9hpQfVw2KWrezJUj-nB5uEiA2LjsFIXQZlORqppp5YvsrAjAUP8_Xn1C9-f9QMvVQqIVGO5iUppoI6hAfhiT'
+        var message = {
+          data: {
+            message: 'Hello World',
+          },
+          token: targetToken
+        };
+
+        messaging()
+        .sendMessage(message)
+        .then((response) => {
+          // Response is a message ID string.
+          console.log('Successfully sent message:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending message:', error);
+        });
+      
+      }
+    });
+
+
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
     });
