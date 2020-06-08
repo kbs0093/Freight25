@@ -346,7 +346,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
         <View style={styles.driveInfo1}>
             <Text style={{fontSize: 8}}></Text>
             <Text style={styles.driveText2}>{item.distanceY} Km</Text>
-            <Text style={styles.timeText}>스마트 화물 : {item.smart} 개</Text>
+            <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
         </View>
         <View style={styles.moneyInfo}>

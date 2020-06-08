@@ -550,7 +550,7 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
                     color: '#BDBDBD',
                   }}>
                   {' '}
-                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 평균 화물 개수{' '}
+                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 평균 화물 점유율{' '}
                 </Text>
               </View>
             </View>
@@ -560,7 +560,7 @@ export class StopoverScreen1 extends React.Component <StopoverScreen1Props> {
                 alignItems: 'center',
                 justifyContent: 'flex-end',
               }}>
-              <Text style={{fontSize: 26, fontWeight: 'bold'}}>{this.state.data.smart}개</Text>
+              <Text style={{fontSize: 26, fontWeight: 'bold'}}>{this.state.data.smart}%</Text>
             </View>
             <Divider style={{backgroundColor: 'black'}} />
           </View>
