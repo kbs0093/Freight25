@@ -41,16 +41,16 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 import Geolocation from 'react-native-geolocation-service';
 
-const isAndroid = Platform.OS === 'android';
-const tmapRouteURL =
-  'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be';
-
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
 const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
 const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
 const carIcon = (style) => <Icon {...style} name="car-outline" />;
+
+const isAndroid = Platform.OS === 'android';
+const tmapRouteURL =
+  'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -69,9 +69,8 @@ export class DetailCheckDriverScreen extends React.Component<
         ownerId: null,
         ownerTel: null,
         oppositeFreightId: null,
-        startAddress: null,
-        endAddress: null,
-        startAddrArray: null,
+        startAddrNoSpace: null,
+        endAddrNoSpace: null,
       },
       latitude: 'unknown',
       longitude: 'unknown',
