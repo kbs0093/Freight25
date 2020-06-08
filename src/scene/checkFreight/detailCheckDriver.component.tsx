@@ -69,11 +69,15 @@ export class DetailCheckDriverScreen extends React.Component<
         ownerId: null,
         ownerTel: null,
         oppositeFreightId: null,
+        startAddress: null,
+        endAddress: null,
+        startAddrArray: null,
       },
       latitude: 'unknown',
-      longtitude: 'unknown',
+      longitude: 'unknown',
     };
   }
+
   requestLocationAndroid = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -84,8 +88,8 @@ export class DetailCheckDriverScreen extends React.Component<
           (position) => {
             let latitude = JSON.stringify(position.coords.latitude);
             let longitude = JSON.stringify(position.coords.longitude);
-            this.setState({latitude});
-            this.setState({longitude});
+            this.setState({latitude: latitude});
+            this.setState({longitude: longitude});
           },
           (error) => Alert.alert('Error', JSON.stringify(error)),
           {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
@@ -105,8 +109,8 @@ export class DetailCheckDriverScreen extends React.Component<
       (position) => {
         latitude = JSON.stringify(position.coords.latitude);
         longitude = JSON.stringify(position.coords.longitude);
-        this.setState({latitude});
-        this.setState({longitude});
+        this.setState({latitude: latitude});
+        this.setState({longitude: longitude});
       },
       (error) => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
@@ -115,6 +119,7 @@ export class DetailCheckDriverScreen extends React.Component<
 
   componentDidMount = async () => {
     isAndroid ? this.requestLocationAndroid() : this.requestLocationIos();
+
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
@@ -185,9 +190,7 @@ export class DetailCheckDriverScreen extends React.Component<
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
             // endMonth: docEndDate.getMonth() + 1,
-            // endDay: docEndDate.getDate(),
             startDayLabel: doc.startDayLabel,
-            // endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
 
             ownerTel: docs.ownerTel,
@@ -195,6 +198,8 @@ export class DetailCheckDriverScreen extends React.Component<
             desc: docs.desc,
           });
 
+          var startAddrNoSpace = docs.startAddr.replace(/\s/g, '');
+          var endAddrNoSpace = docs.endAddr.replace(/\s/g, '');
           var addiData = {
             lastState: freightState,
             dist: docs.dist,
@@ -202,6 +207,8 @@ export class DetailCheckDriverScreen extends React.Component<
             ownerId: docs.ownerId,
             ownerTel: docs.ownerTel,
             oppositeFreightId: docs.oppositeFreightId,
+            startAddrNoSpace: startAddrNoSpace,
+            endAddrNoSpace: endAddrNoSpace,
           };
           that.setState({addiData: addiData});
           that.setState({data: list});
@@ -212,12 +219,20 @@ export class DetailCheckDriverScreen extends React.Component<
     }
   };
 
-  invokeTmap = () => {
-    Linking.openURL(
-      tmapRouteURL +
-        `&name=${this.state.latitude}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
-    );
-    //'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be&name=SKT타워&lon=126.984098&lat=37.566385';
+  invokeTmap = (num) => {
+    if (num == 1) {
+      // Route to start address
+      Linking.openURL(
+        tmapRouteURL +
+          `&name=${this.state.addiData.startAddrNoSpace}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+      );
+    } else if (num == 2) {
+      // Route to end address
+      Linking.openURL(
+        tmapRouteURL +
+          `&name=${this.state.addiData.endAddrNoSpace}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+      );
+    }
   };
 
   navHandler = () => {
@@ -225,8 +240,8 @@ export class DetailCheckDriverScreen extends React.Component<
       '내비게이션 연결',
       '연결 하시겠습니까?',
       [
-        {text: '상차지 경로', onPress: () => this.invokeTmap()},
-        {text: '하차지 경로', onPress: () => this.invokeTmap()},
+        {text: '상차지 경로', onPress: () => this.invokeTmap(1)},
+        {text: '하차지 경로', onPress: () => this.invokeTmap(2)},
         {
           text: 'Cancel',
           onPress: () => console.log('canceled'),
