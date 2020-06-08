@@ -19,7 +19,7 @@ import {
   Button,
   Divider,
 } from '@ui-kitten/components';
-import {DetailCheckDriverScreenProps} from '../../navigation/check.navigator';
+import {DetailCheckStopoverScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import {
@@ -45,8 +45,8 @@ const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
 const carIcon = (style) => <Icon {...style} name="car-outline" />;
 
-export class DetailCheckDriverScreen extends React.Component<
-  DetailCheckDriverScreenProps
+export class DetailCheckStopoverScreen extends React.Component<
+  DetailCheckStopoverScreenProps
 > {
   // The number of frieght information from 'driver' could be more than one.
   constructor(props) {
@@ -61,18 +61,11 @@ export class DetailCheckDriverScreen extends React.Component<
         expense: null,
         ownerId: null,
         ownerTel: null,
-        oppositeFreightId: null,
       },
     };
   }
 
   componentDidMount = async () => {
-    try {
-      const value = await AsyncStorage.getItem('FreightID');
-      if (value !== null) {
-        this.setState({FreightID: value});
-      }
-    } catch (error) {}
     try {
       const value = await AsyncStorage.getItem('OppoFreightID');
       if (value !== null) {
@@ -84,9 +77,10 @@ export class DetailCheckDriverScreen extends React.Component<
     const that = this;
 
     if (user != null) {
-      var docRef = firestore().collection('freights').doc(this.state.FreightID);
+      var docRef = firestore()
+        .collection('freights')
+        .doc(this.state.OppoFreightID);
 
-      // Get the selected(original) freight info from Firebase.
       docRef.get().then(function (doc) {
         var list = [];
 
@@ -125,14 +119,13 @@ export class DetailCheckDriverScreen extends React.Component<
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: docs.endDate,
             expense: docs.expense,
-            startAddress: docs.startAddr,
-            endAddress: docs.endAddr,
             startAddrFullArray: startAddrFullArray,
             endAddrFullArray: endAddrFullArray,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
             startAddrDetail: startAddrDetail,
             endAddrDetail: endAddrDetail,
+            oppositeFreightId: docs.oppositeFreightId,
 
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
@@ -153,7 +146,6 @@ export class DetailCheckDriverScreen extends React.Component<
             expense: docs.expense,
             ownerId: docs.ownerId,
             ownerTel: docs.ownerTel,
-            oppositeFreightId: docs.oppositeFreightId,
           };
           that.setState({addiData: addiData});
           that.setState({data: list});
@@ -173,7 +165,9 @@ export class DetailCheckDriverScreen extends React.Component<
   setComplete = () => {
     console.log('운송 완료');
     try {
-      var ref = firestore().collection('freights').doc(this.state.FreightID);
+      var ref = firestore()
+        .collection('freights')
+        .doc(this.state.OppoFreightID);
       ref.update({
         state: 2,
       });
@@ -202,18 +196,10 @@ export class DetailCheckDriverScreen extends React.Component<
     );
   };
 
-  _showStopoverFreight = () => {
-    if (this.state.addiData.oppositeFreightId != null) {
-      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_STOPOVER);
-    } else {
-      Toast.show('경유지 화물이 없습니다');
-    }
-  };
-
   _renderItem = ({item}) => (
     <View>
       <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>화물 내역</Text>
+        <Text style={styles.Subtitle}>경유지 화물 내역</Text>
         {item.lastState == '배송중' ? (
           <Button
             style={styles.Badge}
@@ -295,7 +281,6 @@ export class DetailCheckDriverScreen extends React.Component<
   render() {
     let navButton;
     let completeButton;
-    let showStopoverButton;
     let callButton = (
       <Button
         onPress={() => {
@@ -309,34 +294,6 @@ export class DetailCheckDriverScreen extends React.Component<
       </Button>
     );
 
-    if (this.state.addiData.oppositeFreightId != null) {
-      showStopoverButton = (
-        <Button
-          onPress={() => {
-            this._showStopoverFreight();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={cartIcon}>
-          경유지
-        </Button>
-      );
-    } else {
-      showStopoverButton = (
-        <Button
-          onPress={() => {
-            this._showStopoverFreight();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}
-          status="info"
-          icon={cartIcon}>
-          경유지
-        </Button>
-      );
-    }
     if (this.state.addiData.lastState == '배송중') {
       navButton = (
         <Button
@@ -374,8 +331,8 @@ export class DetailCheckDriverScreen extends React.Component<
         <Button
           style={styles.button}
           textStyle={styles.buttonText}
-          status="danger"
           icon={homeIcon}
+          status="danger"
           disabled={true}>
           운송 완료
         </Button>
@@ -394,7 +351,6 @@ export class DetailCheckDriverScreen extends React.Component<
         />
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{navButton}</View>
-          <View style={styles.ButtonHalfContainer}>{showStopoverButton}</View>
           <View style={styles.ButtonHalfContainer}>{completeButton}</View>
         </View>
         <View style={styles.ButtonContainter}>
@@ -443,9 +399,6 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
-  container: {
-    flex: 1,
-  },
   freightContainer: {
     paddingHorizontal: 20,
     alignItems: 'flex-start',
@@ -453,12 +406,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  freightInfoContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 70,
-    alignItems: 'flex-start',
   },
   freightInfoTotalContainer: {
     paddingVertical: 10,
@@ -499,13 +446,12 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   infoTitle: {
-    paddingVertical: 3,
+    paddingVertical: 4,
     fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
-    justifyContent: 'space-between',
   },
   infoRightTitle: {
-    paddingVertical: 3,
+    paddingVertical: 4,
     fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
   },

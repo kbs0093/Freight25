@@ -73,9 +73,24 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           console.log(docCnt + '번째 화물 id: ' + doc.id);
 
           var freightState = '';
-          if (doc.state == 0) freightState = '배송전';
-          else if (doc.state == 1) freightState = '배송중';
-          else if (doc.state == 2) freightState = '배송완료';
+          var isMixed = false;
+
+          if (doc.state == 0) {
+            freightState = '배송전';
+            docStartDate = new Date(doc.startDay._seconds * 1000);
+          } else if (doc.state == 1) {
+            freightState = '배송중';
+            if (doc.timeStampAssigned == null) {
+              docStartDate = new Date(doc.startDay._seconds * 1000);
+            } else
+              docStartDate = new Date(doc.timeStampAssigned._seconds * 1000);
+          } else if (doc.state == 2) {
+            freightState = '배송완료';
+            if (doc.timeStampAssigned == null) {
+              docStartDate = new Date(doc.startDay._seconds * 1000);
+            } else
+              docStartDate = new Date(doc.timeStampAssigned._seconds * 1000);
+          }
 
           var docStartDate = new Date(doc.startDay._seconds * 1000);
           var docEndDate = new Date(doc.endDay._seconds * 1000);
@@ -83,13 +98,19 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           var startAddrArray = doc.startAddr.split(' ');
           var endAddrArray = doc.endAddr.split(' ');
 
+          var oppositeFreightId = '';
+          if (doc.oppositeFreightId != null) {
+            oppositeFreightId = doc.oppositeFreightId;
+          }
+
           list.push({
             id: doc.id, // Freight key?
+            oppositeFreightId: oppositeFreightId,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
+            stateNum: doc.state,
             startAddress: doc.startAddr,
             endAddress: doc.endAddr,
             distance: doc.dist,
-            lastRefresh: 'null',
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
 
@@ -109,6 +130,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
   ClickList = (item) => () => {
     AsyncStorage.setItem('FreightID', item.id);
+    AsyncStorage.setItem('OppoFreightID', item.oppositeFreightId);
     if (this.state.userType == 'owner') {
       this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
     } else if (this.state.userType == 'driver') {
@@ -127,11 +149,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
   }
 
   statusSort(a, b) {
-    return Number(a.distanceY) > Number(b.distanceY)
-      ? -1
-      : Number(a.distanceY) < Number(b.distanceY)
-      ? 1
-      : 0;
+    return a.stateNum > b.stateNum ? 1 : -1;
   }
 
   _renderItem = ({item}) => (
@@ -160,30 +178,34 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             </View>
           </View>
           <View style={styles.geoInfo1}>
-            <Text style={styles.timeText}>
-              {item.startMonth}월 {item.startDay}일 {item.startDayLabel}요일 -{' '}
-              {item.endMonth}월 {item.endDay}일 {item.endDayLabel}요일
-            </Text>
+            {item.lastState == '배송전' ? (
+              <Text style={styles.timeText}>
+                {item.startMonth}월 {item.startDay}일 {item.startDayLabel}요일
+              </Text>
+            ) : (
+              <Text style={styles.timeText}>
+                {item.startMonth}월 {item.startDay}일 {item.startDayLabel}요일 -{' '}
+                {item.endMonth}월 {item.endDay}일 {item.endDayLabel}요일
+              </Text>
+            )}
           </View>
         </View>
         <View style={styles.statusInfo}>
           {item.lastState == '배송중' ? (
-            <Button
-              style={styles.Badge}
-              appearance="ghost"
-              status="danger"
-              textStyle={styles.badgeText}>
-              {item.lastState}
-            </Button>
+            <Text style={styles.badgeTextRed}>{item.lastState}</Text>
           ) : (
-            <Button
-              style={styles.Badge}
-              appearance="ghost"
-              status="primary"
-              textStyle={styles.badgeText}>
-              {item.lastState}
-            </Button>
+            // <Button
+            //   style={styles.Badge}
+            //   appearance="ghost"
+            //   status="primary"
+            //   textStyle={styles.badgeText}>
+            //   {item.lastState}
+            // </Button>
+            <Text style={styles.badgeText}>{item.lastState}</Text>
           )}
+          {item.oppositeFreightId != '' ? (
+            <Text style={styles.badgeTextMixed}>혼적</Text>
+          ) : null}
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
@@ -251,7 +273,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   badgeText: {
-    fontSize: RFPercentage(1.6),
+    fontSize: RFPercentage(1.8),
+    fontWeight: 'bold',
+    color: 'blue',
+  },
+  badgeTextMixed: {
+    fontSize: RFPercentage(1.8),
+    fontWeight: 'bold',
+    color: 'green',
+  },
+
+  badgeTextRed: {
+    fontSize: RFPercentage(1.8),
+    fontWeight: 'bold',
+    color: 'red',
   },
   container: {
     paddingVertical: 10,
@@ -289,10 +324,10 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
   statusInfo: {
-    paddingVertical: 15,
     flex: 1,
     alignItems: 'center',
-    height: '20%',
+    justifyContent: 'space-around',
+    //borderWidth: 0.5,
   },
   icon: {
     width: 32,

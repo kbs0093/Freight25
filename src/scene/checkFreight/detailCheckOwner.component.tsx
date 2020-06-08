@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
+  Linking,
 } from 'react-native';
 import {
   LayoutElement,
@@ -35,11 +36,11 @@ import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-let userType;
-
-AsyncStorage.getItem('userType', (err, result) => {
-  userType = result;
-});
+const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
+const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
+const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
+const homeIcon = (style) => <Icon {...style} name="home-outline" />;
+const carIcon = (style) => <Icon {...style} name="car-outline" />;
 
 export class DetailCheckOwnerScreen extends React.Component<
   DetailCheckOwnerScreenProps
@@ -56,6 +57,7 @@ export class DetailCheckOwnerScreen extends React.Component<
         dist: null,
         expense: null,
         ownerID: null,
+        driverTel: null,
       },
     };
   }
@@ -89,15 +91,35 @@ export class DetailCheckOwnerScreen extends React.Component<
           var endAddrArray = docs.endAddr.split(' ');
           var docStartDate = '';
 
+          var startAddrFullArray = docs.startAddr_Full.split(' ');
+          var endAddrFullArray = docs.endAddr_Full.split(' ');
+
+          var i = 2,
+            j = 2;
+          var startAddrDetail = '';
+          var endAddrDetail = '';
+          for (i = 3; i < startAddrFullArray.length; i++) {
+            startAddrDetail += startAddrFullArray[i] + ' ';
+          }
+          for (j = 3; j < endAddrFullArray.length; j++) {
+            endAddrDetail += endAddrFullArray[j] + ' ';
+          }
+
           if (docs.state == 0) {
             freightState = '배송전';
             docStartDate = new Date(docs.startDay._seconds * 1000);
           } else if (docs.state == 1) {
             freightState = '배송중';
-            docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+            if (docs.timeStampAssigned == null) {
+              docStartDate = new Date(docs.startDay._seconds * 1000);
+            } else
+              docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           } else if (docs.state == 2) {
             freightState = '배송완료';
-            docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
+            if (docs.timeStampAssigned == null) {
+              docStartDate = new Date(docs.startDay._seconds * 1000);
+            } else
+              docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           }
 
           list.push({
@@ -109,11 +131,14 @@ export class DetailCheckOwnerScreen extends React.Component<
             expense: docs.expense,
             startAddr: docs.startAddr,
             endAddr: docs.endAddr,
-            startAddrFull: docs.startAddr_Full,
-            endAddrFull: docs.endAddr_Full,
+            startAddrFullArray: startAddrFullArray,
+            endAddrFullArray: endAddrFullArray,
             startAddrArray: startAddrArray,
             endAddrArray: endAddrArray,
+            startAddrDetail: startAddrDetail,
+            endAddrDetail: endAddrDetail,
             driveOption: docs.driveOption,
+            driverTel: docs.driverTel,
             desc: docs.desc,
 
             startMonth: docStartDate.getMonth() + 1,
@@ -129,6 +154,7 @@ export class DetailCheckOwnerScreen extends React.Component<
             dist: docs.dist,
             expense: docs.expense,
             ownerId: docs.ownerId,
+            driverTel: docs.driverTel,
           };
 
           that.setState({addiData: addiData});
@@ -140,6 +166,12 @@ export class DetailCheckOwnerScreen extends React.Component<
     }
   };
 
+  callDriver = () => {
+    console.log('Call to the driver');
+    console.log(this.state.addiData.driverTel);
+    Linking.openURL(`tel:${this.state.addiData.driverTel}`);
+  };
+
   _renderItem = ({item}) => (
     <View>
       <View style={styles.freightContainer}>
@@ -149,6 +181,7 @@ export class DetailCheckOwnerScreen extends React.Component<
             style={styles.Badge}
             appearance="outline"
             status="danger"
+            icon={carIcon}
             textStyle={styles.badgeText}>
             {item.lastState}
           </Button>
@@ -189,41 +222,45 @@ export class DetailCheckOwnerScreen extends React.Component<
       <View style={styles.freightInfoTotalContainer}>
         <View style={styles.freightInfoHalfContainer} key="1">
           {item.lastState == '배송전' ? (
-            <Text style={styles.infoTitle}>등록 날짜</Text>
+            <Text style={styles.infoTitle}>등록 날짜:</Text>
           ) : (
-            <Text style={styles.infoTitle}>배차 날짜</Text>
+            <Text style={styles.infoTitle}>배차 날짜:</Text>
           )}
           {item.lastState == '배송전' ? (
-            <Text style={styles.infoTitle}>예상 운행 거리</Text>
+            <Text style={styles.infoTitle}>예상 운행 거리:</Text>
           ) : (
-            <Text style={styles.infoTitle}>운행 거리</Text>
+            <Text style={styles.infoTitle}>운행 거리:</Text>
           )}
-          <Text style={styles.infoTitle}>운행 운임</Text>
-          <Text style={styles.infoTitle}>운행 방식</Text>
-          <Text style={styles.infoTitle}>상차지 주소</Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}>하차지 주소</Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}>화물 설명</Text>
-          <Text style={styles.infoTitle}></Text>
-          <Text style={styles.infoTitle}></Text>
+          <Text style={styles.infoTitle}>운행 운임:</Text>
+          <Text style={styles.infoTitle}>운행 방식:</Text>
+          <Text style={styles.infoTitle}>상차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>하차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>화물 설명:</Text>
+          {item.lastState == '배송중' ? (
+            <Text style={styles.infoTitle}>화물차 기사 전화번호:</Text>
+          ) : null}
         </View>
-        <View style={styles.freightInfoHalfContainer}>
+        <View style={styles.freightInfoHalfRightContainer}>
           <Text style={styles.infoRightTitle}>
             {item.startMonth}월 {item.startDay}일
           </Text>
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
-          <Text style={styles.infoRightTitle}>{item.driveOption}</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          <Text style={styles.infoRightTitle}>{item.startAddrFull}</Text>
-          <Text style={styles.infoRightTitle}></Text>
-          <Text style={styles.infoRightTitle}>{item.endAddrFull}</Text>
-          <Text style={styles.infoRightTitle}></Text>
+          <Text style={styles.infoRightTitle}>{item.driveOption}</Text>
+          <Text style={styles.infoRightTitle}>
+            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
+            {item.startAddrFullArray[2]} {'\n'}
+            {item.startAddrDetail}
+          </Text>
+          <Text style={styles.infoRightTitle}>
+            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
+            {item.endAddrFullArray[2]} {'\n'}
+            {item.endAddrDetail}
+          </Text>
           <Text style={styles.infoRightTitle}>{item.desc}</Text>
-          <Text style={styles.infoRightTitle}></Text>
-          <Text style={styles.infoRightTitle}></Text>
+          {item.lastState == '배송중' ? (
+            <Text style={styles.infoTitle}>{item.driverTel}</Text>
+          ) : null}
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
@@ -237,10 +274,14 @@ export class DetailCheckOwnerScreen extends React.Component<
     if (this.state.addiData.lastState == '배송전') {
       callButton = (
         <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
+          onPress={() => {
+            this.callDriver();
+          }}
+          style={styles.callButton}
+          textStyle={styles.callButtonText}
           status="success"
-          disabled={true}>
+          disabled={true}
+          icon={phoneIcon}>
           화물차 기사에게 전화
         </Button>
       );
@@ -255,9 +296,13 @@ export class DetailCheckOwnerScreen extends React.Component<
     } else if (this.state.addiData.lastState == '배송중') {
       callButton = (
         <Button
-          style={styles.button}
+          onPress={() => {
+            this.callDriver();
+          }}
+          style={styles.callButton}
           status="success"
-          textStyle={styles.buttonText}>
+          textStyle={styles.callButtonText}
+          icon={phoneIcon}>
           화물차 기사에게 전화
         </Button>
       );
@@ -272,9 +317,13 @@ export class DetailCheckOwnerScreen extends React.Component<
     } else if (this.state.addiData.lastState == '배송완료') {
       callButton = (
         <Button
-          style={styles.button}
+          onPress={() => {
+            this.callDriver();
+          }}
+          style={styles.callButton}
           status="success"
-          textStyle={styles.buttonText}>
+          textStyle={styles.callButtonText}
+          icon={phoneIcon}>
           화물차 기사에게 전화
         </Button>
       );
@@ -284,23 +333,6 @@ export class DetailCheckOwnerScreen extends React.Component<
         </Button>
       );
     } else {
-      callButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="success"
-          disabled={true}>
-          화물차 기사에게 전화
-        </Button>
-      );
-      reviewButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          화물차 기사 평가
-        </Button>
-      );
     }
 
     return (
@@ -310,20 +342,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           style={{backgroundColor: 'white'}}
           data={this.state.data}
           renderItem={this._renderItem}
-          //keyExtractor={(item) => item.key}
         />
-        {/* <View style={styles.totalInfoContainer}>
-          <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>총 운행 거리</Text>
-            <Text style={styles.infoTitle}>총 운행 운임</Text>
-          </View>
-          <View style={styles.totalInfoHalfContainer}>
-            <Text style={styles.infoTitle}>{this.state.addiData.dist} KM</Text>
-            <Text style={styles.infoTitle}>
-              {this.state.addiData.expense} 원
-            </Text>
-          </View>
-        </View> */}
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{callButton}</View>
           {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
@@ -335,9 +354,13 @@ export class DetailCheckOwnerScreen extends React.Component<
 
 const styles = StyleSheet.create({
   Badge: {
-    width: RFPercentage(12),
+    width: RFPercentage(14),
     height: RFPercentage(4),
     borderRadius: 8,
+  },
+  smallBadge: {
+    width: RFPercentage(8),
+    height: RFPercentage(2),
   },
   badgeText: {
     fontSize: RFPercentage(1.5),
@@ -349,7 +372,14 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: RFPercentage(2),
-    color: 'black',
+  },
+  callButton: {
+    width: RFPercentage(30),
+    height: RFPercentage(6),
+    borderRadius: 8,
+  },
+  callButtonText: {
+    fontSize: RFPercentage(2.2),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -363,7 +393,6 @@ const styles = StyleSheet.create({
   freightContainer: {
     paddingHorizontal: 20,
     alignItems: 'flex-start',
-    borderColor: '#20232a',
     paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
@@ -373,10 +402,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
   },
   freightInfoHalfContainer: {
     flex: 1,
+    paddingRight: 15,
+    alignItems: 'flex-end',
+  },
+  freightInfoHalfRightContainer: {
+    flex: 1,
+    paddingLeft: 15,
+    alignItems: 'flex-start',
   },
   geoContainer: {
     paddingVertical: 15,
@@ -393,30 +428,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(2.8),
+    fontSize: RFPercentage(3.5),
     fontWeight: 'bold',
   },
   geoSubText: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
   },
   infoTitle: {
-    paddingVertical: 2,
-    paddingHorizontal: 40,
-    fontSize: RFPercentage(2),
+    paddingVertical: 4,
+    fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
-    fontStyle: 'normal',
-    justifyContent: 'space-between',
   },
   infoRightTitle: {
-    paddingVertical: 2,
-    paddingHorizontal: 40,
-    fontSize: RFPercentage(2),
+    paddingVertical: 4,
+    fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
-    fontStyle: 'normal',
-    //alignSelf: 'flex-end',
-    alignSelf: 'stretch',
   },
   totalInfoContainer: {
     backgroundColor: 'white',

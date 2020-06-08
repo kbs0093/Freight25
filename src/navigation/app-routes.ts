@@ -17,10 +17,10 @@ export enum AppRoute {
   SEARCH_MAIN = 'Search_Main',
   SEARCH_DETAIL = 'Search_Detail',
   SEARCH_DETAIL_MAIN = 'Search_Detail_Main',
-  CHECK = 'Check',
   CHECK_MAIN = 'Check_Main',
   CHECK_DETAIL_OWNER = 'Check_Detail_Owner',
   CHECK_DETAIL_DRIVER = 'Check_Detail_Driver',
+  CHECK_DETAIL_STOPOVER = 'Check_Detail_Stopover',
   APPLY = 'Apply',
   APPLY_MAIN = 'Apply_Main',
   TAB_BAR = 'Tab_bar',
@@ -39,5 +39,5 @@ export enum AppRoute {
   ALONE_DETAIL_MAIN = 'Alone Detail Main',
   ALONE_DETAIL = 'Alone Detail',
   STOPOVERAD = 'Stopover AD',
-  STOPOVERAD_MAIN = 'Stopover AD Main'
+  STOPOVERAD_MAIN = 'Stopover AD Main',
 }

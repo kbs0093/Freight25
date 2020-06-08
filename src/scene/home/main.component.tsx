@@ -15,7 +15,7 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   };
 
   const clickCheck = () => {
-    props.navigation.navigate(AppRoute.CHECK);
+    props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
 
   // Push Notification part (background)
@@ -96,7 +96,7 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
     props.navigation.navigate(AppRoute.APPLY);
   };
   const clickCheck = () => {
-    props.navigation.navigate(AppRoute.CHECK);
+    props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
 
   return (
