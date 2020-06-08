@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   callButtonText: {
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(1.5),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3.5),
+    fontSize: RFPercentage(3.2),
     fontWeight: 'bold',
   },
   geoSubText: {

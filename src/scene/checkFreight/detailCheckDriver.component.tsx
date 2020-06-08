@@ -1,6 +1,7 @@
 import React, {useState, Fragment} from 'react';
 import {
   Text,
+  PermissionsAndroid,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,6 +10,7 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Platform,
 } from 'react-native';
 import {
   LayoutElement,
@@ -37,6 +39,11 @@ import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
+import Geolocation from 'react-native-geolocation-service';
+
+const isAndroid = Platform.OS === 'android';
+const tmapRouteURL =
+  'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -63,10 +70,51 @@ export class DetailCheckDriverScreen extends React.Component<
         ownerTel: null,
         oppositeFreightId: null,
       },
+      latitude: 'unknown',
+      longtitude: 'unknown',
     };
   }
+  requestLocationAndroid = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Geolocation.getCurrentPosition(
+          (position) => {
+            let latitude = JSON.stringify(position.coords.latitude);
+            let longitude = JSON.stringify(position.coords.longitude);
+            this.setState({latitude});
+            this.setState({longitude});
+          },
+          (error) => Alert.alert('Error', JSON.stringify(error)),
+          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+        );
+      } else {
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  requestLocationIos = () => {
+    var latitude;
+    var longitude;
+
+    Geolocation.getCurrentPosition(
+      (position) => {
+        latitude = JSON.stringify(position.coords.latitude);
+        longitude = JSON.stringify(position.coords.longitude);
+        this.setState({latitude});
+        this.setState({longitude});
+      },
+      (error) => Alert.alert('Error', JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );
+  };
 
   componentDidMount = async () => {
+    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos();
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
@@ -162,6 +210,31 @@ export class DetailCheckDriverScreen extends React.Component<
         }
       });
     }
+  };
+
+  invokeTmap = () => {
+    Linking.openURL(
+      tmapRouteURL +
+        `&name=${this.state.latitude}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+    );
+    //'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be&name=SKT타워&lon=126.984098&lat=37.566385';
+  };
+
+  navHandler = () => {
+    Alert.alert(
+      '내비게이션 연결',
+      '연결 하시겠습니까?',
+      [
+        {text: '상차지 경로', onPress: () => this.invokeTmap()},
+        {text: '하차지 경로', onPress: () => this.invokeTmap()},
+        {
+          text: 'Cancel',
+          onPress: () => console.log('canceled'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   callOwner = () => {
@@ -340,6 +413,9 @@ export class DetailCheckDriverScreen extends React.Component<
     if (this.state.addiData.lastState == '배송중') {
       navButton = (
         <Button
+          onPress={() => {
+            this.navHandler();
+          }}
           style={styles.button}
           textStyle={styles.buttonText}
           status="info"
@@ -432,7 +508,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   callButtonText: {
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(1.5),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -490,7 +566,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3.5),
+    fontSize: RFPercentage(3.2),
     fontWeight: 'bold',
   },
   geoSubText: {
