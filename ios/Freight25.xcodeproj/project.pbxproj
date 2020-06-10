@@ -64,6 +64,7 @@
 		660550CFA540E22CD6953CFF /* libPods-Freight25-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Freight25-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		721CFBBC010D67B7D51929F9 /* Pods-Freight25-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Freight25-tvOS/Pods-Freight25-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		814CD7EF187D424BBDFB17D4 /* libPods-Freight25-Freight25Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Freight25-Freight25Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB5385802490E3550081B76E /* Freight25.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Freight25.entitlements; path = Freight25/Freight25.entitlements; sourceTree = "<group>"; };
 		AD052F5C38AAD4E8D4ED4A71 /* Pods-Freight25-Freight25Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-Freight25Tests.debug.xcconfig"; path = "Target Support Files/Pods-Freight25-Freight25Tests/Pods-Freight25-Freight25Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		BED98E9FA47D588E225EDC38 /* Pods-Freight25-Freight25Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-Freight25Tests.release.xcconfig"; path = "Target Support Files/Pods-Freight25-Freight25Tests/Pods-Freight25-Freight25Tests.release.xcconfig"; sourceTree = "<group>"; };
 		C86900778E66295C832C4A9E /* Pods-Freight25-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Freight25-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Freight25-tvOSTests/Pods-Freight25-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -130,6 +131,7 @@
 		13B07FAE1A68108700A75B9A /* Freight25 */ = {
 			isa = PBXGroup;
 			children = (
+				AB5385802490E3550081B76E /* Freight25.entitlements */,
 				E7FA7AA62448A77700CFD69A /* GoogleService-Info.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -691,6 +693,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Freight25/Freight25.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -718,6 +721,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Freight25/Freight25.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = Freight25/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

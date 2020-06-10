@@ -6,6 +6,8 @@ import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-community/async-storage';
+const isAndroid = (Platform.OS === 'android')
+
 
 export const MainScreen = (props: MainScreenProps): LayoutElement => {
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -28,7 +30,11 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       var message = JSON.stringify(remoteMessage);
       message = JSON.parse(message)
-      Alert.alert(message.notification.title ,message.notification.body);
+      var parsed_message = message.notification;
+      if (!isAndroid){
+        parsed_message = message.data.notification;
+      }
+      Alert.alert(parsed_message.title ,parsed_message.body);
     });
     return unsubscribe;
   }, []);
@@ -76,15 +82,22 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
   });
+  if (messaging().isDeviceRegisteredForRemoteMessages) {
+    messaging().registerDeviceForRemoteMessages();
+  }
   
   // Push Notification part (foreground)
   useEffect(() => {
+      
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       var message = JSON.stringify(remoteMessage);
       message = JSON.parse(message)
-      Alert.alert(message.notification.title ,message.notification.body);
+      var parsed_message = message.notification;
+      if (!isAndroid){
+        parsed_message = message.data.notification;
+      }
+      Alert.alert(parsed_message.title ,parsed_message.body);
     });
-
     return unsubscribe;
   }, []);
 
