@@ -25,37 +25,11 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   
   // Push Notification part (foreground)
   useEffect(() => {
-    AsyncStorage.getItem('messageToken', (error,result)=>{
-      if(error){
-        console.log('Message token is not valid', error);
-      }
-      else{
-        let targetToken = 'eq6h4QiGQxWd2jlGpmWWPD:APA91bFbaEkrHfc-cOr7Hd81bFEMZdH-3uF3iICMEBiWllGuwJauhh8r9hpQfVw2KWrezJUj-nB5uEiA2LjsFIXQZlORqppp5YvsrAjAUP8_Xn1C9-f9QMvVQqIVGO5iUppoI6hAfhiT'
-        var message = {
-          data: {
-            message: 'Hello World',
-          },
-          token: targetToken
-        };
-
-        messaging()
-        .sendMessage(message)
-        .then((response) => {
-          // Response is a message ID string.
-          console.log('Successfully sent message:', response);
-        })
-        .catch((error) => {
-          console.log('Error sending message:', error);
-        });
-      
-      }
-    });
-
-
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      var message = JSON.stringify(remoteMessage);
+      message = JSON.parse(message)
+      Alert.alert(message.notification.title ,message.notification.body);
     });
-
     return unsubscribe;
   }, []);
 
@@ -98,6 +72,21 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
   const clickCheck = () => {
     props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
+  
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+  });
+  
+  // Push Notification part (foreground)
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      var message = JSON.stringify(remoteMessage);
+      message = JSON.parse(message)
+      Alert.alert(message.notification.title ,message.notification.body);
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <React.Fragment>
