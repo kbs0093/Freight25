@@ -4,7 +4,7 @@ import {
   PermissionsAndroid,
   StyleSheet,
   View,
-  TouchableOpacity,
+  NativeModules,
   SafeAreaView,
   FlatList,
   ScrollView,
@@ -12,15 +12,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import {
-  LayoutElement,
-  TopNavigationAction,
-  TopNavigation,
-  OverflowMenu,
-  Icon,
-  Button,
-  Divider,
-} from '@ui-kitten/components';
+import {Icon, Button, Divider} from '@ui-kitten/components';
 import {DetailCheckDriverScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -51,6 +43,7 @@ const carIcon = (style) => <Icon {...style} name="car-outline" />;
 const isAndroid = Platform.OS === 'android';
 const tmapRouteURL =
   'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be';
+const DirectSms = NativeModules.DirectSms;
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -76,6 +69,46 @@ export class DetailCheckDriverScreen extends React.Component<
       longitude: 'unknown',
     };
   }
+
+  sendDirectSms = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.SEND_SMS,
+          {
+            title: 'Freight25 App Sms Permission',
+            message:
+              'Freight25 App needs access to your inbox ' +
+              'so you can send messages in background.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          DirectSms.sendDirectSms(
+            this.state.addiData.recvTel,
+            'Signup process completed! ' + this.state.addiData.recvName,
+          );
+          console.log('SMS sent successfully');
+        } else {
+          console.log('SMS permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      console.log('Send message');
+      console.log(this.state.addiData.recvTel);
+
+      const url = `sms:${this.state.addiData.recvTel}${
+        Platform.OS === 'ios' ? '&' : '?'
+      }body=${'signup process completed! ' + this.state.addiData.recvName}`;
+      Linking.openURL(url).catch((err) =>
+        console.error('An error occurred', err),
+      );
+    }
+  };
 
   requestLocationAndroid = async () => {
     try {
@@ -205,6 +238,8 @@ export class DetailCheckDriverScreen extends React.Component<
             expense: docs.expense,
             ownerId: docs.ownerId,
             ownerTel: docs.ownerTel,
+            recvName: docs.recvName,
+            recvTel: docs.recvTel,
             oppositeFreightId: docs.oppositeFreightId,
             startAddrNoSpace: startAddrNoSpace,
             endAddrNoSpace: endAddrNoSpace,
@@ -258,6 +293,7 @@ export class DetailCheckDriverScreen extends React.Component<
   };
 
   setComplete = () => {
+    this.sendDirectSms();
     console.log('운송 완료');
     try {
       var ref = firestore().collection('freights').doc(this.state.FreightID);

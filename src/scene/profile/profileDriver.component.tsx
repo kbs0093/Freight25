@@ -344,6 +344,7 @@ export const ProfileDriverScreen = (
                 Toast.show('탈퇴 실패');
               }
             }}
+            status="danger"
             style={styles.withdrawButton}
             textStyle={styles.withdrawButtonText}>
             회원 탈퇴
