@@ -204,7 +204,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             <Text style={styles.badgeText}>{item.lastState}</Text>
           )}
           {item.oppositeFreightId != '' ? (
-            <Text style={styles.badgeTextMixed}>혼적</Text>
+            <Text style={styles.badgeTextMixed}>경유지 O</Text>
           ) : null}
         </View>
       </View>

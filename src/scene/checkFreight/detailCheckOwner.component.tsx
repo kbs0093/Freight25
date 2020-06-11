@@ -355,23 +355,23 @@ export class DetailCheckOwnerScreen extends React.Component<
 const styles = StyleSheet.create({
   Badge: {
     width: RFPercentage(14),
-    height: RFPercentage(4),
+    height: RFPercentage(6),
     borderRadius: 8,
   },
   smallBadge: {
-    width: RFPercentage(8),
+    width: RFPercentage(12),
     height: RFPercentage(2),
   },
   badgeText: {
     fontSize: RFPercentage(1.5),
   },
   button: {
-    width: RFPercentage(30),
+    width: RFPercentage(28),
     height: RFPercentage(8),
     borderRadius: 8,
   },
   buttonText: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
   },
   callButton: {
     width: RFPercentage(30),
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   callButtonText: {
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(1.5),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3.5),
+    fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
   geoSubText: {

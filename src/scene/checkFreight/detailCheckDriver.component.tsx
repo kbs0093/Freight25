@@ -1,6 +1,7 @@
 import React, {useState, Fragment} from 'react';
 import {
   Text,
+  PermissionsAndroid,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,6 +10,7 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Platform,
 } from 'react-native';
 import {
   LayoutElement,
@@ -37,6 +39,7 @@ import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
+import Geolocation from 'react-native-geolocation-service';
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -44,6 +47,10 @@ const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
 const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const cartIcon = (style) => <Icon {...style} name="shopping-cart-outline" />;
 const carIcon = (style) => <Icon {...style} name="car-outline" />;
+
+const isAndroid = Platform.OS === 'android';
+const tmapRouteURL =
+  'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 
 export class DetailCheckDriverScreen extends React.Component<
   DetailCheckDriverScreenProps
@@ -62,11 +69,56 @@ export class DetailCheckDriverScreen extends React.Component<
         ownerId: null,
         ownerTel: null,
         oppositeFreightId: null,
+        startAddrNoSpace: null,
+        endAddrNoSpace: null,
       },
+      latitude: 'unknown',
+      longitude: 'unknown',
     };
   }
 
+  requestLocationAndroid = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Geolocation.getCurrentPosition(
+          (position) => {
+            let latitude = JSON.stringify(position.coords.latitude);
+            let longitude = JSON.stringify(position.coords.longitude);
+            this.setState({latitude: latitude});
+            this.setState({longitude: longitude});
+          },
+          (error) => Alert.alert('Error', JSON.stringify(error)),
+          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+        );
+      } else {
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  requestLocationIos = () => {
+    var latitude;
+    var longitude;
+
+    Geolocation.getCurrentPosition(
+      (position) => {
+        latitude = JSON.stringify(position.coords.latitude);
+        longitude = JSON.stringify(position.coords.longitude);
+        this.setState({latitude: latitude});
+        this.setState({longitude: longitude});
+      },
+      (error) => Alert.alert('Error', JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );
+  };
+
   componentDidMount = async () => {
+    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos();
+
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
@@ -137,9 +189,7 @@ export class DetailCheckDriverScreen extends React.Component<
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
             // endMonth: docEndDate.getMonth() + 1,
-            // endDay: docEndDate.getDate(),
             startDayLabel: doc.startDayLabel,
-            // endDayLabel: doc.endDayLabel,
             driveOption: docs.driveOption,
 
             ownerTel: docs.ownerTel,
@@ -147,6 +197,8 @@ export class DetailCheckDriverScreen extends React.Component<
             desc: docs.desc,
           });
 
+          var startAddrNoSpace = docs.startAddr.replace(/\s/g, '');
+          var endAddrNoSpace = docs.endAddr.replace(/\s/g, '');
           var addiData = {
             lastState: freightState,
             dist: docs.dist,
@@ -154,6 +206,8 @@ export class DetailCheckDriverScreen extends React.Component<
             ownerId: docs.ownerId,
             ownerTel: docs.ownerTel,
             oppositeFreightId: docs.oppositeFreightId,
+            startAddrNoSpace: startAddrNoSpace,
+            endAddrNoSpace: endAddrNoSpace,
           };
           that.setState({addiData: addiData});
           that.setState({data: list});
@@ -162,6 +216,39 @@ export class DetailCheckDriverScreen extends React.Component<
         }
       });
     }
+  };
+
+  invokeTmap = (num) => {
+    if (num == 1) {
+      // Route to start address
+      Linking.openURL(
+        tmapRouteURL +
+          `&name=${this.state.addiData.startAddrNoSpace}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+      );
+    } else if (num == 2) {
+      // Route to end address
+      Linking.openURL(
+        tmapRouteURL +
+          `&name=${this.state.addiData.endAddrNoSpace}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+      );
+    }
+  };
+
+  navHandler = () => {
+    Alert.alert(
+      '내비게이션 연결',
+      '연결 하시겠습니까?',
+      [
+        {text: '상차지 경로', onPress: () => this.invokeTmap(1)},
+        {text: '하차지 경로', onPress: () => this.invokeTmap(2)},
+        {
+          text: 'Cancel',
+          onPress: () => console.log('canceled'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   callOwner = () => {
@@ -340,6 +427,9 @@ export class DetailCheckDriverScreen extends React.Component<
     if (this.state.addiData.lastState == '배송중') {
       navButton = (
         <Button
+          onPress={() => {
+            this.navHandler();
+          }}
           style={styles.button}
           textStyle={styles.buttonText}
           status="info"
@@ -408,11 +498,11 @@ export class DetailCheckDriverScreen extends React.Component<
 const styles = StyleSheet.create({
   Badge: {
     width: RFPercentage(14),
-    height: RFPercentage(4),
+    height: RFPercentage(6),
     borderRadius: 8,
   },
   smallBadge: {
-    width: RFPercentage(8),
+    width: RFPercentage(12),
     height: RFPercentage(2),
   },
   badgeText: {
@@ -420,19 +510,19 @@ const styles = StyleSheet.create({
   },
   button: {
     width: RFPercentage(15),
-    height: RFPercentage(6),
+    height: RFPercentage(8),
     borderRadius: 8,
   },
   buttonText: {
     fontSize: RFPercentage(1.5),
   },
   callButton: {
-    width: RFPercentage(30),
-    height: RFPercentage(6),
+    width: RFPercentage(28),
+    height: RFPercentage(8),
     borderRadius: 8,
   },
   callButtonText: {
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(1.5),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -490,7 +580,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3.5),
+    fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
   geoSubText: {
