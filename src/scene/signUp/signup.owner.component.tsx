@@ -104,6 +104,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               console.log("currentAuth uid: "+user?.uid);
               //현재 로그인된 auth 본인만 접근가능하도록 규칙테스트 완료
               var ref = firestore().collection('owners').doc(user?.uid);
+              var messageToken = AsyncStorage.getItem('messageToken')
               if(user != null){
                 console.log("firestore target uid: "+user.uid);
                 try {
@@ -126,7 +127,9 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                     savedEndCompact:endAddrCompact,
                     savedEndFull:endAddrFull,
                     savedEndLat:endAddr_lat,
-                    savedEndLon:endAddr_lon
+                    savedEndLon:endAddr_lon,
+
+                    messageToken : messageToken,
                   });
                   Toast.hide(toastLoading);
                   Toast.showSuccess('회원가입이 완료되었습니다.');

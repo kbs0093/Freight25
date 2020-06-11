@@ -1,9 +1,13 @@
-import React, {useState} from 'react';
-import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Image, StyleSheet, View, TouchableOpacity, Alert, AppRegistry} from 'react-native';
 import {LayoutElement, Text, ViewPager} from '@ui-kitten/components';
 import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
+import messaging from '@react-native-firebase/messaging'
+import AsyncStorage from '@react-native-community/async-storage';
+const isAndroid = (Platform.OS === 'android')
+
 
 export const MainScreen = (props: MainScreenProps): LayoutElement => {
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -15,6 +19,25 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   const clickCheck = () => {
     props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
+
+  // Push Notification part (background)
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+  });
+  
+  // Push Notification part (foreground)
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      var message = JSON.stringify(remoteMessage);
+      message = JSON.parse(message)
+      var parsed_message = message.notification;
+      if (!isAndroid){
+        parsed_message = message.data.notification;
+      }
+      Alert.alert(parsed_message.title ,parsed_message.body);
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <React.Fragment>
@@ -55,6 +78,28 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
   const clickCheck = () => {
     props.navigation.navigate(AppRoute.CHECK_MAIN);
   };
+  
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+  });
+  if (messaging().isDeviceRegisteredForRemoteMessages) {
+    messaging().registerDeviceForRemoteMessages();
+  }
+  
+  // Push Notification part (foreground)
+  useEffect(() => {
+      
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      var message = JSON.stringify(remoteMessage);
+      message = JSON.parse(message)
+      var parsed_message = message.notification;
+      if (!isAndroid){
+        parsed_message = message.data.notification;
+      }
+      Alert.alert(parsed_message.title ,parsed_message.body);
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <React.Fragment>

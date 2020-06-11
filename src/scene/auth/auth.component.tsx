@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
@@ -7,6 +7,7 @@ import {
   View,
   Linking,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import {
   Input,
@@ -26,6 +27,7 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 import {CommonActions} from '@react-navigation/native';
 
+import messaging from '@react-native-firebase/messaging'
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
 }
@@ -60,7 +62,36 @@ const SignupNavigate = CommonActions.reset({
 
 
 
+const isAndroid = (Platform.OS === 'android')
+
 export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
+  var messageToken = ''
+  useEffect(() => {
+    messaging()
+    .hasPermission()
+    .then(enabled => {       
+      if (enabled) {
+      } else {
+        messaging()
+        .requestPermission()
+        .then()
+        .catch(err => {
+          if (!isAndroid) {
+            Linking.canOpenURL('app-settings:')
+              .then(supported => {
+                Linking.openURL('app-settings:');
+              })
+              .catch(error => {});
+          }
+        });
+      }
+      messaging().getToken().then(token => {
+        messageToken = token
+        AsyncStorage.setItem('messageToken', token)})
+    })
+    .catch();
+  }, []);
+
   const [token, setToken] = useState(TOKEN_EMPTY);
   const [profile, setProfile] = useState(PROFILE_EMPTY);
 
@@ -75,6 +106,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
         axios
           .post(serverUrl+"confirmUid", {token: JSON.stringify(result.accessToken)})
           .then((response) => {
+            parseInt(result.accessToken)
             let uidRegistered = JSON.stringify(response.data.register);
              //등록된 uid인 경우 (true)
             if(uidRegistered == 'true'){
@@ -90,6 +122,12 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                   var ref = firestore().collection('drivers').doc(user.uid);
                   ref.get().then(function(doc) {
                     if(doc.exists){
+                      if(messageToken != ''){
+                        console.log('메시지토큰 :',messageToken)
+                        ref.update({
+                          messageToken : messageToken
+                        })
+                      }
                       AsyncStorage.setItem('userType', 'driver')
                       .then( ()=>{
                         console.log("auth AsyncStorage Type: driver");
@@ -101,6 +139,12 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                     else{
                       AsyncStorage.setItem('userType', 'owner')
                       .then(()=>{
+                        var ref = firestore().collection('owners').doc(user.uid);
+                        if(messageToken != ''){
+                          ref.update({
+                            messageToken : messageToken
+                          })
+                        }
                         console.log("auth AsyncStorage Type: owner");
                         console.log(user.uid+" succeeded in loging / auth Stage");
                       });
