@@ -128,27 +128,37 @@ export const ProfileOwnerScreen = (
   const withdrawHandler = async () => {
     var user = auth().currentUser;
     var ref = firestore().collection('owners').doc(user?.uid);
-    try {
-      ref.delete().then(() => {
-        console.log('1. ' + user.uid + ' 탈퇴 시작');
+    var refFreight = firestore()
+      .collection('freights')
+      .where('ownerId', '==', user?.uid);
 
-        user?.delete().then(async () => {
-          await KakaoLogins.logout().then((result) => {
-            console.log(`2. Kakao Logout Finished:${result}`);
-          });
+    refFreight.get().then(function (doc) {
+      if (doc.size == 0) {
+        try {
+          ref.delete().then(() => {
+            console.log('1. ' + user?.uid + ' 탈퇴 시작');
 
-          AsyncStorage.clear().then(() => {
-            console.log('3. AsyncStorage 초기화 완료');
-            withdrawAlertHandler();
+            user?.delete().then(async () => {
+              await KakaoLogins.logout().then((result) => {
+                console.log(`2. Kakao Logout Finished:${result}`);
+              });
+
+              AsyncStorage.clear().then(() => {
+                console.log('3. AsyncStorage 초기화 완료');
+                withdrawAlertHandler();
+              });
+            });
           });
-        });
-      });
-    } catch {
-      (error) => {
-        Toast.show('탈퇴가 실패하였습니다.');
-        console.log(error);
-      };
-    }
+        } catch {
+          (error) => {
+            Toast.show('탈퇴가 실패하였습니다.');
+            console.log(error);
+          };
+        }
+      } else {
+        Toast.show('기존에 등록된 화물이 존재합니다');
+      }
+    });
   };
 
   const withdrawAlertHandler = () => {

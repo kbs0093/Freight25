@@ -67,7 +67,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       auth().onAuthStateChanged(function (user) {
         if (user) {
           AsyncStorage.getItem('userType').then((userType) => {
-            if (value == 'driver') {
+            if (userType == 'driver') {
               var ref = firestore().collection('drivers').doc(user.uid);
               ref.get().then(function (doc) {
                 if (doc.exists) {
@@ -88,6 +88,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       });
     }
   });
+
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
