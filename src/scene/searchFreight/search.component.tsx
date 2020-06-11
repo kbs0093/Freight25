@@ -1,37 +1,27 @@
-import React, {useState, Component} from 'react';
+import React, {Component} from 'react';
 import {
   Text,
   StyleSheet,
   View,
-  Linking,
   Platform,
   FlatList,
-  FlatListProps,
-  ListRenderItemInfo,
   SafeAreaView,
   Alert,
-  RefreshControl,
   PermissionsAndroid,
-  NavigatorIOS,
 } from 'react-native';
 import {
-  LayoutElement, 
   Icon,
   Divider,
-  Button,
-  TopNavigation, 
-  TopNavigationAction,
 } from '@ui-kitten/components';
-import { FORWARDIcon } from '../../assets/icons'
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
-import { withNavigation } from 'react-navigation';
 import { SearchScreenProps } from'../../navigation/search.navigator';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
 import Geolocation from 'react-native-geolocation-service';
+import TextTicker from 'react-native-text-ticker'
 
 
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
@@ -306,7 +296,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
         <View style={styles.geoInfo1}>
           <View style={styles.geoInfo11}>
           <View style={{flex: 1, justifyContent: 'flex-end'}}>
-              <Text style={styles.geoTitleText}>{item.startAddress[0]} {item.startAddress[1]}</Text>
+            <TextTicker
+                style={styles.geoTitleText}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.startAddress[0]} {item.startAddress[1]}
+              </TextTicker>            
+              
             </View>
             <View>
               <Text style={styles.geoTitleText}>{item.startAddress[2]}</Text>
@@ -322,7 +322,16 @@ export class SearchScreen extends Component <SearchScreenProps> {
           
           <View style={styles.geoInfo11}>
             <View style={{flex: 1, justifyContent: 'flex-end'}}>
-              <Text style={styles.geoTitleText}>{item.endAddress[0]} {item.endAddress[1]}</Text>
+              <TextTicker
+                style={styles.geoTitleText}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.endAddress[0]} {item.endAddress[1]}
+              </TextTicker>              
             </View>
             <View>
               <Text style={styles.geoTitleText}>{item.endAddress[2]}</Text>
@@ -337,8 +346,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
         </View>
 
           <View style={styles.geoInfo3}/>                        
-            <View style={styles.freightType}>
-              <Text style={styles.freightTypeText}> {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text>
+            <View style={styles.freightTypeText}>
+              <TextTicker
+                style={styles.freightTypeText}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}
+              </TextTicker>
             </View>
       </View>
 
@@ -350,7 +368,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
         </View>
         <View style={styles.moneyInfo}>
-          <Text style={styles.driveText}>{item.moneyPrint} 원</Text>
+            <TextTicker
+              style={styles.driveText}
+              duration={3000}
+              loop
+              bounce
+              repeatSpacer={50}
+              marqueeDelay={1000}
+            >
+              {item.moneyPrint} 원
+            </TextTicker>
+          
         </View>
       </View>                          
     </View>
@@ -377,9 +405,25 @@ export class SearchScreen extends Component <SearchScreenProps> {
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
         <View style={{flex: 3, justifyContent: 'center'}}>
-          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-            검색 위치 : {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
-          </Text>
+          <View style={{flexDirection: "row"}}>
+            <View>
+              <Text style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}>검색 위치 : </Text>
+            </View>
+            <View>
+              <TextTicker
+                style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
+              </TextTicker>
+            </View>         
+          </View>
+         
+
         </View>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           
@@ -388,7 +432,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
       <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
         <View style={{flex: 1, justifyContent: 'center'}}>
           <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-            검색 조건 : 
+          검색 조건 : 
           </Text>
         </View>
         <View style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
@@ -474,7 +518,7 @@ const styles = StyleSheet.create({
   },
   Type: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
     color: '#9B51E0',
   },
   container: {
@@ -498,20 +542,20 @@ const styles = StyleSheet.create({
   },
   geoTitleText: {    
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 18,
     margin: 2,    
   },
   timeText: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
   },
   driveText: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
   },
   driveText2: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
     justifyContent: 'flex-start',
   },
   geoInfo11: {
@@ -558,16 +602,15 @@ const styles = StyleSheet.create({
   },
   distance: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
     color: '#E5E5E5',
   },
   freightTypeText: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 15,
     color: '#219653'
   },
-  freightType: {
-    
+  freightType: {    
     flexDirection: 'row',
     flex : 1,
   }

@@ -1,20 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
   StyleSheet,
   View,
-  Linking,
   Platform,
-  SafeAreaView,
-  FlatList,
-  FlatListProps,
   ScrollView,
 } from 'react-native';
 import {
-  LayoutElement,
-  Layout,
-  ViewPager,
   Icon,
   Divider,
   Button,
@@ -22,10 +15,7 @@ import {
 import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
 import {DetailScreenProps} from '../../navigation/search.navigator';
 import {AppRoute} from '../../navigation/app-routes';
-import {
-  TouchableOpacity,
-  TouchableHighlight,
-} from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
@@ -563,7 +553,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                     color: '#BDBDBD',
                   }}>
                   {' '}
-                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 평균 화물 점유율{' '}
+                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 화물 점유율{' '}
                 </Text>
               </View>
             </View>
