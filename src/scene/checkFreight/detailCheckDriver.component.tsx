@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   geoText: {
-    fontSize: RFPercentage(3.2),
+    fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
   geoSubText: {
