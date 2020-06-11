@@ -70,9 +70,7 @@ export const ProfileOwnerScreen = (
   const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(
     false,
   );
-  const [addrCompact, setAddrCompact] = useState<string>(
-    '자주쓰는 상차지 없음',
-  );
+  const [addrCompact, setAddrCompact] = useState<string>('');
   const [addrFull, setAddrFull] = useState<string>('');
   const [addr_lat, setAddr_lat] = useState<string>('');
   const [addr_lon, setAddr_lon] = useState<string>('');
@@ -80,9 +78,7 @@ export const ProfileOwnerScreen = (
   const [modalAddEndAddrVisible, setmodalAddEndAddrVisible] = useState<boolean>(
     false,
   );
-  const [endAddrCompact, setEndAddrCompact] = useState<string>(
-    '자주쓰는 하차지 없음',
-  );
+  const [endAddrCompact, setEndAddrCompact] = useState<string>('');
   const [endAddrFull, setEndAddrFull] = useState<string>('');
   const [endAddr_lat, setEndAddr_lat] = useState<string>('');
   const [endAddr_lon, setEndAddr_lon] = useState<string>('');
@@ -117,6 +113,8 @@ export const ProfileOwnerScreen = (
           accountOwner(docs.accountOwner);
           manNum(docs.companyNumber);
           companyName(docs.companyName);
+          setAddrCompact(docs.savedStartCompact);
+          setEndAddrCompact(docs.savedEndCompact);
         }
       });
       setLock(1);
@@ -197,14 +195,14 @@ export const ProfileOwnerScreen = (
           accountOwner: accountNumInput,
 
           // TODO: Need to add Favorite address
-          // savedStartCompact: addrCompact,
-          // savedStartFull: addrFull,
-          // savedStartlat: addr_lat,
-          // savedStartlon: addr_lon,
-          // savedEndCompact: endAddrCompact,
-          // savedEndFull: endAddrFull,
-          // savedEndLat: endAddr_lat,
-          // savedEndLon: endAddr_lon,
+          savedStartCompact: addrCompact,
+          savedStartFull: addrFull,
+          savedStartlat: addr_lat,
+          savedStartlon: addr_lon,
+          savedEndCompact: endAddrCompact,
+          savedEndFull: endAddrFull,
+          savedEndLat: endAddr_lat,
+          savedEndLon: endAddr_lon,
         });
       } catch (error) {
         console.log(error);

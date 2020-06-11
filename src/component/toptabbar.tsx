@@ -66,10 +66,21 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
     if (value) {
       auth().onAuthStateChanged(function (user) {
         if (user) {
-          var ref = firestore().collection('drivers').doc(user.uid);
-          ref.get().then(function (doc) {
-            if (doc.exists) {
-              setUserName(doc.data().name);
+          AsyncStorage.getItem('userType').then((userType) => {
+            if (value == 'driver') {
+              var ref = firestore().collection('drivers').doc(user.uid);
+              ref.get().then(function (doc) {
+                if (doc.exists) {
+                  setUserName(doc.data().name);
+                }
+              });
+            } else if (userType == 'owner') {
+              var ref = firestore().collection('owners').doc(user.uid);
+              ref.get().then(function (doc) {
+                if (doc.exists) {
+                  setUserName(doc.data().name);
+                }
+              });
             }
           });
         } else {
@@ -150,7 +161,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
   };
 
   const BackAction = () =>
-    routeName == 'Home' ? null : (
+    routeName == 'Home' || routeName == 'Owner' ? null : (
       <TopNavigationAction icon={BackIcon} onPress={navigateBack} />
     );
 
