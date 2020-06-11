@@ -35,17 +35,9 @@ import KakaoLogins from '@react-native-seoul/kakao-login';
 import {NavigationActions} from 'react-navigation';
 import {useRoute} from '@react-navigation/native';
 import {CommonActions} from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
 
-let email;
-let nickname = 'unknown';
 let userType;
-
-AsyncStorage.getItem('email', (err, result) => {
-  email = result;
-});
-AsyncStorage.getItem('nickname', (err, result) => {
-  nickname = result;
-});
 
 const resetAction = CommonActions.reset({
   index: 0,
@@ -54,13 +46,11 @@ const resetAction = CommonActions.reset({
 
 export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
   const [menuVisible, setMenuVisible] = React.useState(false);
+  const [userName, setUserName] = React.useState('');
+
   const menuData = [
     {
-      title: `${nickname} 님 환영합니다`,
-    },
-    {
-      title: '버전 정보 확인',
-      icon: InfoIcon,
+      title: `${userName} 님 환영합니다`,
     },
     {
       title: '개인 정보 수정',
@@ -72,6 +62,21 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
     },
   ];
 
+  AsyncStorage.getItem('fbToken').then((value) => {
+    if (value) {
+      auth().onAuthStateChanged(function (user) {
+        if (user) {
+          var ref = firestore().collection('drivers').doc(user.uid);
+          ref.get().then(function (doc) {
+            if (doc.exists) {
+              setUserName(doc.data().name);
+            }
+          });
+        } else {
+        }
+      });
+    }
+  });
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
@@ -104,7 +109,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
 
     console.log(index);
 
-    if (index == 2) {
+    if (index == 1) {
       AsyncStorage.getItem('userType').then((value) => {
         userType = value;
         if (userType == 'owner') {
@@ -113,7 +118,7 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
           props.navigation.navigate(AppRoute.PROFILE_DRIVER);
         }
       });
-    } else if (index == 3) {
+    } else if (index == 2) {
       {
         /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
       }
@@ -144,9 +149,10 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
     if (routeName != 'Home' && routeName != 'Owner') props.navigation.goBack();
   };
 
-  const BackAction = () => (
-    <TopNavigationAction icon={BackIcon} onPress={navigateBack} />
-  );
+  const BackAction = () =>
+    routeName == 'Home' ? null : (
+      <TopNavigationAction icon={BackIcon} onPress={navigateBack} />
+    );
 
   return (
     <React.Fragment>

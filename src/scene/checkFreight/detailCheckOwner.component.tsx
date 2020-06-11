@@ -355,18 +355,18 @@ export class DetailCheckOwnerScreen extends React.Component<
 const styles = StyleSheet.create({
   Badge: {
     width: RFPercentage(14),
-    height: RFPercentage(4),
+    height: RFPercentage(6),
     borderRadius: 8,
   },
   smallBadge: {
-    width: RFPercentage(8),
+    width: RFPercentage(12),
     height: RFPercentage(2),
   },
   badgeText: {
     fontSize: RFPercentage(1.5),
   },
   button: {
-    width: RFPercentage(30),
+    width: RFPercentage(28),
     height: RFPercentage(8),
     borderRadius: 8,
   },

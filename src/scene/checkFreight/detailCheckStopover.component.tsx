@@ -454,11 +454,11 @@ export class DetailCheckStopoverScreen extends React.Component<
 const styles = StyleSheet.create({
   Badge: {
     width: RFPercentage(14),
-    height: RFPercentage(4),
+    height: RFPercentage(6),
     borderRadius: 8,
   },
   smallBadge: {
-    width: RFPercentage(8),
+    width: RFPercentage(12),
     height: RFPercentage(2),
   },
   badgeText: {
@@ -466,15 +466,15 @@ const styles = StyleSheet.create({
   },
   button: {
     width: RFPercentage(15),
-    height: RFPercentage(6),
+    height: RFPercentage(8),
     borderRadius: 8,
   },
   buttonText: {
     fontSize: RFPercentage(1.5),
   },
   callButton: {
-    width: RFPercentage(30),
-    height: RFPercentage(6),
+    width: RFPercentage(28),
+    height: RFPercentage(8),
     borderRadius: 8,
   },
   callButtonText: {
