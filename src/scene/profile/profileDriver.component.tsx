@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   StyleSheet,
@@ -40,24 +40,16 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import {CommonActions} from '@react-navigation/native';
+
 const resetAction = CommonActions.reset({
   index: 0,
   routes: [{name: AppRoute.AUTH}],
 });
 
-const useInputState = (initialValue = '') => {
-  const [value, setValue] = React.useState(initialValue);
-  return {value, onChangeText: setValue};
-};
-
-const useSelectState = (initialValue = '') => {
-  const [value, setValue] = React.useState(initialValue);
-  return {value, onSelect: setValue, selectedOption: value};
-};
-
 export const ProfileDriverScreen = (
   props: ProfileDriverScreenProps,
 ): LayoutElement => {
+  const [userID, setUserID] = React.useState('');
   const [TonValue, setTonValue] = React.useState('');
   const [TypeValue, setTypeValue] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
@@ -67,42 +59,75 @@ export const ProfileDriverScreen = (
   const [accountOwnerInput, accountOwner] = React.useState('');
   const [carNumInput, carNum] = React.useState('');
   const [manNumInput, manNum] = React.useState('');
-  const [companyNameInput, companyName] = React.useState('');
+  const [lock, setLock] = React.useState(0);
 
-    // TODO: Implement withdrawal function.
+  useEffect(() => {
+    AsyncStorage.getItem('fbToken').then((value) => {
+      if (value) {
+        auth().onAuthStateChanged(function (user) {
+          if (user) {
+            setUserID(user.uid);
+          } else {
+          }
+        });
+      }
+    });
+  });
+
+  const getDB = () => {
+    if (userID) {
+      var ref = firestore().collection('drivers').doc(userID);
+      ref.get().then(function (doc) {
+        if (doc.exists) {
+          // Get the information from driver
+          const docs = doc.data();
+          setTonValue(docs.carTone);
+          setTypeValue(docs.carType);
+          setBankValue(docs.bankName);
+          name(docs.name);
+          phoneNum(docs.tel);
+          accountNum(docs.accountNumber);
+          accountOwner(docs.accountOwner);
+          carNum(docs.carNumber);
+          manNum(docs.companyNumber);
+        }
+      });
+      setLock(1);
+    }
+  };
+
+  if (lock == 0) {
+    getDB();
+  }
+
   const withdrawHandler = async () => {
     var user = auth().currentUser;
     var ref = firestore().collection('drivers').doc(user?.uid);
-    try{
-      ref.delete()
-      .then(() => {
-        console.log("1. "+user.uid+" 탈퇴 시작");
+    try {
+      ref.delete().then(() => {
+        console.log('1. ' + user.uid + ' 탈퇴 시작');
 
-        user?.delete()
-        .then(async () => {
-          await KakaoLogins.logout()
-          .then((result) => {
+        user?.delete().then(async () => {
+          await KakaoLogins.logout().then((result) => {
             console.log(`2. Kakao Logout Finished:${result}`);
-          })
+          });
 
           AsyncStorage.clear().then(() => {
-            console.log("3. AsyncStorage 초기화 완료");
+            console.log('3. AsyncStorage 초기화 완료');
             withdrawAlertHandler();
           });
-        })
-      })
-      
-    }
-    catch{
+        });
+      });
+    } catch {
       (error) => {
         Toast.show('탈퇴가 실패하였습니다.');
         console.log(error);
-      }
+      };
     }
   };
 
   const withdrawAlertHandler = () => {
-    console.log("4. 탈퇴 완료");
+    console.log('4. 탈퇴 완료');
     Alert.alert('탈퇴가 완료되었습니다.');
     props.navigation.dispatch(resetAction);
   };
@@ -133,6 +158,15 @@ export const ProfileDriverScreen = (
     if (user != null) {
       console.log('firestore target uid: ' + auth().currentUser?.uid);
       try {
+        if (TonValue != null) {
+          ref.update({carTon: TonValue});
+        }
+        if (TypeValue != null) {
+          ref.update({carType: TypeValue});
+        }
+        if (BankValue != null) {
+          ref.update({bankName: BankValue});
+        }
         ref.update({
           name: nameInput,
           accountOwner: accountOwnerInput,
@@ -140,9 +174,6 @@ export const ProfileDriverScreen = (
           companyNumber: manNumInput,
           accountNumber: accountNumInput,
           tel: phoneNumInput,
-          carTon: TonValue,
-          caryType: TypeValue,
-          bankName: BankValue,
         });
       } catch (error) {
         //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
@@ -162,6 +193,7 @@ export const ProfileDriverScreen = (
             onPress={() => {
               reviseProfile();
               Toast.showSuccess('수정 완료');
+              props.navigation.navigate(AppRoute.HOME);
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
@@ -194,7 +226,8 @@ export const ProfileDriverScreen = (
             <Text style={styles.infoTitle}>사업자등록번호: </Text>
             <Layout style={styles.selectContainer}>
               <Input
-                placeholder="사업자 등록번호를 입력하세요"
+                //placeholder="사업자 등록번호를 입력하세요"
+                placeholder={manNumInput}
                 value={manNumInput}
                 onChangeText={manNum}
               />
@@ -218,7 +251,7 @@ export const ProfileDriverScreen = (
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 톤수 : </Text>
             <RNPickerSelect
-              onValueChange={(itemValue, itemIndex) => setTonValue(itemValue)}
+              onValueChange={(itemValue) => setTonValue(itemValue)}
               placeholder={{
                 label: '차량 톤수를 선택하세요',
                 value: null,
@@ -240,7 +273,6 @@ export const ProfileDriverScreen = (
               placeholder={{
                 label: '차량 유형을 선택하세요',
                 value: null,
-                fontsize: 12,
               }}
               useNativeAndroidPickerStyle={false}
               items={[

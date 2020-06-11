@@ -48,10 +48,12 @@ import Modal from 'react-native-modal';
 import Postcode from 'react-native-daum-postcode';
 
 // Postcode API를 위한 URL선언
-const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
+const tmap_FullTextGeocodingQueryUrl =
+  'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
 const tmap_FullTextGeocodingURL_rest = '&coordType=WGS84GEO&fullAddr=';
-const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_FullTextGeocodingURL_rest;
+const tmap_FullTextGeocodingUrl =
+  tmap_FullTextGeocodingQueryUrl + tmap_appKey + tmap_FullTextGeocodingURL_rest;
 
 export const ProfileOwnerScreen = (
   props: ProfileOwnerScreenProps,
@@ -64,52 +66,55 @@ export const ProfileOwnerScreen = (
   const [manNumInput, manNum] = React.useState('');
   const [companyNameInput, companyName] = React.useState('');
 
-  const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(false);
-  const [addrCompact, setAddrCompact] = useState<string>('자주쓰는 상차지 없음');
-  const [addrFull, setAddrFull] = useState<string>("");
-  const [addr_lat, setAddr_lat] = useState<string>("");
-  const [addr_lon, setAddr_lon] = useState<string>("");
+  const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(
+    false,
+  );
+  const [addrCompact, setAddrCompact] = useState<string>(
+    '자주쓰는 상차지 없음',
+  );
+  const [addrFull, setAddrFull] = useState<string>('');
+  const [addr_lat, setAddr_lat] = useState<string>('');
+  const [addr_lon, setAddr_lon] = useState<string>('');
 
-  const [modalAddEndAddrVisible, setmodalAddEndAddrVisible] = useState<boolean>(false);
-  const [endAddrCompact, setEndAddrCompact] = useState<string>("자주쓰는 하차지 없음");
-  const [endAddrFull, setEndAddrFull] = useState<string>("");
-  const [endAddr_lat, setEndAddr_lat] = useState<string>("");
-  const [endAddr_lon, setEndAddr_lon] = useState<string>("");
+  const [modalAddEndAddrVisible, setmodalAddEndAddrVisible] = useState<boolean>(
+    false,
+  );
+  const [endAddrCompact, setEndAddrCompact] = useState<string>(
+    '자주쓰는 하차지 없음',
+  );
+  const [endAddrFull, setEndAddrFull] = useState<string>('');
+  const [endAddr_lat, setEndAddr_lat] = useState<string>('');
+  const [endAddr_lon, setEndAddr_lon] = useState<string>('');
 
   // TODO: Implement withdrawal function.
   const withdrawHandler = async () => {
     var user = auth().currentUser;
     var ref = firestore().collection('owners').doc(user?.uid);
-    try{
-      ref.delete()
-      .then(() => {
-        console.log("1. "+user.uid+" 탈퇴 시작");
+    try {
+      ref.delete().then(() => {
+        console.log('1. ' + user.uid + ' 탈퇴 시작');
 
-        user?.delete()
-        .then(async () => {
-          await KakaoLogins.logout()
-          .then((result) => {
+        user?.delete().then(async () => {
+          await KakaoLogins.logout().then((result) => {
             console.log(`2. Kakao Logout Finished:${result}`);
-          })
+          });
 
           AsyncStorage.clear().then(() => {
-            console.log("3. AsyncStorage 초기화 완료");
+            console.log('3. AsyncStorage 초기화 완료');
             withdrawAlertHandler();
           });
-        })
-      })
-      
-    }
-    catch{
+        });
+      });
+    } catch {
       (error) => {
         Toast.show('탈퇴가 실패하였습니다.');
         console.log(error);
-      }
+      };
     }
   };
 
   const withdrawAlertHandler = () => {
-    console.log("4. 탈퇴 완료");
+    console.log('4. 탈퇴 완료');
     Alert.alert('탈퇴가 완료되었습니다.');
     props.navigation.dispatch(resetAction);
   };
@@ -177,6 +182,7 @@ export const ProfileOwnerScreen = (
             onPress={() => {
               reviseProfile();
               Toast.showSuccess('수정 완료');
+              props.navigation.navigate(AppRoute.HOME);
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
@@ -237,13 +243,13 @@ export const ProfileOwnerScreen = (
               <Text style={styles.textStyle}>{addrCompact}</Text>
             </View>
             <View style={{flex: 0.7}}>
-              <Button 
-                    appearance='outline' 
-                    size='small'
-                    onPress={() => {
-                      setmodalAddAddrVisible(true);
-                    }}
-                    >변경
+              <Button
+                appearance="outline"
+                size="small"
+                onPress={() => {
+                  setmodalAddAddrVisible(true);
+                }}>
+                변경
               </Button>
             </View>
           </View>
@@ -253,17 +259,16 @@ export const ProfileOwnerScreen = (
               <Text style={styles.textStyle}>{endAddrCompact}</Text>
             </View>
             <View style={{flex: 0.7}}>
-              <Button 
-                    appearance='outline' 
-                    size='small'
-                    onPress={() => {
-                      setmodalAddEndAddrVisible(true);
-                    }}
-                    >변경
+              <Button
+                appearance="outline"
+                size="small"
+                onPress={() => {
+                  setmodalAddEndAddrVisible(true);
+                }}>
+                변경
               </Button>
             </View>
           </View>
-
         </View>
 
         <View style={styles.lineStyle} />
@@ -324,22 +329,26 @@ export const ProfileOwnerScreen = (
         </View>
 
         <Modal
-            //isVisible Props에 State 값을 물려주어 On/off control
-            isVisible={modalAddAddrVisible}
-            //아이폰에서 모달창 동작시 깜박임이 있었는데, useNativeDriver Props를 True로 주니 해결되었다.
-            useNativeDriver={true}
-            hideModalContentWhileAnimating={true}
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+          //isVisible Props에 State 값을 물려주어 On/off control
+          isVisible={modalAddAddrVisible}
+          //아이폰에서 모달창 동작시 깜박임이 있었는데, useNativeDriver Props를 True로 주니 해결되었다.
+          useNativeDriver={true}
+          hideModalContentWhileAnimating={true}
+          style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
           <View>
             <Postcode
               style={{width: 350, height: 600}}
-              jsOptions={{ animated: true }}
+              jsOptions={{animated: true}}
               onSelected={(addrResult) => {
-                let addrFull = JSON.stringify(addrResult.jibunAddress).replace(/\"/gi, "");
-                if (addrFull == ''){
-                  addrFull = JSON.stringify(addrResult.autoJibunAddress).replace(/\"/gi, "");
+                let addrFull = JSON.stringify(addrResult.jibunAddress).replace(
+                  /\"/gi,
+                  '',
+                );
+                if (addrFull == '') {
+                  addrFull = JSON.stringify(
+                    addrResult.autoJibunAddress,
+                  ).replace(/\"/gi, '');
                 }
                 setAddrFull(addrFull);
                 let addr = addrFull.split(' ', 3).join(' ');
@@ -347,16 +356,27 @@ export const ProfileOwnerScreen = (
                 axios
                   .get(tmap_FullTextGeocodingUrl + addrFull)
                   .then((responseJSON) => {
-                    let tmapResponse = JSON.stringify(responseJSON.request._response)
-                    tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
-                    tmapResponse = tmapResponse.replace(/\\/gi, "") // '\'문자 replaceall
-                    tmapResponse = JSON.parse(tmapResponse)
+                    let tmapResponse = JSON.stringify(
+                      responseJSON.request._response,
+                    );
+                    tmapResponse = tmapResponse.substring(
+                      1,
+                      tmapResponse.length - 1,
+                    ); // 따옴표 삭제
+                    tmapResponse = tmapResponse.replace(/\\/gi, ''); // '\'문자 replaceall
+                    tmapResponse = JSON.parse(tmapResponse);
 
-                    let coordinate = tmapResponse.coordinateInfo.coordinate[0]
-                    let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
-                    let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
+                    let coordinate = tmapResponse.coordinateInfo.coordinate[0];
+                    let lat = JSON.stringify(coordinate.lat).replace(
+                      /\"/gi,
+                      '',
+                    ); //latitude 위도
+                    let lon = JSON.stringify(coordinate.lon).replace(
+                      /\"/gi,
+                      '',
+                    ); //longitude 경도
 
-                    console.log('하차지 주소 :', addrFull)
+                    console.log('하차지 주소 :', addrFull);
                     console.log('변환된 위도 :', lat);
                     console.log('변환된 경도 :', lon);
 
@@ -368,34 +388,39 @@ export const ProfileOwnerScreen = (
                   .catch((error) => {
                     console.log(error);
                   });
-                setmodalAddAddrVisible(false)
+                setmodalAddAddrVisible(false);
               }}
             />
             <Button
               onPress={() => {
-                setmodalAddAddrVisible(false)
+                setmodalAddAddrVisible(false);
               }}>
-            뒤로 돌아가기</Button>
+              뒤로 돌아가기
+            </Button>
           </View>
         </Modal>
 
         <Modal
-            //isVisible Props에 State 값을 물려주어 On/off control
-            isVisible={modalAddEndAddrVisible}
-            //아이폰에서 모달창 동작시 깜박임이 있었는데, useNativeDriver Props를 True로 주니 해결되었다.
-            useNativeDriver={true}
-            hideModalContentWhileAnimating={true}
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+          //isVisible Props에 State 값을 물려주어 On/off control
+          isVisible={modalAddEndAddrVisible}
+          //아이폰에서 모달창 동작시 깜박임이 있었는데, useNativeDriver Props를 True로 주니 해결되었다.
+          useNativeDriver={true}
+          hideModalContentWhileAnimating={true}
+          style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
           <View>
             <Postcode
               style={{width: 350, height: 600}}
-              jsOptions={{ animated: true }}
+              jsOptions={{animated: true}}
               onSelected={(addrResult) => {
-                let addrFull = JSON.stringify(addrResult.jibunAddress).replace(/\"/gi, "");
-                if (addrFull == ''){
-                  addrFull = JSON.stringify(addrResult.autoJibunAddress).replace(/\"/gi, "");
+                let addrFull = JSON.stringify(addrResult.jibunAddress).replace(
+                  /\"/gi,
+                  '',
+                );
+                if (addrFull == '') {
+                  addrFull = JSON.stringify(
+                    addrResult.autoJibunAddress,
+                  ).replace(/\"/gi, '');
                 }
                 setEndAddrFull(addrFull);
                 let addr = addrFull.split(' ', 3).join(' ');
@@ -403,16 +428,27 @@ export const ProfileOwnerScreen = (
                 axios
                   .get(tmap_FullTextGeocodingUrl + addrFull)
                   .then((responseJSON) => {
-                    let tmapResponse = JSON.stringify(responseJSON.request._response)
-                    tmapResponse = tmapResponse.substring(1, tmapResponse.length - 1) // 따옴표 삭제
-                    tmapResponse = tmapResponse.replace(/\\/gi, "") // '\'문자 replaceall
-                    tmapResponse = JSON.parse(tmapResponse)
+                    let tmapResponse = JSON.stringify(
+                      responseJSON.request._response,
+                    );
+                    tmapResponse = tmapResponse.substring(
+                      1,
+                      tmapResponse.length - 1,
+                    ); // 따옴표 삭제
+                    tmapResponse = tmapResponse.replace(/\\/gi, ''); // '\'문자 replaceall
+                    tmapResponse = JSON.parse(tmapResponse);
 
-                    let coordinate = tmapResponse.coordinateInfo.coordinate[0]
-                    let lat = JSON.stringify(coordinate.lat).replace(/\"/gi, "") //latitude 위도
-                    let lon = JSON.stringify(coordinate.lon).replace(/\"/gi, "") //longitude 경도
+                    let coordinate = tmapResponse.coordinateInfo.coordinate[0];
+                    let lat = JSON.stringify(coordinate.lat).replace(
+                      /\"/gi,
+                      '',
+                    ); //latitude 위도
+                    let lon = JSON.stringify(coordinate.lon).replace(
+                      /\"/gi,
+                      '',
+                    ); //longitude 경도
 
-                    console.log('하차지 주소 :', addrFull)
+                    console.log('하차지 주소 :', addrFull);
                     console.log('변환된 위도 :', lat);
                     console.log('변환된 경도 :', lon);
 
@@ -424,17 +460,17 @@ export const ProfileOwnerScreen = (
                   .catch((error) => {
                     console.log(error);
                   });
-                setmodalAddEndAddrVisible(false)
+                setmodalAddEndAddrVisible(false);
               }}
             />
             <Button
               onPress={() => {
-                setmodalAddEndAddrVisible(false)
+                setmodalAddEndAddrVisible(false);
               }}>
-            뒤로 돌아가기</Button>
+              뒤로 돌아가기
+            </Button>
           </View>
         </Modal>
-
       </ScrollView>
     </React.Fragment>
   );
