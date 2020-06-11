@@ -226,15 +226,14 @@ export const ProfileDriverScreen = (
             <Text style={styles.infoTitle}>사업자등록번호: </Text>
             <Layout style={styles.selectContainer}>
               <Input
-                //placeholder="사업자 등록번호를 입력하세요"
-                placeholder={manNumInput}
+                placeholder="사업자 등록번호를 입력하세요"
                 value={manNumInput}
                 onChangeText={manNum}
               />
             </Layout>
           </View>
         </View>
-        <View style={styles.lineStyle} />
+        <Divider style={{backgroundColor: 'black'}} />
 
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>차량 정보</Text>
@@ -284,7 +283,7 @@ export const ProfileDriverScreen = (
             />
           </View>
         </View>
-        <View style={styles.lineStyle} />
+        <Divider style={{backgroundColor: 'black'}} />
 
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
@@ -373,20 +372,22 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 5,
+    paddingVertical: 10,
     flex: 0.2,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     borderColor: '#20232a',
+    backgroundColor: 'white',
   },
   infoContainer: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
     justifyContent: 'space-between',
+    backgroundColor: 'white',
   },
   rowContainer: {
     paddingVertical: 8,
@@ -407,6 +408,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: '#20232a',
     justifyContent: 'space-between',
+    backgroundColor: 'white',
   },
   infoTitle: {
     paddingVertical: 2,

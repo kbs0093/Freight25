@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   StyleSheet,
@@ -40,6 +40,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import {CommonActions} from '@react-navigation/native';
+
 const resetAction = CommonActions.reset({
   index: 0,
   routes: [{name: AppRoute.AUTH}],
@@ -86,7 +87,46 @@ export const ProfileOwnerScreen = (
   const [endAddr_lat, setEndAddr_lat] = useState<string>('');
   const [endAddr_lon, setEndAddr_lon] = useState<string>('');
 
-  // TODO: Implement withdrawal function.
+  const [lock, setLock] = React.useState(0);
+  const [userID, setUserID] = React.useState('');
+
+  useEffect(() => {
+    AsyncStorage.getItem('fbToken').then((value) => {
+      if (value) {
+        auth().onAuthStateChanged(function (user) {
+          if (user) {
+            setUserID(user.uid);
+          } else {
+          }
+        });
+      }
+    });
+  });
+
+  const getDB = () => {
+    if (userID) {
+      var ref = firestore().collection('owners').doc(userID);
+      ref.get().then(function (doc) {
+        if (doc.exists) {
+          // Get the information from driver
+          const docs = doc.data();
+          setBankValue(docs.bankName);
+          name(docs.name);
+          phoneNum(docs.tel);
+          accountNum(docs.account);
+          accountOwner(docs.accountOwner);
+          manNum(docs.companyNumber);
+          companyName(docs.companyName);
+        }
+      });
+      setLock(1);
+    }
+  };
+
+  if (lock == 0) {
+    getDB();
+  }
+
   const withdrawHandler = async () => {
     var user = auth().currentUser;
     var ref = firestore().collection('owners').doc(user?.uid);
@@ -145,10 +185,16 @@ export const ProfileOwnerScreen = (
     if (user != null) {
       console.log('firestore target uid: ' + auth().currentUser?.uid);
       try {
+        if (BankValue != null) {
+          ref.update({bankName: BankValue});
+        }
         ref.update({
           name: nameInput,
           tel: phoneNumInput,
           companyNumber: manNumInput,
+          companyName: companyNameInput,
+          account: accountNumInput,
+          accountOwner: accountNumInput,
 
           // TODO: Need to add Favorite address
           // savedStartCompact: addrCompact,
@@ -159,11 +205,6 @@ export const ProfileOwnerScreen = (
           // savedEndFull: endAddrFull,
           // savedEndLat: endAddr_lat,
           // savedEndLon: endAddr_lon,
-          companyName: companyNameInput,
-
-          bankName: BankValue,
-          account: accountNumInput,
-          accountOwner: accountNumInput,
         });
       } catch (error) {
         console.log(error);
@@ -233,10 +274,10 @@ export const ProfileOwnerScreen = (
             </Layout>
           </View>
         </View>
-        <View style={styles.lineStyle} />
+        <Divider style={{backgroundColor: 'black'}} />
 
         <View style={styles.infoContainer}>
-          <Text style={styles.Subtitle}>자주 쓰는 상차/하차지 설정</Text>
+          <Text style={styles.Subtitle}>자주 쓰는 상차 / 하차지 설정</Text>
           <View style={styles.rowContainer}>
             <Text style={styles.infoTitle}>상차지: </Text>
             <View style={{flex: 2.3}}>
@@ -270,8 +311,8 @@ export const ProfileOwnerScreen = (
             </View>
           </View>
         </View>
+        <Divider style={{backgroundColor: 'black'}} />
 
-        <View style={styles.lineStyle} />
         <View style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
           <View style={styles.rowContainer}>
@@ -322,6 +363,7 @@ export const ProfileOwnerScreen = (
                 Toast.show('탈퇴 실패');
               }
             }}
+            status="danger"
             style={styles.withdrawButton}
             textStyle={styles.withdrawButtonText}>
             회원 탈퇴
@@ -478,16 +520,15 @@ export const ProfileOwnerScreen = (
 
 const styles = StyleSheet.create({
   Button: {
-    width: RFPercentage(12),
+    width: RFPercentage(14),
     height: RFPercentage(5),
     borderRadius: 8,
   },
   ButtonText: {
     fontSize: RFPercentage(1.5),
   },
-
   withdrawButton: {
-    width: RFPercentage(14),
+    width: RFPercentage(16),
     height: RFPercentage(6),
     borderRadius: 8,
   },
@@ -500,25 +541,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   Subtitle: {
-    fontSize: RFPercentage(2.5),
+    fontSize: RFPercentage(3),
     fontWeight: 'bold',
   },
   titleContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 5,
+    paddingVertical: 10,
     flex: 0.2,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     borderColor: '#20232a',
+    backgroundColor: 'white',
   },
   infoContainer: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'flex-start',
     borderColor: '#20232a',
     justifyContent: 'space-between',
+    backgroundColor: 'white',
   },
   rowContainer: {
     paddingVertical: 8,
@@ -536,8 +579,8 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     paddingVertical: 2,
-    paddingHorizontal: 30,
-    fontSize: RFPercentage(2),
+    paddingHorizontal: 10,
+    fontSize: RFPercentage(2.2),
     fontWeight: 'bold',
   },
   withdrawContainer: {
@@ -545,6 +588,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: '#20232a',
     justifyContent: 'space-between',
+    backgroundColor: 'white',
   },
   iconSize: {
     width: 32,
@@ -554,5 +598,10 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'black',
     margin: 5,
+  },
+  textStyle: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    margin: 8,
   },
 });
