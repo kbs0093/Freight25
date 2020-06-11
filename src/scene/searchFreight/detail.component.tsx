@@ -1,20 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
   StyleSheet,
   View,
-  Linking,
   Platform,
-  SafeAreaView,
-  FlatList,
-  FlatListProps,
   ScrollView,
 } from 'react-native';
 import {
-  LayoutElement,
-  Layout,
-  ViewPager,
   Icon,
   Divider,
   Button,
@@ -22,10 +15,7 @@ import {
 import MapView, {PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
 import {DetailScreenProps} from '../../navigation/search.navigator';
 import {AppRoute} from '../../navigation/app-routes';
-import {
-  TouchableOpacity,
-  TouchableHighlight,
-} from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
@@ -40,6 +30,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
       mapVisible: true,
       stopoverVisible: true,
       FreightID: null,
+      totalTime: null,
       data: {
         startAddress: [],
         endAddress: [],
@@ -78,26 +69,31 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
       if (value !== null) {
         this.setState({FreightID: value});
       }
-    } catch (error) {}
-
-    // 이 시점부터 this.state.FreightID로 화물 ID에 접근이 가능합니다 바로 사용하시면 됩니다.
+    } catch (error) {
+      console.log(error)
+    }
 
     var user = auth().currentUser;
     const that = this;
+    var week = new Array('일요일','월요일', '화요일', '수요일', '목요일', '금요일', '토요일');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+
     if (user != null) {
       var docRef = firestore().collection('freights').doc(this.state.FreightID);
 
-      docRef.get().then(function (doc) {
+      docRef.get().then(async function (doc) {
         if (doc.exists) {
           var parseStart = doc.data().startAddr + '';
           var startArr = parseStart.split(' ');
-
           var parseEnd = doc.data().endAddr + '';
           var endArr = parseEnd.split(' ');
           var moneyprint = doc.data().expense + '';
           moneyprint = moneyprint
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          var smart;
+          await that.RegionCode(endArr[0]).then((result)=>{smart = result});
 
           var detaildata = {
             startAddress: startArr,
@@ -116,13 +112,14 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             loadType: doc.data().freightLoadType,
             distanceY: doc.data().dist,
             time: null,
-            smart: null,
+            smart: smart,
             money: doc.data().expense,
             moneyPrint: moneyprint,
             startFull: doc.data().startAddr_Full,
             endFull: doc.data().endAddr_Full,
             isShowLocation: true,
             desc: doc.data().desc,
+            day: dayName,
           };
 
           var region = {
@@ -156,7 +153,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 truckWidth: '100',
                 truckHeight: '100',
                 truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
-                truckTotalWeight: '35000', // 화물 무게도 불러올 것
+                truckTotalWeight: '20000', // 화물 무게도 불러올 것
                 truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
               }),
             },
@@ -166,7 +163,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             })
             .then(function (jsonData) {
               var coordinates = [];
-              for (let i = 0; i < Object(jsonData.features).length; i++) {
+               for (let i = 0; i < Object(jsonData.features).length; i++) {
                 if (
                   typeof jsonData.features[i].geometry.coordinates[0] ===
                   'object'
@@ -202,6 +199,43 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
               that.setState({apiInfo: coordinates});
               return JSON.stringify(jsonData);
             });
+
+            var data2 = fetch(
+              'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
+              {
+                method: 'POST',
+                headers: {
+                  appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
+                },
+                body: JSON.stringify({
+                  startX: doc.data().startAddr_lon,
+                  startY: doc.data().startAddr_lat,
+                  endX: doc.data().endAddr_lon,
+                  endY: doc.data().endAddr_lat,
+                  reqCoordType: 'WGS84GEO',
+                  resCoordType: 'WGS84GEO',
+                  angle: '172',
+                  searchOption: '1',
+                  passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
+                  trafficInfo: 'Y',
+                  truckType: '1',
+                  truckWidth: '100',
+                  truckHeight: '100',
+                  truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+                  truckTotalWeight: '20000', // 화물 무게도 불러올 것
+                  truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+                  totalValue: '2'
+                }),
+              },
+            )
+              .then(function (response) {
+                return response.json();
+              })
+              .then(function (jsonData) {                         
+                that.setState({totalTime: jsonData.features[0].properties.totalTime});
+              });
+
+
         } else {
           console.log('No such document!');
         }
@@ -230,8 +264,12 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
   };
 
   ClickApply = async () => {
+    let date = new Date()
+    date.setSeconds(date.getSeconds() + this.state.totalTime);
+
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('FreightID');
+     
     if (user != null) {
       if (value != null) {
         var freightRef = firestore().collection('freights').doc(value);
@@ -244,12 +282,19 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             driverId: user.uid,
             driverTel: driverTel,
             timeStampAssigned: new Date(),
+            totalTime: date
           });
           console.log(
             'StopOver X ' + freightRef.id + ' was assigned to ' + user.uid,
           );
-          //Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
-          this.props.navigation.navigate(AppRoute.STOPOVERAD);
+          
+          if(this.state.data.Type == '혼적'){
+            this.props.navigation.navigate(AppRoute.STOPOVERAD);
+          } else{
+            Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
+            this.props.navigation.navigate(AppRoute.HOME);
+          }
+          
         } catch {
           console.log('Failed assign to ' + freightRef.id);
         }
@@ -260,12 +305,12 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             transactionId: transRef.id,
             driverId: user.uid,
             driverTel: driverTel,
-            driveOption:"혼적",
             originalFreightId: value,
             stopoverFreightId: "",   
             totalExpense: "",
             totalDistance: "",
-            timeStampAssigned: new Date()
+            timeStampAssigned: new Date(),
+            totalTime: date
           })
           AsyncStorage.setItem('tsActId',transRef.id);
         }
@@ -275,6 +320,54 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
       }
     }
   };
+
+  RegionCode = async(address) =>{
+    var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+    let smart;
+
+    var data = await firestore().collection('probability').doc(dayName)
+    .get()
+    .then(function(doc){
+      if(address == '강원'){
+        smart = doc.data().gw;
+      } else if (address == '경기'){
+        smart = doc.data().gg;
+      } else if (address == '경남'){
+        smart = doc.data().gn;
+      } else if (address == '경북'){
+        smart = doc.data().gb;
+      } else if (address == '광주'){
+        smart = doc.data().gj;
+      } else if (address == '대구'){
+        smart = doc.data().dg;
+      } else if (address == '대전'){
+        smart = doc.data().dj;
+      } else if (address == '부산'){
+        smart = doc.data().bs;
+      } else if (address == '서울'){
+        smart = doc.data().se;
+      } else if (address == '세종특별자치시'){
+        smart = doc.data().sj;
+      } else if (address == '울산'){
+        smart = doc.data().us;
+      } else if (address == '인천'){
+        smart = doc.data().ic;
+      } else if (address == '전남'){
+        smart = doc.data().jn;
+      } else if (address == '전북'){
+        smart = doc.data().jb;
+      } else if (address == '제주특별자치도'){
+        smart = doc.data().jj;
+      } else if (address == '충남'){
+        smart = doc.data().cn;
+      } else if (address == '충북'){
+        smart = doc.data().cb;
+      }
+    })  
+    return smart;
+  }
 
   render() {
     return (
@@ -343,15 +436,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 onRegionChange={this.onRegionChange}>
                 <Polyline
                   coordinates={this.state.apiInfo}
-                  strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-                  strokeColors={[
-                    '#7F0000',
-                    '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                    '#B24112',
-                    '#E5845C',
-                    '#238C23',
-                    '#7F0000',
-                  ]}
+                  strokeColor="#2F80ED" // fallback for when `strokeColors` is not supported by the map-provider
                   strokeWidth={6}
                 />
               </MapView>
@@ -468,7 +553,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                     color: '#BDBDBD',
                   }}>
                   {' '}
-                  하차지 서울 성북에서 화물이 있을 확률{' '}
+                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 화물 점유율{' '}
                 </Text>
               </View>
             </View>
@@ -478,7 +563,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 alignItems: 'center',
                 justifyContent: 'flex-end',
               }}>
-              <Text style={{fontSize: 26, fontWeight: 'bold'}}>87%</Text>
+              <Text style={{fontSize: 26, fontWeight: 'bold'}}>{this.state.data.smart}%</Text>
             </View>
             <Divider style={{backgroundColor: 'black'}} />
           </View>

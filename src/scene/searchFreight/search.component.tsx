@@ -1,37 +1,27 @@
-import React, {useState, Component} from 'react';
+import React, {Component} from 'react';
 import {
   Text,
   StyleSheet,
   View,
-  Linking,
   Platform,
   FlatList,
-  FlatListProps,
-  ListRenderItemInfo,
   SafeAreaView,
   Alert,
-  RefreshControl,
   PermissionsAndroid,
-  NavigatorIOS,
 } from 'react-native';
 import {
-  LayoutElement, 
   Icon,
   Divider,
-  Button,
-  TopNavigation, 
-  TopNavigationAction,
 } from '@ui-kitten/components';
-import { FORWARDIcon } from '../../assets/icons'
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
-import { withNavigation } from 'react-navigation';
 import { SearchScreenProps } from'../../navigation/search.navigator';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
 import Geolocation from 'react-native-geolocation-service';
+import TextTicker from 'react-native-text-ticker'
 
 
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
@@ -133,11 +123,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
     );
   };
 
-  FirebaseRequest = async() => {    
+  FirebaseRequest = async() => {
     var user = auth().currentUser;
     const that = this;
     
-    if(user != null){      
+    if(user != null){
       try {
         firestore().collection('freights').where("state", "==", 0)
         .get()
@@ -145,19 +135,19 @@ export class SearchScreen extends Component <SearchScreenProps> {
           var list =[];
           
           for(var docCnt in querySnapshot.docs){
-              
             const doc = querySnapshot.docs[docCnt].data();
             var parseStart = doc.startAddr + "";
             var startArr = parseStart.split(" ");
-
+            var smart;
             var parseEnd = doc.endAddr + "";
             var endArr = parseEnd.split(" ");
             var moneyprint = doc.expense + "";
             var distance;
-            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
             var distance = 100 * (Math.acos(Math.sin(that.state.latitude)*Math.sin(doc.startAddr_lat) + Math.cos(that.state.latitude)*Math.cos(doc.startAddr_lat)*Math.cos(that.state.longitude - doc.startAddr_lon)));;
+            
             distance = Math.floor(distance);
+            moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            await that.RegionCode(endArr[0]).then((result)=>{smart = result});
 
             list.push({
               id: doc.id,
@@ -176,7 +166,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
               distanceX: distance,              
               distanceY: doc.dist,
               time: null,
-              smart: null,
+              smart: smart,
               money: doc.expense,
               moneyPrint: moneyprint,
               
@@ -193,20 +183,63 @@ export class SearchScreen extends Component <SearchScreenProps> {
     }   
   }
 
+  RegionCode = async(address) =>{
+    var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+    let smart;
+
+    var data = await firestore().collection('probability').doc(dayName)
+    .get()
+    .then(function(doc){
+      if(address == '강원'){
+        smart = doc.data().gw;
+      } else if (address == '경기'){
+        smart = doc.data().gg;
+      } else if (address == '경남'){
+        smart = doc.data().gn;
+      } else if (address == '경북'){
+        smart = doc.data().gb;
+      } else if (address == '광주'){
+        smart = doc.data().gj;
+      } else if (address == '대구'){
+        smart = doc.data().dg;
+      } else if (address == '대전'){
+        smart = doc.data().dj;
+      } else if (address == '부산'){
+        smart = doc.data().bs;
+      } else if (address == '서울'){
+        smart = doc.data().se;
+      } else if (address == '세종특별자치시'){
+        smart = doc.data().sj;
+      } else if (address == '울산'){
+        smart = doc.data().us;
+      } else if (address == '인천'){
+        smart = doc.data().ic;
+      } else if (address == '전남'){
+        smart = doc.data().jn;
+      } else if (address == '전북'){
+        smart = doc.data().jb;
+      } else if (address == '제주특별자치도'){
+        smart = doc.data().jj;
+      } else if (address == '충남'){
+        smart = doc.data().cn;
+      } else if (address == '충북'){
+        smart = doc.data().cb;
+      }
+    })  
+    return smart;
+  }
 
 
   componentDidMount = () => {
     isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()
+
   }
 
    ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
-    if(item.Type == '독차'){
-      this.props.navigation.navigate(AppRoute.ALONE_DETAIL);
-    } else {
-      this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
-    }
-
+    this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
 
   moneySort(a, b) {
@@ -263,7 +296,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
         <View style={styles.geoInfo1}>
           <View style={styles.geoInfo11}>
           <View style={{flex: 1, justifyContent: 'flex-end'}}>
-              <Text style={styles.geoTitleText}>{item.startAddress[0]} {item.startAddress[1]}</Text>
+            <TextTicker
+                style={styles.geoTitleText}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.startAddress[0]} {item.startAddress[1]}
+              </TextTicker>            
+              
             </View>
             <View>
               <Text style={styles.geoTitleText}>{item.startAddress[2]}</Text>
@@ -279,7 +322,16 @@ export class SearchScreen extends Component <SearchScreenProps> {
           
           <View style={styles.geoInfo11}>
             <View style={{flex: 1, justifyContent: 'flex-end'}}>
-              <Text style={styles.geoTitleText}>{item.endAddress[0]} {item.endAddress[1]}</Text>
+              <TextTicker
+                style={styles.geoTitleText}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.endAddress[0]} {item.endAddress[1]}
+              </TextTicker>              
             </View>
             <View>
               <Text style={styles.geoTitleText}>{item.endAddress[2]}</Text>
@@ -294,8 +346,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
         </View>
 
           <View style={styles.geoInfo3}/>                        
-            <View style={styles.freightType}>
-              <Text style={styles.freightTypeText}> {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}</Text>
+            <View style={styles.freightTypeText}>
+              <TextTicker
+                style={styles.freightTypeText}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}
+              </TextTicker>
             </View>
       </View>
 
@@ -307,7 +368,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
         </View>
         <View style={styles.moneyInfo}>
-          <Text style={styles.driveText}>{item.moneyPrint} 원</Text>
+            <TextTicker
+              style={styles.driveText}
+              duration={3000}
+              loop
+              bounce
+              repeatSpacer={50}
+              marqueeDelay={1000}
+            >
+              {item.moneyPrint} 원
+            </TextTicker>
+          
         </View>
       </View>                          
     </View>
@@ -315,18 +386,17 @@ export class SearchScreen extends Component <SearchScreenProps> {
   );
   
   render(){
-      
     if(this.state.value == '1'){  
-      this.state.data.sort(this.smartSort);
+      this.state.data2.sort(this.smartSort);
     }
     else if(this.state.value == '2'){
-      this.state.data.sort(this.moneySort);
+      this.state.data2.sort(this.moneySort);
     }
     else if(this.state.value == '3'){
-      this.state.data.sort(this.distanceSort);
+      this.state.data2.sort(this.distanceSort);
     }
     else if(this.state.value == '4'){
-      this.state.data.sort(this.distanceSort2);
+      this.state.data2.sort(this.distanceSort2);
     }
     
     
@@ -335,9 +405,25 @@ export class SearchScreen extends Component <SearchScreenProps> {
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
         <View style={{flex: 3, justifyContent: 'center'}}>
-          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-            검색 위치 : {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
-          </Text>
+          <View style={{flexDirection: "row"}}>
+            <View>
+              <Text style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}>검색 위치 : </Text>
+            </View>
+            <View>
+              <TextTicker
+                style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
+              </TextTicker>
+            </View>         
+          </View>
+         
+
         </View>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           
@@ -346,7 +432,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
       <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
         <View style={{flex: 1, justifyContent: 'center'}}>
           <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-            검색 조건 : 
+          검색 조건 : 
           </Text>
         </View>
         <View style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
@@ -365,6 +451,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
                 {label: '운임 순', value: '2'},
                 {label: '스마트 확률 순', value: '1'},
               ]}
+              style={{
+                placeholder: {
+                  color: 'orange'
+                },
+              }}
       
             />
         </View>      
@@ -391,7 +482,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
                 {label: '50Km', value: '2'},
                 {label: '100Km', value: '1'},
               ]}
-      
+              style={{
+                placeholder: {
+                  color: 'orange'
+                },
+              }}
             />
         </View>      
       </View>     
@@ -423,7 +518,7 @@ const styles = StyleSheet.create({
   },
   Type: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
     color: '#9B51E0',
   },
   container: {
@@ -447,20 +542,20 @@ const styles = StyleSheet.create({
   },
   geoTitleText: {    
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 18,
     margin: 2,    
   },
   timeText: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
   },
   driveText: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
   },
   driveText2: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
     justifyContent: 'flex-start',
   },
   geoInfo11: {
@@ -507,16 +602,15 @@ const styles = StyleSheet.create({
   },
   distance: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
     color: '#E5E5E5',
   },
   freightTypeText: {
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 15,
     color: '#219653'
   },
-  freightType: {
-    
+  freightType: {    
     flexDirection: 'row',
     flex : 1,
   }

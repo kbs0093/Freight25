@@ -21,6 +21,18 @@ import {LoadingScreenProps, AuthNavigator} from '../../navigation/auth.navigator
 import {AppRoute} from '../../navigation/app-routes';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import {CommonActions} from '@react-navigation/native';
+
+const HomeNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.HOME}],
+});
+
+const OwnerNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.OWNER}],
+});
+
 
 export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
   AsyncStorage.getItem('fbToken')
@@ -39,7 +51,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
                   AsyncStorage.setItem('userType', 'driver').then(() =>{
                     console.log("loading AsyncStorage Type: driver");
                     console.log(user.uid+" succeeded in loging / loading Stage");
-                    props.navigation.navigate(AppRoute.HOME);
+                    props.navigation.dispatch(HomeNavigate);
                   });
                 }
   
@@ -47,7 +59,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
                   AsyncStorage.setItem('userType', 'owner').then(()=>{
                     console.log("loading AsyncStorage Type: owner");
                     console.log(user.uid+" succeeded in loging / loading Stage");
-                    props.navigation.navigate(AppRoute.OWNER);
+                    props.navigation.dispatch(OwnerNavigate);
                   });
                 } 
               })

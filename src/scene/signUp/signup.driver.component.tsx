@@ -24,6 +24,12 @@ import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
 
+const HomeNavigate = CommonActions.reset({
+  index: 0,
+  routes: [{name: AppRoute.HOME}],
+});
+
+
 const serverUrl = 'http://49.50.162.128:8000/';
 
 const logCallback = (log, callback) => {
@@ -123,7 +129,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                   Toast.showSuccess('회원가입이 완료되었습니다.');
                   AsyncStorage.setItem('userType', 'driver');
                   console.log(user.uid+" succeeded in loging / signup Stage");
-                  props.navigation.push(AppRoute.HOME);
+                  props.navigation.dispatch(HomeNavigate);
                 } 
                 catch (error) {
                   //오류 toast 출력 혹은 뒤로 가기 필요할 것 같습니다.
