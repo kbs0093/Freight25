@@ -42,18 +42,19 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
   return (
     <React.Fragment>
       <View style={styles.viewForm}>
-        <TouchableOpacity onPress={clickButtonType}>
+        <TouchableOpacity onPress={clickButtonType} style={styles.Button}>
           <Image
-            style={styles.Button}
+            style={styles.Image}
             source={require('../../assets/SearchButton-round.png')}
           />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={clickCheck}>
+        </TouchableOpacity>                      
+        <TouchableOpacity onPress={clickCheck} style={styles.Button}>
           <Image
-            style={styles.Button}
+            style={styles.Image}
             source={require('../../assets/CheckButton-round.png')}
           />
         </TouchableOpacity>
+             
       </View>
 
       <View style={{backgroundColor: 'white'}}>
@@ -147,12 +148,20 @@ const styles = StyleSheet.create({
   viewForm: {
     flex: 2,
     backgroundColor: 'white',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   Button: {
-    width: 355,
-    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '45%',
+    margin: 10,
+    borderRadius: 15,
+  },
+  Image: {
+    width: '90%',
+    height: '100%',
     margin: 10,
     borderRadius: 15,
   },
