@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   View,
-  Platform,
   ScrollView,
 } from 'react-native';
 import {
@@ -19,8 +18,6 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
-
-const isAndroid = Platform.OS === 'android';
 
 export class DetailScreen extends React.Component<DetailScreenProps> {
   constructor(props) {
