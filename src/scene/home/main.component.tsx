@@ -105,15 +105,15 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
   return (
     <React.Fragment>
       <View style={styles.viewForm}>
-        <TouchableOpacity onPress={clickButtonType}>
+      <TouchableOpacity onPress={clickButtonType} style={styles.Button}>
           <Image
-            style={styles.Button}
+            style={styles.Image}
             source={require('../../assets/ApplyButton.png')}
           />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={clickCheck}>
+        </TouchableOpacity>                      
+        <TouchableOpacity onPress={clickCheck} style={styles.Button}>
           <Image
-            style={styles.Button}
+            style={styles.Image}
             source={require('../../assets/CheckButton-round.png')}
           />
         </TouchableOpacity>
