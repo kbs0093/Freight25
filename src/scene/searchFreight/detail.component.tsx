@@ -18,6 +18,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
+import TextTicker from 'react-native-text-ticker'
 
 export class DetailScreen extends React.Component<DetailScreenProps> {
   constructor(props) {
@@ -507,9 +508,16 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 <Text style={styles.freightTitle}>상차지 상세주소 : </Text>
               </View>
               <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.startFull}
-                </Text>
+                <TextTicker
+                  style={styles.freightTitle}
+                  duration={3000}
+                  loop
+                  bounce
+                  repeatSpacer={50}
+                  marqueeDelay={1000}
+                >
+                {this.state.data.startFull}
+                </TextTicker>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -517,9 +525,16 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
                 <Text style={styles.freightTitle}>하차지 상세주소 : </Text>
               </View>
               <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.endFull}
-                </Text>
+                <TextTicker
+                  style={styles.freightTitle}
+                  duration={3000}
+                  loop
+                  bounce
+                  repeatSpacer={50}
+                  marqueeDelay={1000}
+                >
+                {this.state.data.endFull}
+                </TextTicker>
               </View>
             </View>
             <View style={{flexDirection: 'row'}}>
