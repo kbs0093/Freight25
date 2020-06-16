@@ -17,12 +17,9 @@ export const CheckNavigator = (): React.ReactElement => (
   </TopTab.Navigator>
 );
 export const CheckDetailOwnerNavigator = (): React.ReactElement => (
-  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
-    <Stack.Screen
-      name={AppRoute.CHECK_DETAIL_OWNER}
-      component={DetailCheckOwnerScreen}
-    />
-  </TopTab.Navigator>
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name={AppRoute.CHECK_DETAIL_OWNER} component={DetailCheckOwnerScreen}/>  
+  </Stack.Navigator>  
 );
 export const CheckDetailDriverNavigator = (): React.ReactElement => (
   <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>

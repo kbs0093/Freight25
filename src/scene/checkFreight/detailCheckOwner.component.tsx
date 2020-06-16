@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   Linking,
+  Image
 } from 'react-native';
 import {
   LayoutElement,
@@ -35,6 +36,7 @@ import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import TextTicker from 'react-native-text-ticker'
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -121,6 +123,10 @@ export class DetailCheckOwnerScreen extends React.Component<
             } else
               docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           }
+          var moneyprint = docs.expense + '';
+          moneyprint = moneyprint
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
           list.push({
             key: docs.id,
@@ -128,7 +134,7 @@ export class DetailCheckOwnerScreen extends React.Component<
             dist: docs.dist,
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: docs.endDate,
-            expense: docs.expense,
+            expense: moneyprint,
             startAddr: docs.startAddr,
             endAddr: docs.endAddr,
             startAddrFullArray: startAddrFullArray,
@@ -172,28 +178,52 @@ export class DetailCheckOwnerScreen extends React.Component<
     Linking.openURL(`tel:${this.state.addiData.driverTel}`);
   };
 
+  navigateBack = () => {
+    this.props.navigation.goBack()
+  }
+  
+  deleteFreight =() => {
+
+  }
+
   _renderItem = ({item}) => (
     <View>
-      <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>화물 내역</Text>
-        {item.lastState == '배송중' ? (
-          <Button
-            style={styles.Badge}
-            appearance="outline"
-            status="danger"
-            icon={carIcon}
-            textStyle={styles.badgeText}>
-            {item.lastState}
-          </Button>
-        ) : (
-          <Button
-            style={styles.Badge}
-            appearance="outline"
-            textStyle={styles.badgeText}>
-            {item.lastState}
-          </Button>
-        )}
+      <View style={{flexDirection: 'row'}}>
+        <View style={{flex: 1, justifyContent: 'center' }}>
+          <View></View>
+          <TouchableOpacity onPress={this.navigateBack}>
+           <Icon name='arrow-back-outline' width={28} height={28} fill='black'/>
+          </TouchableOpacity>
+        </View>
+        <View style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
+          <Text style={styles.Subtitle}>
+            화물 내역
+          </Text>
+        </View>
+        <View style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
+          {item.lastState == '배송중' ? (
+            <Button
+              style={styles.Badge}
+              appearance="outline"
+              status="danger"
+              icon={carIcon}
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
+          ) : (
+            <Button
+              style={styles.Badge}
+              appearance='outline'
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
+          )}
+          <Divider style={{backgroundColor: 'black'}}/>
+        </View>        
       </View>
+
+      <Divider style={{backgroundColor: 'black'}} />
+     
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -203,21 +233,28 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.geoSubText}>{item.startDate}</Text>
         </View>
         <View style={styles.geoInfoContainer}>
-          <Icon
-            style={styles.iconSize}
-            fill="#8F9BB3"
-            name="arrow-forward-outline"
-          />
+          <View>
+            <Icon
+              style={styles.iconSize}
+              fill="#8F9BB3"
+              name="arrow-forward-outline"
+            />
+          </View>
+          <View>
+           <Text style={styles.geoSubText3}>{item.driveOption}</Text>
+          </View>
+         
         </View>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
             {item.endAddrArray[0]} {item.endAddrArray[1]}
           </Text>
           <Text style={styles.geoText}>{item.endAddrArray[2]}</Text>
-          <Text style={styles.geoSubText}>{item.endDate}</Text>
-        </View>
+          <Text style={styles.geoSubText2}>{item.endDate}</Text>
+        </View>        
       </View>
-      <Divider style={{backgroundColor: 'black'}} />
+
+      <Divider style={{backgroundColor: 'black'}} />      
 
       <View style={styles.freightInfoTotalContainer}>
         <View style={styles.freightInfoHalfContainer} key="1">
@@ -233,8 +270,8 @@ export class DetailCheckOwnerScreen extends React.Component<
           )}
           <Text style={styles.infoTitle}>운행 운임:</Text>
           <Text style={styles.infoTitle}>운행 방식:</Text>
-          <Text style={styles.infoTitle}>상차지 주소:{'\n'}</Text>
-          <Text style={styles.infoTitle}>하차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>상차지 주소:</Text>
+          <Text style={styles.infoTitle}>하차지 주소:</Text>
           <Text style={styles.infoTitle}>화물 설명:</Text>
           {item.lastState == '배송중' ? (
             <Text style={styles.infoTitle}>화물차 기사 전화번호:</Text>
@@ -247,16 +284,27 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
           <Text style={styles.infoRightTitle}>{item.driveOption}</Text>
-          <Text style={styles.infoRightTitle}>
-            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
-            {item.startAddrFullArray[2]} {'\n'}
-            {item.startAddrDetail}
-          </Text>
-          <Text style={styles.infoRightTitle}>
-            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
-            {item.endAddrFullArray[2]} {'\n'}
-            {item.endAddrDetail}
-          </Text>
+          <TextTicker
+                style={styles.infoRightTitle}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.startAddrFullArray[0]} {item.startAddrFullArray[1]} {item.startAddrFullArray[2]} {item.startAddrDetail}
+          </TextTicker>
+          <TextTicker
+                style={styles.infoRightTitle}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+              {item.endAddrFullArray[0]} {item.endAddrFullArray[1]} {item.endAddrFullArray[2]} {item.endAddrDetail}
+          </TextTicker>
+
           <Text style={styles.infoRightTitle}>{item.desc}</Text>
           {item.lastState == '배송중' ? (
             <Text style={styles.infoTitle}>{item.driverTel}</Text>
@@ -338,14 +386,34 @@ export class DetailCheckOwnerScreen extends React.Component<
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <FlatList
-          style={{backgroundColor: 'white'}}
-          data={this.state.data}
-          renderItem={this._renderItem}
-        />
-        <View style={styles.ButtonContainter}>
-          <View style={styles.ButtonHalfContainer}>{callButton}</View>
-          {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
+        <View style={{backgroundColor: 'white', flex: 1}}>
+          <View style={{flex: 4}}>
+            <FlatList
+              style={{backgroundColor: 'white'}}
+              data={this.state.data}
+              renderItem={this._renderItem}
+            />
+          </View>
+
+          <View style={styles.ButtonContainter}>
+            <View style={styles.ButtonHalfContainer}>{callButton}</View>
+            <View style={{flex:1, alignItems: 'center'}}>
+              <Button
+                status='danger'
+                onPress={this.deleteFreight}
+              >
+                삭제
+              </Button>
+            </View>
+            {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
+          </View>
+
+          <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1.6}}>
+            <Image
+              style={styles.adImage}
+              source={require('../../assets/AD/ad2.jpg')}
+            />
+          </View>
         </View>
       </React.Fragment>
     );
@@ -357,6 +425,7 @@ const styles = StyleSheet.create({
     width: RFPercentage(14),
     height: RFPercentage(6),
     borderRadius: 8,
+    margin: 5
   },
   smallBadge: {
     width: RFPercentage(12),
@@ -409,7 +478,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   freightInfoHalfRightContainer: {
-    flex: 1,
+    flex: 2,
     paddingLeft: 15,
     alignItems: 'flex-start',
   },
@@ -435,16 +504,30 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
+    color: '#2F80ED'
+  },
+  geoSubText2: {
+    fontSize: RFPercentage(2.5),
+    fontWeight: 'bold',
+    paddingVertical: 15,
+    color: '#EB5757'
+  },
+  geoSubText3: {
+    fontSize: RFPercentage(2.5),
+    fontWeight: 'bold',
+    paddingVertical: 15,
+    color: '#9B51E0',
   },
   infoTitle: {
     paddingVertical: 4,
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
   },
   infoRightTitle: {
     paddingVertical: 4,
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
+    justifyContent: 'center'
   },
   totalInfoContainer: {
     backgroundColor: 'white',
@@ -458,13 +541,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   ButtonContainter: {
+    flex: 0.5,
     backgroundColor: 'white',
     flexDirection: 'row',
-    flex: 3,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5
   },
   ButtonHalfContainer: {
-    flex: 1,
+    flex: 2,
     alignItems: 'center',
   },
   iconSize: {
@@ -475,5 +560,11 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'black',
     margin: 10,
+  },
+  adImage: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    borderRadius: 15,
   },
 });

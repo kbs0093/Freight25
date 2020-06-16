@@ -237,7 +237,7 @@ export class SearchScreen extends Component <SearchScreenProps> {
 
   }
 
-   ClickList = item => () => {
+  ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
     this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
