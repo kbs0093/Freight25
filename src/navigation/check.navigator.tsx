@@ -22,18 +22,12 @@ export const CheckDetailOwnerNavigator = (): React.ReactElement => (
   </Stack.Navigator>  
 );
 export const CheckDetailDriverNavigator = (): React.ReactElement => (
-  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
-    <Stack.Screen
-      name={AppRoute.CHECK_DETAIL_DRIVER}
-      component={DetailCheckDriverScreen}
-    />
-  </TopTab.Navigator>
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name={AppRoute.CHECK_DETAIL_DRIVER} component={DetailCheckDriverScreen}/>
+  </Stack.Navigator>
 );
 export const CheckDetailStopoverNavigator = (): React.ReactElement => (
-  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
-    <Stack.Screen
-      name={AppRoute.CHECK_DETAIL_DRIVER}
-      component={DetailCheckStopoverScreen}
-    />
-  </TopTab.Navigator>
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name={AppRoute.CHECK_DETAIL_DRIVER} component={DetailCheckStopoverScreen}/>
+  </Stack.Navigator>
 );

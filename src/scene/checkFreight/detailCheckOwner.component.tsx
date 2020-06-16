@@ -20,20 +20,8 @@ import {
   Divider,
 } from '@ui-kitten/components';
 import {DetailCheckOwnerScreenProps} from '../../navigation/check.navigator';
-import {MainScreenProps} from '../../navigation/home.navigator';
-import {AppRoute} from '../../navigation/app-routes';
-import {
-  BackIcon,
-  MenuIcon,
-  InfoIcon,
-  LogoutIcon,
-  MAPIcon,
-  PHONEIcon,
-  NOTEIcon,
-} from '../../assets/icons';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
-import ViewPager from '@react-native-community/viewpager';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import TextTicker from 'react-native-text-ticker'
@@ -242,8 +230,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           </View>
           <View>
            <Text style={styles.geoSubText3}>{item.driveOption}</Text>
-          </View>
-         
+          </View>         
         </View>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -432,7 +419,7 @@ const styles = StyleSheet.create({
     height: RFPercentage(2),
   },
   badgeText: {
-    fontSize: RFPercentage(1.5),
+    fontSize: RFPercentage(2),
   },
   button: {
     width: RFPercentage(28),

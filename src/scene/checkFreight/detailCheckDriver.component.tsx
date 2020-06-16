@@ -7,6 +7,7 @@ import {
   NativeModules,
   SafeAreaView,
   FlatList,
+  TouchableOpacity,
   ScrollView,
   Alert,
   Linking,
@@ -32,6 +33,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 import Geolocation from 'react-native-geolocation-service';
+import TextTicker from 'react-native-text-ticker'
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -203,13 +205,19 @@ export class DetailCheckDriverScreen extends React.Component<
           var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
           //var docEndDate = new Date(docs.endDay._seconds * 1000);
 
+          var moneyprint = docs.expense + '';
+          moneyprint = moneyprint
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+
           list.push({
             key: docs.id,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
             dist: docs.dist,
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
             endDate: docs.endDate,
-            expense: docs.expense,
+            expense: moneyprint,
             startAddress: docs.startAddr,
             endAddress: docs.endAddr,
             startAddrFullArray: startAddrFullArray,
@@ -333,29 +341,49 @@ export class DetailCheckDriverScreen extends React.Component<
     }
   };
 
+  navigateBack = () => {
+    this.props.navigation.goBack()
+  }
+
   _renderItem = ({item}) => (
     <View>
-      <View style={styles.freightContainer}>
-        <Text style={styles.Subtitle}>화물 내역</Text>
-        {item.lastState == '배송중' ? (
-          <Button
-            style={styles.Badge}
-            appearance="outline"
-            status="danger"
-            icon={carIcon}
-            textStyle={styles.badgeText}>
-            {item.lastState}
-          </Button>
-        ) : (
-          <Button
-            style={styles.Badge}
-            appearance="outline"
-            textStyle={styles.badgeText}>
-            {item.lastState}
-          </Button>
-        )}
+      <View style={{flexDirection: 'row'}}>
+        <View style={{flex: 1, justifyContent: 'center' }}>
+          <View></View>
+          <TouchableOpacity onPress={this.navigateBack}>
+           <Icon name='arrow-back-outline' width={28} height={28} fill='black'/>
+          </TouchableOpacity>
+        </View>
+        <View style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
+          <Text style={styles.Subtitle}>
+            화물 내역
+          </Text>
+        </View>
+        <View style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
+          {item.lastState == '배송중' ? (
+            <Button
+              style={styles.Badge}
+              appearance="outline"
+              status="danger"
+              icon={carIcon}
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
+          ) : (
+            <Button
+              style={styles.Badge}
+              appearance='outline'
+              textStyle={styles.badgeText}>
+              {item.lastState}
+            </Button>
+          )}
+        </View>        
       </View>
+
+      <Divider style={{backgroundColor: 'black'}} />
+
       <View style={styles.geoContainer}>
+        
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
             {item.startAddrArray[0]} {item.startAddrArray[1]}{' '}
@@ -364,18 +392,24 @@ export class DetailCheckDriverScreen extends React.Component<
           <Text style={styles.geoSubText}>{item.startDate}</Text>
         </View>
         <View style={styles.geoInfoContainer}>
-          <Icon
-            style={styles.iconSize}
-            fill="#8F9BB3"
-            name="arrow-forward-outline"
-          />
+          <View>
+            <Icon
+              style={styles.iconSize}
+              fill="#8F9BB3"
+              name="arrow-forward-outline"
+            />
+          </View>
+          <View>
+            <Text style={styles.geoSubText3}>{item.driveOption}</Text>
+          </View>         
         </View>
+  
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
             {item.endAddrArray[0]} {item.endAddrArray[1]}
           </Text>
           <Text style={styles.geoText}>{item.endAddrArray[2]}</Text>
-          <Text style={styles.geoSubText}>{item.endDate}</Text>
+          <Text style={styles.geoSubText2}>{item.endDate}</Text>
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
@@ -384,8 +418,8 @@ export class DetailCheckDriverScreen extends React.Component<
           <Text style={styles.infoTitle}>배차 날짜:</Text>
           <Text style={styles.infoTitle}>운행 거리:</Text>
           <Text style={styles.infoTitle}>운행 운임:</Text>
-          <Text style={styles.infoTitle}>상차지 주소:{'\n'}</Text>
-          <Text style={styles.infoTitle}>하차지 주소:{'\n'}</Text>
+          <Text style={styles.infoTitle}>상차지 주소:</Text>
+          <Text style={styles.infoTitle}>하차지 주소:</Text>
           <Text style={styles.infoTitle}>화주 이름:</Text>
           <Text style={styles.infoTitle}>화주 연락처:</Text>
           <Text style={styles.infoTitle}>화물 설명:</Text>
@@ -396,16 +430,26 @@ export class DetailCheckDriverScreen extends React.Component<
           </Text>
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
-          <Text style={styles.infoRightTitle}>
-            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
-            {item.startAddrFullArray[2]} {'\n'}
-            {item.startAddrDetail}
-          </Text>
-          <Text style={styles.infoRightTitle}>
-            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
-            {item.endAddrFullArray[2]} {'\n'}
-            {item.endAddrDetail}
-          </Text>
+          <TextTicker
+                style={styles.infoRightTitle}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+                {item.startAddrFullArray[0]} {item.startAddrFullArray[1]} {item.startAddrFullArray[2]} {item.startAddrDetail}
+          </TextTicker>
+          <TextTicker
+                style={styles.infoRightTitle}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+              {item.endAddrFullArray[0]} {item.endAddrFullArray[1]} {item.endAddrFullArray[2]} {item.endAddrDetail}
+          </TextTicker>
           <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
           <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
           <Text style={styles.infoRightTitle}>{item.desc}</Text>
@@ -424,7 +468,7 @@ export class DetailCheckDriverScreen extends React.Component<
         onPress={() => {
           this.callOwner();
         }}
-        style={styles.callButton}
+        style={styles.button}
         status="success"
         icon={phoneIcon}
         textStyle={styles.callButtonText}>
@@ -521,10 +565,10 @@ export class DetailCheckDriverScreen extends React.Component<
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{navButton}</View>
           <View style={styles.ButtonHalfContainer}>{showStopoverButton}</View>
-          <View style={styles.ButtonHalfContainer}>{completeButton}</View>
         </View>
         <View style={styles.ButtonContainter}>
           <View style={styles.ButtonHalfContainer}>{callButton}</View>
+          <View style={styles.ButtonHalfContainer}>{completeButton}</View>
         </View>
       </React.Fragment>
     );
@@ -536,6 +580,7 @@ const styles = StyleSheet.create({
     width: RFPercentage(14),
     height: RFPercentage(6),
     borderRadius: 8,
+    margin: 5
   },
   smallBadge: {
     width: RFPercentage(12),
@@ -545,12 +590,12 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(1.5),
   },
   button: {
-    width: RFPercentage(15),
+    width: RFPercentage(20),
     height: RFPercentage(8),
     borderRadius: 8,
   },
   buttonText: {
-    fontSize: RFPercentage(1.5),
+    fontSize: RFPercentage(2),
   },
   callButton: {
     width: RFPercentage(28),
@@ -558,7 +603,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   callButtonText: {
-    fontSize: RFPercentage(1.5),
+    fontSize: RFPercentage(2),
   },
   titleStyles: {
     paddingHorizontal: 20,
@@ -597,7 +642,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   freightInfoHalfRightContainer: {
-    flex: 1,
+    flex: 2,
     paddingLeft: 15,
     alignItems: 'flex-start',
   },
@@ -623,16 +668,29 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
+    color: '#2F80ED'
+  },
+  geoSubText2: {
+    fontSize: RFPercentage(2.5),
+    fontWeight: 'bold',
+    paddingVertical: 15,
+    color: '#EB5757'
+  },
+  geoSubText3: {
+    fontSize: RFPercentage(2.5),
+    fontWeight: 'bold',
+    paddingVertical: 15,
+    color: '#9B51E0',
   },
   infoTitle: {
     paddingVertical: 3,
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     justifyContent: 'space-between',
   },
   infoRightTitle: {
     paddingVertical: 3,
-    fontSize: RFPercentage(2.2),
+    fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
   },
   totalInfoContainer: {
