@@ -288,7 +288,8 @@ export class SearchScreen extends Component <SearchScreenProps> {
     }    
   };
   
-  _renderItem = ({item}) => (   
+  _renderItem = ({item}) => (
+
     <TouchableOpacity onPress={this.ClickList(item)}>    
     <View style={styles.container}>
       <View style={styles.geoInfo}>
@@ -516,6 +517,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#EB5757'
   },
+  endType2: {
+    fontWeight: 'bold',
+    fontSize: 12,
+    color: '#F2994A'
+  },
   Type: {
     fontWeight: 'bold',
     fontSize: 14,
@@ -524,6 +530,7 @@ const styles = StyleSheet.create({
   container: {
     flex : 1,
     flexDirection: 'row',
+    margin: 5
   },
   geoInfo: {
     flex: 4,
