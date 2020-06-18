@@ -90,7 +90,7 @@ export class DetailCheckDriverScreen extends React.Component<
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           DirectSms.sendDirectSms(
             this.state.addiData.recvTel,
-            'Signup process completed! ' + this.state.addiData.recvName,
+            '화물차 기사가 ' + this.state.addiData.recvName +'님께 안전하게 운송을 완료하였습니다.',
           );
           console.log('SMS sent successfully');
         } else {
@@ -105,7 +105,7 @@ export class DetailCheckDriverScreen extends React.Component<
 
       const url = `sms:${this.state.addiData.recvTel}${
         Platform.OS === 'ios' ? '&' : '?'
-      }body=${'signup process completed! ' + this.state.addiData.recvName}`;
+      }body=${'화물차 기사가 ' + this.state.addiData.recvName +'님께 안전하게 운송을 완료하였습니다.'}`;
       Linking.openURL(url).catch((err) =>
         console.error('An error occurred', err),
       );
