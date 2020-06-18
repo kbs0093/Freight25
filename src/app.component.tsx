@@ -6,6 +6,7 @@ import {
   light,
   mapping,
 } from '@eva-design/eva';
+import * as eva from '@eva-design/eva';
 import {
   ApplicationProvider,
   IconRegistry,
@@ -23,7 +24,7 @@ export default (): React.ReactFragment => {
       <IconRegistry icons={EvaIconsPack}/>
       <ApplicationProvider
         mapping={mapping}
-        theme={light}>
+        theme={eva.dark}>
         <SafeAreaProvider>
           <NavigationContainer>
             <AppNavigator initialRouteName={AppRoute.CHECK_LOGIN}/>
