@@ -135,61 +135,66 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   //화물 db에 등록
   const applyFreightToDb = () => {
-    if(user != null){
-      //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
-      var ref = firestore().collection('freights').doc();
-      getDate();
-      if(user != null){
-        try {
-          ref.set({
-            id: ref.id,
-            ownerId: auth().currentUser?.uid,
-//              ownerTel: p
-            carSize: selectedCarSize,
-            carType: selectedCarType,
-            driveOption: selectedDrive,
-            weight: weightValue,
-            volume: volumeValue,
-            freightLoadType: freightLoadTypeValue,
-            desc: descValue,
-            dist: distValue,
-            expense: expenseValue,
-            startAddr: startAddrCompact,
-            startAddr_Full: startAddrFull,
-            startAddr_lat: startAddr_lat,
-            startAddr_lon: startAddr_lon,
-            startDate: selectedStartDate,
-            endAddr: endAddrCompact,
-            endAddr_Full: endAddrFull,
-            endAddr_lat: endAddr_lat,
-            endAddr_lon: endAddr_lon,
-            endDate: selectedEndDate,
-            timeStampCreated: new Date(),
-            startDay: startDay,
-            endDay: endDay,
-            startDayLabel: startDayLabel,
-            endDayLabel: endDayLabel,
-            state: 0,
-            driverId: "",
-            oppoisteFreightId: "",
-            recvName: recvName,
-            recvTel: recvTel,
-            });
-            firestore().collection('owners').doc(user.uid).get()
-            .then(function(snapShot){
-                  ref.update({ownerTel: snapShot.data().tel, ownerName: snapShot.data().name});
-                  console.log(snapShot.data().tel);
+    Alert.alert('화물 추가', '정말 화물을 추가하시겠습니까?', [
+      { text: '예', onPress:() => {
+        if(user != null){
+          //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
+          var ref = firestore().collection('freights').doc();
+          getDate();
+          if(user != null){
+            try {
+              ref.set({
+                id: ref.id,
+                ownerId: auth().currentUser?.uid,
+    //              ownerTel: p
+                carSize: selectedCarSize,
+                carType: selectedCarType,
+                driveOption: selectedDrive,
+                weight: weightValue,
+                volume: volumeValue,
+                freightLoadType: freightLoadTypeValue,
+                desc: descValue,
+                dist: distValue,
+                expense: expenseValue,
+                startAddr: startAddrCompact,
+                startAddr_Full: startAddrFull,
+                startAddr_lat: startAddr_lat,
+                startAddr_lon: startAddr_lon,
+                startDate: selectedStartDate,
+                endAddr: endAddrCompact,
+                endAddr_Full: endAddrFull,
+                endAddr_lat: endAddr_lat,
+                endAddr_lon: endAddr_lon,
+                endDate: selectedEndDate,
+                timeStampCreated: new Date(),
+                startDay: startDay,
+                endDay: endDay,
+                startDayLabel: startDayLabel,
+                endDayLabel: endDayLabel,
+                state: 0,
+                driverId: "",
+                oppoisteFreightId: "",
+                recvName: recvName,
+                recvTel: recvTel,
                 });
-            props.navigation.navigate(AppRoute.OWNER);
-            console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " + new Date());
-            Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
-        } catch (error) {
-          //오류 출력 
-          console.log(error);
-          Toast.show('화물이 등록되지 않았습니다.');
-        }
-      }
-    }
+                firestore().collection('owners').doc(user.uid).get()
+                .then(function(snapShot){
+                      ref.update({ownerTel: snapShot.data().tel, ownerName: snapShot.data().name});
+                      console.log(snapShot.data().tel);
+                    });
+                props.navigation.navigate(AppRoute.OWNER);
+                console.log(auth().currentUser?.uid + ' Added document with ID: '+ref.id+ " at " + new Date());
+                Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
+            } catch (error) {
+              //오류 출력 
+              console.log(error);
+              Toast.show('화물이 등록되지 않았습니다.');
+            }
+          }
+        }    
+      }},
+      { text: '아니오', onPress:() => {console.log('화물 추가를 취소')}}
+    ])
   };
 
   const cancelButtonPressed = () => {
@@ -337,7 +342,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             </View>
           </View>
           <View style={styles.rowContainer}>
-          <Text style={styles.infoTitle}>하차유형 : </Text>
+              <Text style={styles.infoTitle}>하차지 : {endAddrCompact}</Text>
             <Button 
               appearance='outline'
               size='small'
@@ -347,7 +352,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             >변경</Button>
           </View>
           <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>하차일 : </Text>
+          <Text style={styles.infoTitle}>하차유형 : </Text>
             <View style={{flex:3}}>
               <RNPickerSelect
                 onValueChange={(itemValue, itemIndex) => 
