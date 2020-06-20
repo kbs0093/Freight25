@@ -482,7 +482,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     margin: 2,
-    color: 'white'   
   },
   timeText: {
     fontWeight: 'bold',

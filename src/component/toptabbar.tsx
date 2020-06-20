@@ -1,11 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   StyleSheet,
-  View,
-  Linking,
   SafeAreaView,
-  ScrollView,
 } from 'react-native';
 import {
   Button,
@@ -21,30 +18,28 @@ import {
 import {
   BackIcon,
   MenuIcon,
-  InfoIcon,
+  FLIPIcon,
   LogoutIcon,
   PersonIcon,
-  MAPIcon,
-  PHONEIcon,
-  NOTEIcon,
+  POWERIcon
 } from '../assets/icons';
 import {AppRoute} from '../navigation/app-routes';
 import {TopTapBarProps} from '../navigation/TopTabBarNavigator';
 import auth from '@react-native-firebase/auth';
 import KakaoLogins from '@react-native-seoul/kakao-login';
-import {NavigationActions} from 'react-navigation';
 import {useRoute} from '@react-navigation/native';
 import {CommonActions} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import { ThemeContext } from './theme-context';
 
 let userType;
-
 const resetAction = CommonActions.reset({
   index: 0,
   routes: [{name: AppRoute.AUTH}],
 });
 
 export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
+  const themeContext = React.useContext(ThemeContext);
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [userName, setUserName] = React.useState('');
 
@@ -55,6 +50,10 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
     {
       title: '개인 정보 수정',
       icon: PersonIcon,
+    },
+    {
+      title: '다크/주간 모드',
+      icon: FLIPIcon,
     },
     {
       title: '로그아웃',
@@ -130,16 +129,18 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
           props.navigation.navigate(AppRoute.PROFILE_DRIVER);
         }
       });
-    } else if (index == 2) {
-      {
-        /*0,1,2 의 순서로 진행됩니다 로그 아웃 기능 구현*/
-      }
+    } else if (index ==2) {
+      // 주간 야간 모드 전환
+      themeContext.toggleTheme()
+    } else if (index == 3) {
       AsyncStorage.clear().then(() => {
         kakaoLogout();
         fbLogout();
       });
       props.navigation.dispatch(resetAction);
       console.log('Logout Success');
+    } else {
+
     }
   };
 
