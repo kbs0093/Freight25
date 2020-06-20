@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-import {
-  Text,
+import {  
   StyleSheet,
-  View,
   ScrollView,
 } from 'react-native';
 import {
+  Text,
+  Layout,
   Icon,
   Divider,
   Button,
@@ -19,53 +19,34 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 import TextTicker from 'react-native-text-ticker'
+import { ThemeContext } from '../../component/theme-context';
 
-export class DetailScreen extends React.Component<DetailScreenProps> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      apiInfo: [],
-      mapVisible: true,
-      stopoverVisible: true,
-      FreightID: null,
-      totalTime: null,
-      data: {
-        startAddress: [],
-        endAddress: [],
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-        startType: null,
-        endType: null,
-        Type: null,
-        carType: null,
-        carType2: null,
-        freightSize: null,
-        freightWeight: null,
-        loadType: null,
-        distanceY: null,
-        time: null,
-        smart: null,
-        money: null,
-        moneyPrint: null,
-        isShowLocation: false,
-        desc: null,
-      },
-      region: {
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      },
-    };
-  }
+export const DetailScreen = (props) : DetailScreenProps => {
 
-  componentDidMount = async () => {
+  const themeContext = React.useContext(ThemeContext);
+  const [apiInfo, setApiInfo] = useState([]);
+  const [mapVisible, setmapVisible] = useState(true);
+  const [stopoverVisible, setstopoverVisible] = useState(true);
+  const [FreightID, setFreightID] = useState('');
+  const [totalTime, settotalTime] = useState('');
+  const [data, setdata] = useState({});
+  const [region, setRegion] = useState({});
+  setRegion({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  })
+  useEffect(() => {
+    FirebaseRequest(); // 한번만 실행
+  })
+
+
+  const FirebaseRequest = async () => {
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
-        this.setState({FreightID: value});
+        setFreightID(value);
       }
     } catch (error) {
       console.log(error)
@@ -78,7 +59,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
     var dayName = week[date.getDay()];
 
     if (user != null) {
-      var docRef = firestore().collection('freights').doc(this.state.FreightID);
+      var docRef = firestore().collection('freights').doc(FreightID);
 
       docRef.get().then(async function (doc) {
         if (doc.exists) {
@@ -241,29 +222,29 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
     }
   };
 
-  hideMap = () => {
-    if (this.state.mapVisible) {
-      this.setState({mapVisible: false});
+  const hideMap = () => {
+    if (mapVisible) {
+      setmapVisible(false);
     } else {
-      this.setState({mapVisible: true});
+      setmapVisible(true);
     }
   };
 
-  hideStopvoer = () => {
-    if (this.state.stopoverVisible) {
-      this.setState({stopoverVisible: false});
+  const hideStopvoer = () => {
+    if (stopoverVisible) {
+      setstopoverVisible(false);
     } else {
-      this.setState({stopoverVisible: true});
+      setstopoverVisible(true);
     }
   };
 
-  onRegionChange = (region) => {
-    this.setState({region});
+  const onRegionChange = (region) => {
+    setRegion({region});
   };
 
-  ClickApply = async () => {
+  const ClickApply = async () => {
     let date = new Date()
-    date.setSeconds(date.getSeconds() + this.state.totalTime);
+    date.setSeconds(date.getSeconds() + totalTime);
 
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('FreightID');
@@ -286,11 +267,11 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
             'StopOver X ' + freightRef.id + ' was assigned to ' + user.uid,
           );
           
-          if(this.state.data.Type == '혼적'){
-            this.props.navigation.navigate(AppRoute.STOPOVERAD);
+          if(data.Type == '혼적'){
+            props.navigation.navigate(AppRoute.STOPOVERAD);
           } else{
             Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
-            this.props.navigation.navigate(AppRoute.HOME);
+            props.navigation.navigate(AppRoute.HOME);
           }
           
         } catch {
@@ -319,7 +300,7 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
     }
   };
 
-  RegionCode = async(address) =>{
+  const RegionCode = async(address) =>{
     var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
     var date = new Date();
     var dayName = week[date.getDay()];
@@ -367,247 +348,246 @@ export class DetailScreen extends React.Component<DetailScreenProps> {
     return smart;
   }
 
-  render() {
-    return (
-      <React.Fragment>
-        <ScrollView>
-          <View style={{backgroundColor: 'white'}}>
-            <View style={styles.MainInfo}>
-              <View style={styles.MainInfoGeo}>
-                <View>
-                  <Text style={styles.geoText}>
-                    {this.state.data.startAddress[0]}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.geoText}>
-                    {this.state.data.startAddress[1]}{' '}
-                    {this.state.data.startAddress[2]}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.startType}>
-                    {this.state.data.startType}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.MainInfoIcon}>
-                <Icon
-                  style={styles.icon}
-                  fill="black"
-                  name="arrow-forward-outline"
-                />
-                <Text style={styles.Type}>{this.state.data.Type}</Text>
-              </View>
-              <View style={styles.MainInfoGeo}>
-                <View>
-                  <Text style={styles.geoText}>
-                    {this.state.data.endAddress[0]}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.geoText}>
-                    {this.state.data.endAddress[1]}{' '}
-                    {this.state.data.endAddress[2]}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.endType}>{this.state.data.endType}</Text>
-                </View>
-              </View>
-            </View>
-            <Divider style={{backgroundColor: 'black'}} />
-          </View>
-
-          <TouchableOpacity onPress={this.hideMap}>
-            <View style={{backgroundColor: 'white'}}>
-              <Text style={styles.Title}> 배차 정보 (Tmap)</Text>
-              <Divider style={{backgroundColor: 'black'}} />
-            </View>
-          </TouchableOpacity>
-          {this.state.data.isShowLocation ? (
-            <View style={{height: 200, backgroundColor: 'white'}}>
-              <MapView
-                style={{flex: 1}}
-                provider={PROVIDER_GOOGLE}
-                initialRegion={this.state.region}
-                onRegionChange={this.onRegionChange}>
-                <Polyline
-                  coordinates={this.state.apiInfo}
-                  strokeColor="#2F80ED" // fallback for when `strokeColors` is not supported by the map-provider
-                  strokeWidth={6}
-                />
-              </MapView>
-              <Divider style={{backgroundColor: 'black'}} />
-            </View>
-          ) : null}
-
-          <TouchableOpacity onPress={this.hideStopvoer}>
-            <View style={{backgroundColor: 'white'}}>
-              <Text style={styles.Title}> 경유지 정보</Text>
-              <Divider style={{backgroundColor: 'black'}} />
-            </View>
-          </TouchableOpacity>
-
+  return (
+    <React.Fragment>
+      <ScrollView>
+        <Layout>
+          <Layout style={styles.MainInfo}>
+            <Layout style={styles.MainInfoGeo}>
+              <Layout>
+                <Text style={styles.geoText}>
+                  {data.startAddress[0]}
+                </Text>
+              </Layout>
+              <Layout>
+                <Text style={styles.geoText}>
+                  {data.startAddress[1]}{' '}
+                  {data.startAddress[2]}
+                </Text>
+              </Layout>
+              <Layout>
+                <Text style={styles.startType}>
+                  {data.startType}
+                </Text>
+              </Layout>
+            </Layout>
+            <Layout style={styles.MainInfoIcon}>
+              <Icon
+                style={styles.icon}
+                fill="black"
+                name="arrow-forward-outline"
+              />
+              <Text style={styles.Type}>{data.Type}</Text>
+            </Layout>
+            <Layout style={styles.MainInfoGeo}>
+              <Layout>
+                <Text style={styles.geoText}>
+                  {data.endAddress[0]}
+                </Text>
+              </Layout>
+              <Layout>
+                <Text style={styles.geoText}>
+                  {data.endAddress[1]}{' '}
+                  {data.endAddress[2]}
+                </Text>
+              </Layout>
+              <Layout>
+                <Text style={styles.endType}>{data.endType}</Text>
+              </Layout>
+            </Layout>
+          </Layout>
           <Divider style={{backgroundColor: 'black'}} />
-          <View style={{backgroundColor: 'white'}}>
-            <Text style={styles.Title}> 화물 상세 정보</Text>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>운행거리 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.distanceY} Km
-                </Text>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>운임 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.moneyPrint}원
-                </Text>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>차량정보 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.carType} {this.state.data.carType2}
-                </Text>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>화물정보 및 적재 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.freightWeight}톤 /{' '}
-                  {this.state.data.freightSize}파렛
-                </Text>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>적재방법 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>
-                  {this.state.data.loadType}
-                </Text>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>상차지 상세주소 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <TextTicker
-                  style={styles.freightTitle}
-                  duration={3000}
-                  loop
-                  bounce
-                  repeatSpacer={50}
-                  marqueeDelay={1000}
-                >
-                {this.state.data.startFull}
-                </TextTicker>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>하차지 상세주소 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <TextTicker
-                  style={styles.freightTitle}
-                  duration={3000}
-                  loop
-                  bounce
-                  repeatSpacer={50}
-                  marqueeDelay={1000}
-                >
-                {this.state.data.endFull}
-                </TextTicker>
-              </View>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{flex: 3, alignItems: 'flex-end'}}>
-                <Text style={styles.freightTitle}>특이사항 : </Text>
-              </View>
-              <View style={{flex: 5, alignItems: 'center'}}>
-                <Text style={styles.freightTitle}>{this.state.data.desc}</Text>
-              </View>
-            </View>
-            <Divider style={{backgroundColor: 'black'}} />
-          </View>
+        </Layout>
 
-          <Divider style={{backgroundColor: 'black'}} />
-          <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-            <View style={{flex: 3}}>
-              <Text style={{fontWeight: 'bold', fontSize: 16, margin: 5}}>
-                {' '}
-                스마트 확률
-              </Text>
-              <View
-                style={{alignItems: 'flex-end', justifyContent: 'flex-start'}}>
-                <Text
-                  style={{
-                    margin: 2,
-                    fontSize: 14,
-                    fontWeight: 'bold',
-                    color: '#BDBDBD',
-                  }}>
-                  {' '}
-                  {this.state.data.day}에 발생한 {this.state.data.endAddress[0]}지역의 화물 점유율{' '}
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              }}>
-              <Text style={{fontSize: 26, fontWeight: 'bold'}}>{this.state.data.smart}%</Text>
-            </View>
+        <TouchableOpacity onPress={hideMap}>
+          <Layout>
+            <Text style={styles.Title}> 배차 정보 (Tmap)</Text>
             <Divider style={{backgroundColor: 'black'}} />
-          </View>
-        </ScrollView>
+          </Layout>
+        </TouchableOpacity>
+        {data.isShowLocation ? (
+          <Layout style={{height: 200, backgroundColor: 'white'}}>
+            <MapView
+              style={{flex: 1}}
+              provider={PROVIDER_GOOGLE}
+              initialRegion={region}
+              onRegionChange={onRegionChange}>
+              <Polyline
+                coordinates={apiInfo}
+                strokeColor="#2F80ED" // fallback for when `strokeColors` is not supported by the map-provider
+                strokeWidth={6}
+              />
+            </MapView>
+            <Divider style={{backgroundColor: 'black'}} />
+          </Layout>
+        ) : null}
+
+        <TouchableOpacity onPress={hideStopvoer}>
+          <Layout>
+            <Text style={styles.Title}> 경유지 정보</Text>
+            <Divider style={{backgroundColor: 'black'}} />
+          </Layout>
+        </TouchableOpacity>
 
         <Divider style={{backgroundColor: 'black'}} />
+        <Layout>
+          <Text style={styles.Title}> 화물 상세 정보</Text>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>운행거리 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <Text style={styles.freightTitle}>
+                {data.distanceY} Km
+              </Text>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>운임 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <Text style={styles.freightTitle}>
+                {data.moneyPrint}원
+              </Text>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>차량정보 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <Text style={styles.freightTitle}>
+                {data.carType} {data.carType2}
+              </Text>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>화물정보 및 적재 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <Text style={styles.freightTitle}>
+                {data.freightWeight}톤 /{' '}
+                {data.freightSize}파렛
+              </Text>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>적재방법 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <Text style={styles.freightTitle}>
+                {data.loadType}
+              </Text>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>상차지 상세주소 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <TextTicker
+                style={styles.freightTitle}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+              {data.startFull}
+              </TextTicker>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>하차지 상세주소 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <TextTicker
+                style={styles.freightTitle}
+                duration={3000}
+                loop
+                bounce
+                repeatSpacer={50}
+                marqueeDelay={1000}
+              >
+              {data.endFull}
+              </TextTicker>
+            </Layout>
+          </Layout>
+          <Layout style={{flexDirection: 'row'}}>
+            <Layout style={{flex: 3, alignItems: 'flex-end'}}>
+              <Text style={styles.freightTitle}>특이사항 : </Text>
+            </Layout>
+            <Layout style={{flex: 5, alignItems: 'center'}}>
+              <Text style={styles.freightTitle}>{data.desc}</Text>
+            </Layout>
+          </Layout>
+          <Divider style={{backgroundColor: 'black'}} />
+        </Layout>
 
-        <View style={{backgroundColor: 'white', flexDirection: 'row'}}>
-          <View style={{flex: 5, justifyContent: 'center'}}>
-            <Text style={styles.freightTitle}>
+        <Divider style={{backgroundColor: 'black'}} />
+        <Layout style={{backgroundColor: 'white', flexDirection: 'row'}}>
+          <Layout style={{flex: 3}}>
+            <Text style={{fontWeight: 'bold', fontSize: 16, margin: 5}}>
               {' '}
-              운행거리 :   {this.state.data.distanceY}km{' '}
+              스마트 확률
             </Text>
-            <Text style={styles.freightTitle}>
-              {' '}
-              운행운임 :   {this.state.data.moneyPrint}원{' '}
-            </Text>
-          </View>
-          <View
-            style={{flex: 2, alignItems: 'center', justifyContent: 'center'}}>
-            <Button
-              style={styles.button}
-              status="success"
-              onPress={this.ClickApply}>
-              수 락
-            </Button>
-          </View>
-        </View>
-      </React.Fragment>
-    );
-  }
+            <Layout
+              style={{alignItems: 'flex-end', justifyContent: 'flex-start'}}>
+              <Text
+                style={{
+                  margin: 2,
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  color: '#BDBDBD',
+                }}>
+                {' '}
+                {data.day}에 발생한 {data.endAddress[0]}지역의 화물 점유율{' '}
+              </Text>
+            </Layout>
+          </Layout>
+          <Layout
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+            <Text style={{fontSize: 26, fontWeight: 'bold', lineHeight: 30}}>{data.smart}%</Text>
+          </Layout>
+          <Divider style={{backgroundColor: 'black'}} />
+        </Layout>
+      </ScrollView>
+
+      <Divider style={{backgroundColor: 'black'}} />
+
+      <Layout style={{backgroundColor: 'white', flexDirection: 'row'}}>
+        <Layout style={{flex: 5, justifyContent: 'center'}}>
+          <Text style={styles.freightTitle}>
+            {' '}
+            운행거리 :   {data.distanceY}km{' '}
+          </Text>
+          <Text style={styles.freightTitle}>
+            {' '}
+            운행운임 :   {data.moneyPrint}원{' '}
+          </Text>
+        </Layout>
+        <Layout
+          style={{flex: 2, alignItems: 'center', justifyContent: 'center'}}>
+          <Button
+            style={styles.button}
+            status="success"
+            onPress={ClickApply}>
+            수 락
+          </Button>
+        </Layout>
+      </Layout>
+    </React.Fragment>
+  );
 }
+
 
 const styles = StyleSheet.create({
   Title: {
@@ -650,6 +630,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 20,
+    lineHeight: 26
   },
   icon: {
     width: 32,

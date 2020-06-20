@@ -129,7 +129,7 @@ const App = () => {
           if (uid != null) {
             var locationRef = firestore().collection('location').doc(uid);
             try {
-              locationRef.update({
+              locationRef.set({
                 address: address,
                 latitude: latitude,
                 longitude: longitude
@@ -146,7 +146,7 @@ const App = () => {
     }
   }
 
-  toggleBackground();
+  //toggleBackground();
 
   return (
     <React.Fragment>

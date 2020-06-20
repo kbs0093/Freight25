@@ -1,7 +1,6 @@
-import React, {useState, Component} from 'react';
+import React, {useState, Component, useEffect} from 'react';
 import {  
   StyleSheet,
-  View,
   Platform,
   FlatList,
   SafeAreaView,
@@ -32,6 +31,7 @@ const isAndroid = Platform.OS === 'android';
 export const SearchScreen = (props): SearchScreenProps => {  
   const themeContext = React.useContext(ThemeContext);
 
+
   const [latitude, setlatitude] = useState('');
   const [longitude, setlongitude] = useState('');
   const [city, setcity] = useState('');
@@ -40,7 +40,21 @@ export const SearchScreen = (props): SearchScreenProps => {
   const [dong, setdong] = useState('');
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
-  const [distance, setdistance] = useState([]);
+  const [filter, setfilter] = useState(0);
+  const [sorting, setsorting] = useState(0);
+
+  useEffect(() => {
+    if(isAndroid == true){
+      requestLocationAndroid();
+    } else {
+      requestLocationIos();
+    }
+  }, []);
+  
+  useEffect(() => {
+    filtering();
+    ListSort();
+  },[filter, sorting]);
 
   const requestLocationAndroid = async () => {
     try {
@@ -151,7 +165,7 @@ export const SearchScreen = (props): SearchScreenProps => {
               money: doc.expense,
               moneyPrint: moneyprint,              
             })}          
-          setData(list);
+          setData(list)
           setData2(list)
       })} 
       catch (error) {
@@ -213,20 +227,57 @@ export const SearchScreen = (props): SearchScreenProps => {
     props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
 
-  const moneySort = (a, b) => {
-    if(a.money == b.money){ return 0} return a.money < b.money ? 1 : -1;
+  const ListSort = () => {
+    if(sorting == 4){
+      data2.sort((a,b) => {
+        return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;        
+      })
+    } //운행거리 낮음
+    else if(sorting == 3){
+      data2.sort((a,b) => {
+        return Number(a.distanceY) > Number(b.distanceY) ? -1 : Number(a.distanceY) < Number(b.distanceY) ? 1: 0;
+      })
+    }
+    else if(sorting == 2){
+      data2.sort((a,b) => {
+        return Number(a.money) > Number(b.money) ? -1 : Number(a.money) > Number(b.money) ? 1: 0;
+      })
+    }
+    else if(sorting == 1){
+      data2.sort((a,b) => {
+        return Number(a.smart) > Number(b.smart) ? -1 : Number(a.smart) > Number(b.smart) ? 1: 0;
+      })
+    }
   };
 
-  const distanceSort = (a, b) => {
-    return Number(a.distanceY) > Number(b.distanceY) ? -1 : Number(a.distanceY) < Number(b.distanceY) ? 1: 0;
-  };
-
-  const distanceSort2 = (a, b) => {
-    return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;
-  };    
-
-  const smartSort = (a, b) => {
-    if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
+  const filtering = () => {
+    var temp = [];
+    temp = JSON.parse(JSON.stringify(data));
+     
+    if(filter == 1){        
+      let result = temp.filter(element => {
+        return element.distanceX <= 100
+      });
+      setData2(result)   
+    }
+    else if(filter == 2){
+      let result = temp.filter(element => {
+        return element.distanceX <= 50
+      });
+      setData2(result)    
+    }
+    else if(filter == 3){
+      let result = temp.filter(element => {
+        return element.distanceX <= 30
+      });
+      setData2(result)      
+    }
+    else if(filter == 4){
+      let result = temp.filter(element => {
+        return element.distanceX <= 10
+      });
+      setData2(result)     
+    }    
   };
 
   
@@ -325,19 +376,12 @@ export const SearchScreen = (props): SearchScreenProps => {
       </Layout>                          
     </Layout>
     </TouchableOpacity>
-  );
-  
-  if(isAndroid == true){
-    requestLocationAndroid();
-  } else {
-    requestLocationIos();
-  }
-    
-  return (
-  
+  );  
+
+
+  return (  
   <React.Fragment>
-    <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-    
+    <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />    
     <Layout style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
       <Layout style={{flex: 3, justifyContent: 'center'}}>
         <Layout style={{flexDirection: "row"}}>
@@ -370,7 +414,7 @@ export const SearchScreen = (props): SearchScreenProps => {
       <Layout style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
         <RNPickerSelect
             onValueChange={(value) => {
-                
+              setsorting(value)
             }}
             placeholder={{
               label: '정렬 순서',
@@ -401,7 +445,7 @@ export const SearchScreen = (props): SearchScreenProps => {
       <Layout style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
         <RNPickerSelect
             onValueChange={(value) => {
-              
+              setfilter(value)
             }}
             placeholder={{
               label: '검색 반경 Km를 선택하세요',
