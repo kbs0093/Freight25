@@ -96,7 +96,7 @@ export const SearchScreen = (props): SearchScreenProps => {
             setlatitude(Templatitude)
             setlongitude(Templongitude)
             
-            fetch(server + `&lat=${latitude}&lon=${longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+            fetch(server + `&lat=${Templatitude}&lon=${Templongitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
             .then(response => response.json())
             .then(response => {              
               const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
@@ -128,28 +128,19 @@ export const SearchScreen = (props): SearchScreenProps => {
         setlatitude(Templatitude)
         setlongitude(Templongitude)
         
-        fetch(server + `&lat=${latitude}&lon=${longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+        fetch(server + `&lat=${Templatitude}&lon=${Templongitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
         .then(response => response.json())
         .then(response => {
-          
-          if(JSON.stringify(response.addressInfo.city_do) != null){
-            const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
-            setcity(city);
-          }
-          if(JSON.stringify(response.addressInfo.gu_gun) != null){
-            const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
-            setcity(gu);
-          }
-          if(JSON.stringify(response.addressInfo.eup_myun) != null){
-            const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
-            setcity(myeon);
-          }
-          if(JSON.stringify(response.addressInfo.adminDong) != null){
-            const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
-            setcity(dong);
-          }
+          const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
+          const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
+          const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
+          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");    
+          setcity(city);
+          setgu(gu);
+          setmyeon(myeon);
+          setdong(dong);
+          FirebaseRequest();   
 
-          FirebaseRequest();       
         })   
         .catch(err => console.log(err));     
       },
