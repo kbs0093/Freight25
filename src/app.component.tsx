@@ -18,6 +18,8 @@ import { ThemeContext } from '../src/component/theme-context';
 import AsyncStorage from '@react-native-community/async-storage';
 import BackgroundJob from 'react-native-background-actions';
 import Geolocation from 'react-native-geolocation-service';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const themes = { light, dark };
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
@@ -54,8 +56,8 @@ const App = () => {
 
   const toggleBackground = async () => {
     var playing = BackgroundJob.isRunning();
-   
     playing = !playing;
+    
     if (playing) {
       try {
         console.log('Trying to start background service');
@@ -83,7 +85,6 @@ const App = () => {
         .then((value) => {
           if(value == 'driver'){
             requestLocationAndroid();
-
           } else {
             BackgroundJob.stop();
           }
@@ -122,7 +123,22 @@ const App = () => {
             .catch(err => console.log(err));     
           }, error => Alert.alert('Error', JSON.stringify(error)),
           {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000});
-
+        
+        const user = auth().currentUser;
+        if (user != null) {
+          if (uid != null) {
+            var locationRef = firestore().collection('location').doc(uid);
+            try {
+              locationRef.update({
+                address: address,
+                latitude: latitude,
+                longitude: longitude
+              });
+            } catch {
+              console.log('Failed assign to ' + locationRef.id);
+            }
+          }
+        }
         
       }
     } catch (err) {
@@ -130,7 +146,7 @@ const App = () => {
     }
   }
 
-  //toggleBackground();
+  toggleBackground();
 
   return (
     <React.Fragment>
