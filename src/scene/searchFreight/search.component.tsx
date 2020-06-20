@@ -120,7 +120,6 @@ export const SearchScreen = (props): SearchScreenProps => {
 
   const requestLocationIos = async() => {
     hasLocationPermissionIOS();
-    
     Geolocation.getCurrentPosition(
       position => {
         var Templatitude = JSON.stringify(position.coords.latitude);
