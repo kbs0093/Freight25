@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Alert,
   PermissionsAndroid,
+  Linking,
 } from 'react-native';
 import {
   Text,
@@ -51,7 +52,38 @@ export const SearchScreen = (props): SearchScreenProps => {
     ListSort();
   },[filter, sorting]);
 
-  const requestLocationAndroid = async () => {
+  const hasLocationPermissionIOS = async () => {
+    const openSetting = () => {
+      Linking.openSettings().catch(() => {
+        Alert.alert('Unable to open settings');
+      });
+    };
+    
+    const status = await Geolocation.requestAuthorization('whenInUse') + '';
+
+    if (status === 'granted') {
+      return true;
+    }
+
+    if (status === 'denied') {
+      Alert.alert('Location permission denied');
+    }
+
+    if (status === 'disabled') {
+      Alert.alert(
+        `Turn on Location Services to allow 화물25 to determine your location.`,
+        '',
+        [
+          { text: 'Go to Settings', onPress: openSetting },
+          { text: "Don't Use Location", onPress: () => {} },
+        ],
+      );
+    }
+
+    return false;
+  };
+
+  const requestLocationAndroid = async() => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
@@ -86,7 +118,9 @@ export const SearchScreen = (props): SearchScreenProps => {
     }
   }
 
-  const requestLocationIos = () => {
+  const requestLocationIos = async() => {
+    hasLocationPermissionIOS();
+    
     Geolocation.getCurrentPosition(
       position => {
         var Templatitude = JSON.stringify(position.coords.latitude);
@@ -272,6 +306,12 @@ export const SearchScreen = (props): SearchScreenProps => {
         return element.distanceX <= 10
       });
       setData2(result)     
+    }
+    else if(filter == 5){
+      let result = temp.filter(element => {
+        return element.distanceX >= 0
+      });
+      setData2(result)     
     }    
   };
 
@@ -448,6 +488,7 @@ export const SearchScreen = (props): SearchScreenProps => {
             }}
             useNativeAndroidPickerStyle={isAndroid? true: false}
             items={[
+              {label: '전체 검색', value: '5'},
               {label: '10Km', value: '4'},
               {label: '30Km', value: '3'},
               {label: '50Km', value: '2'},
