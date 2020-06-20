@@ -31,7 +31,6 @@ const isAndroid = Platform.OS === 'android';
 export const SearchScreen = (props): SearchScreenProps => {  
   const themeContext = React.useContext(ThemeContext);
 
-
   const [latitude, setlatitude] = useState('');
   const [longitude, setlongitude] = useState('');
   const [city, setcity] = useState('');
@@ -44,11 +43,7 @@ export const SearchScreen = (props): SearchScreenProps => {
   const [sorting, setsorting] = useState(0);
 
   useEffect(() => {
-    if(isAndroid == true){
-      requestLocationAndroid();
-    } else {
-      requestLocationIos();
-    }
+    isAndroid ? requestLocationAndroid() : requestLocationIos()
   }, []);
   
   useEffect(() => {
