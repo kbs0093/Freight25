@@ -6,15 +6,11 @@ import {
   View,
   SafeAreaView,
   ScrollView,
-  NativeModules,
-  PermissionsAndroid,
   Platform,
-  Linking,
 } from 'react-native';
 import {
   LayoutElement, 
   Divider,
-  Select,
   Button,
   Input,  
 } from '@ui-kitten/components';
@@ -23,13 +19,12 @@ import { AppRoute } from '../../navigation/app-routes';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { StackActions, NavigationActions } from 'react-navigation';
 import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
 import Modal from 'react-native-modal'
 import Postcode from 'react-native-daum-postcode'
 import Toast from 'react-native-tiny-toast';
-
+const isAndroid = Platform.OS === 'android';
 
 const OwnerNavigate = CommonActions.reset({
   index: 0,
@@ -37,7 +32,6 @@ const OwnerNavigate = CommonActions.reset({
 });
 
 const serverUrl = 'http://49.50.162.128:8000/';
-const DirectSms = NativeModules.DirectSms;
 
 // Postcode API를 위한 URL선언
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
@@ -63,13 +57,13 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
 
   // Postcode API를 위한 변수들 선언
   const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(false);
-  const [addrCompact, setAddrCompact] = useState<string>('상차지 설정');
+  const [addrCompact, setAddrCompact] = useState<string>('자주쓰는 상차지 설정');
   const [addrFull, setAddrFull] = useState<string>("");
   const [addr_lat, setAddr_lat] = useState<string>("");
   const [addr_lon, setAddr_lon] = useState<string>("");
 
   const [modalAddEndAddrVisible, setmodalAddEndAddrVisible] = useState<boolean>(false);
-  const [endAddrCompact, setEndAddrCompact] = useState<string>("하차지 설정");
+  const [endAddrCompact, setEndAddrCompact] = useState<string>("자주쓰는 하차지 설정");
   const [endAddrFull, setEndAddrFull] = useState<string>("");
   const [endAddr_lat, setEndAddr_lat] = useState<string>("");
   const [endAddr_lon, setEndAddr_lon] = useState<string>("");
@@ -151,44 +145,6 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
       }
     });      
   };
-
-  const sendDirectSms = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.SEND_SMS,
-          {
-            title: 'Freight25 App Sms Permission',
-            message:
-              'Freight25 App needs access to your inbox ' +
-              'so you can send messages in background.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          DirectSms.sendDirectSms(phoneNumInput, 'Signup process completed! ' + nameInput);
-          console.log('SMS sent successfully');
-        } else {
-          console.log('SMS permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-    else {
-      const url = `sms:${phoneNumInput}${Platform.OS === "ios" ? "&" : "?"}body=${"signup process completed! " + nameInput}`
-      Linking.openURL(url).catch(err => console.error('An error occurred', err));
-    }
-  }
-
-  const onPressCall = () => {
-    const url = `tel:${phoneNumInput}`;
-    Linking.openURL(url).catch(err => console.error('An error occurred', err));
-    console.log('Call sended')
-  }
-
   
     return (
         <React.Fragment>
@@ -264,7 +220,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
           <Text style={styles.textStyle}>자주 쓰는 상차/하차지 설정</Text>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-              <Text style={styles.textStyle}>자주 쓰는 상차지 :</Text>
+              <Text style={styles.textStyle}>상차지 :</Text>
               </View>
               <View style={{flex: 2.3}}>
                 <Text style={styles.textStyle}>{addrCompact}</Text>
@@ -282,7 +238,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>자주 쓰는 하차지 :</Text>
+                <Text style={styles.textStyle}>하차지 :</Text>
               </View>
               <View style={{flex: 2.3}}>
                 <Text style={styles.textStyle}>{endAddrCompact}</Text>
@@ -315,7 +271,12 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                     label: '은행을 선택하세요',
                     value: null,
                   }}
-                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    placeholder:{
+                      color: 'black'
+                    }
+                  }}
+                  useNativeAndroidPickerStyle={isAndroid? true: false}
                   items={[
                     {label: '국민', value: 'kukmin'},
                     {label: '신한', value: 'shinhan'},
@@ -359,11 +320,6 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             <Button style={{margin: 30}} status='danger' size='large' onPress={() => props.navigation.goBack()}>돌아가기</Button>
             <Button style={{margin: 30}} status='primary' size='large' onPress={regOwner}>회원가입</Button>
           </View>
-          <View style={{flex: 2,flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>            
-            <Button style={{margin: 30}} status='primary' size='large' onPress={sendDirectSms}>SMS</Button>
-            <Button style={{margin: 30}} status='primary' size='large' onPress={onPressCall}>전화</Button>
-          </View>
-
           
           <Modal
             //isVisible Props에 State 값을 물려주어 On/off control
