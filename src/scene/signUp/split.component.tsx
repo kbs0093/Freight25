@@ -5,14 +5,12 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Image
+  Image,
+  SafeAreaView
 } from 'react-native';
 import {
   LayoutElement, 
   Divider,
-  Select,
-  Button,
-  Input,  
 } from '@ui-kitten/components';
 import { SplitScreenProps } from '../../navigation/search.navigator';
 import { AppRoute } from '../../navigation/app-routes';
@@ -30,6 +28,7 @@ export const SplitScreen = (props: SplitScreenProps): LayoutElement => {
 
   return(
     <React.Fragment>
+      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <View style={{backgroundColor: 'white'}}>
         <Text style={{fontWeight: 'bold', fontSize: 20, margin: 10}}>회원가입</Text>
         <Divider style={{backgroundColor: 'black'}}/>
