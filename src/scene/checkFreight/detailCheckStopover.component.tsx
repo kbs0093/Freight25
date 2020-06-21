@@ -332,7 +332,7 @@ export const DetailCheckStopoverScreen = (
   const _renderItem = ({item}) => (
     <Layout>
       <View style={{flexDirection: 'row'}}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
+        {/* <View style={{flex: 1, justifyContent: 'center'}}>
           <View></View>
           <TouchableOpacity onPress={navigateBack}>
             <Icon
@@ -342,9 +342,14 @@ export const DetailCheckStopoverScreen = (
               fill={themeContext.theme == 'dark' ? 'white' : 'black'}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View
-          style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
+          style={{
+            flex: 3,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            paddingHorizontal: 10,
+          }}>
           <Text style={styles.Subtitle}>경유지 화물 내역</Text>
         </View>
         <View
@@ -366,7 +371,7 @@ export const DetailCheckStopoverScreen = (
               {item.lastState}
             </Button>
           )}
-          <Divider style={{backgroundColor: 'black'}} />
+          {/* <Divider style={{backgroundColor: 'black'}} /> */}
         </View>
       </View>
 

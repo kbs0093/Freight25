@@ -36,39 +36,41 @@ import RNPickerSelect from 'react-native-picker-select';
 import {ThemeContext} from '../../component/theme-context';
 
 const isAndroid = Platform.OS === 'android';
-//const themeContext = React.useContext(ThemeContext);
 
-//export const CheckScreen props: CheckScreenProps,
-export class CheckScreen extends React.Component<CheckScreenProps> {
-  constructor(props) {
-    super(props);
+export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
+  const [data, setData] = React.useState([]);
+  const [userType, setUserType] = React.useState('');
+  const [sorting, setSorting] = React.useState('');
+  const themeContext = React.useContext(ThemeContext);
 
-    this.state = {
-      data: [],
-      userType: null,
-      value: '1',
-    };
-  }
+  useEffect(() => {
+    requestFirebase();
+  }, []);
 
-  componentDidMount = async () => {
+  useEffect(() => {
+    listSort();
+  }, []);
+
+  const requestFirebase = async () => {
+    var userType;
     try {
       const value = await AsyncStorage.getItem('userType');
       if (value !== null) {
-        this.setState({userType: value});
+        userType = value;
+        setUserType(value);
       }
     } catch (error) {}
 
     var user = auth().currentUser;
-    const that = this;
 
     if (user != null) {
       //var ref = firestore().collection('freights');
       var ref = null;
-      if (this.state.userType == 'driver') {
+      if (userType == 'driver') {
         ref = firestore()
           .collection('freights')
           .where('driverId', '==', user.uid);
-      } else if ((this.state.userType = 'owner')) {
+      } else if ((userType = 'owner')) {
         ref = firestore()
           .collection('freights')
           .where('ownerId', '==', user.uid);
@@ -132,37 +134,58 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             endDayLabel: doc.endDayLabel,
           });
         }
-        that.setState({data: list});
+        setData(list);
       });
     }
   };
 
-  ClickList = (item) => () => {
+  const ClickList = (item) => () => {
     AsyncStorage.setItem('FreightID', item.id);
     AsyncStorage.setItem('OppoFreightID', item.oppositeFreightId);
-    if (this.state.userType == 'owner') {
-      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
-    } else if (this.state.userType == 'driver') {
-      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
+    if (userType == 'owner') {
+      props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
+    } else if (userType == 'driver') {
+      props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
     } else {
       console.log('undefined usertype');
     }
   };
 
-  dateSort(a, b) {
-    if (a.startMonth == b.startMonth) {
-      return a.startDay < b.startDay ? 1 : -1;
-    } else {
-      return a.startMonth < b.startMonth ? 1 : -1;
+  const listSort = () => {
+    var value = sorting;
+    if (value == '1') {
+      console.log(value);
+      if (data.startMonth == data.startMonth) {
+        data.sort((a, b) => {
+          return a.startDay < b.startDay ? 1 : -1;
+        });
+      } else {
+        data.sort((a, b) => {
+          return a.startMonth < b.startMonth ? 1 : -1;
+        });
+      }
+    } else if (value == '2') {
+      console.log(value);
+      if (data.startMonth == data.startMonth) {
+        data.sort((a, b) => {
+          return a.startDay > b.startDay ? 1 : -1;
+        });
+      } else {
+        data.sort((a, b) => {
+          return a.startMonth > b.startMonth ? 1 : -1;
+        });
+      }
+    } else if (value == '3') {
+      console.log(value);
+      data.sort((a, b) => {
+        return a.stateNum > b.stateNum ? 1 : -1;
+      });
     }
-  }
+  };
+  listSort();
 
-  statusSort(a, b) {
-    return a.stateNum > b.stateNum ? 1 : -1;
-  }
-
-  _renderItem = ({item}) => (
-    <TouchableOpacity onPress={this.ClickList(item)}>
+  const _renderItem = ({item}) => (
+    <TouchableOpacity onPress={ClickList(item)}>
       <Layout style={styles.container}>
         <Layout style={styles.geoContainer}>
           <View style={styles.geoInfo1}>
@@ -203,13 +226,6 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
           {item.lastState == '배송중' ? (
             <Text style={styles.badgeTextRed}>{item.lastState}</Text>
           ) : (
-            // <Button
-            //   style={styles.Badge}
-            //   appearance="ghost"
-            //   status="primary"
-            //   textStyle={styles.badgeText}>
-            //   {item.lastState}
-            // </Button>
             <Text style={styles.badgeText}>{item.lastState}</Text>
           )}
           {item.oppositeFreightId != '' ? (
@@ -221,59 +237,62 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     </TouchableOpacity>
   );
 
-  render() {
-    //this.state.data.sort(this.dateSort);
-    if (this.state.value == '1') {
-      this.state.data.sort(this.dateSort);
-    } else if (this.state.value == '2') {
-      this.state.data.sort(this.statusSort);
-    }
-    return (
-      <React.Fragment>
-        <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <Layout
-          style={{
-            height: '8%',
-            flexDirection: 'row',
-            backgroundColor: 'white',
-          }}>
-          <Layout style={{flex: 1, justifyContent: 'center'}}>
-            <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-              검색 조건 :
-            </Text>
-          </Layout>
-          <Layout
-            style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
-            <RNPickerSelect
-              onValueChange={(value) => {
-                this.setState({value});
-              }}
-              placeholder={{
-                label: '정렬 순서',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={isAndroid ? true : false}
-              items={[
-                {label: '상태별 정렬', value: '2'},
-                {label: '최근 날짜 순', value: '1'},
-              ]}
-            />
-          </Layout>
+  return (
+    <React.Fragment>
+      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      <Layout
+        style={{
+          height: '8%',
+          flexDirection: 'row',
+          backgroundColor: 'white',
+        }}>
+        <Layout style={{flex: 1, justifyContent: 'center'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+            검색 조건 :
+          </Text>
         </Layout>
-        <Divider style={{backgroundColor: 'black'}} />
+        <Layout
+          style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+          <RNPickerSelect
+            onValueChange={(value) => {
+              setSorting(value);
+              //listSort();
+            }}
+            placeholder={{
+              label: '정렬 순서',
+              value: null,
+            }}
+            useNativeAndroidPickerStyle={isAndroid ? true : false}
+            items={[
+              {label: '최근 날짜 순', value: '1'},
+              {label: '예전 날짜 순', value: '2'},
+              {label: '상태별 정렬', value: '3'},
+            ]}
+            style={{
+              placeholder: {
+                color: 'orange',
+              },
+            }}
+          />
+        </Layout>
+      </Layout>
+      <Divider style={{backgroundColor: 'black'}} />
 
-        <FlatList
-          style={{backgroundColor: 'white'}}
-          data={this.state.data}
-          renderItem={this._renderItem}
-          keyExtractor={(item) => item.key}
-          showsVerticalScrollIndicator={false}
-        />
-        {/* </ScrollView> */}
-      </React.Fragment>
-    );
-  }
-}
+      <FlatList
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }
+        data={data}
+        renderItem={_renderItem}
+        keyExtractor={(item) => item.key}
+        showsVerticalScrollIndicator={false}
+      />
+      {/* </ScrollView> */}
+    </React.Fragment>
+  );
+};
 
 const styles = StyleSheet.create({
   Badge: {

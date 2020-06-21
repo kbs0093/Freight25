@@ -351,7 +351,7 @@ export const DetailCheckDriverScreen = (
   const _renderItem = ({item}) => (
     <Layout>
       <View style={{flexDirection: 'row'}}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
+        {/* <View style={{flex: 1, justifyContent: 'center'}}>
           <View></View>
           <TouchableOpacity onPress={navigateBack}>
             <Icon
@@ -361,10 +361,15 @@ export const DetailCheckDriverScreen = (
               fill={themeContext.theme == 'dark' ? 'white' : 'black'}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View
-          style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
-          <Text style={styles.Subtitle}>화물 내역</Text>
+          style={{
+            flex: 3,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            paddingHorizontal: 10,
+          }}>
+          <Text style={styles.Subtitle}> 화물 내역</Text>
         </View>
         <View
           style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
@@ -388,7 +393,7 @@ export const DetailCheckDriverScreen = (
         </View>
       </View>
 
-      <Divider style={{backgroundColor: 'black'}} />
+      {/* <Divider style={{backgroundColor: 'black'}} /> */}
 
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
