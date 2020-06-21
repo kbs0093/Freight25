@@ -351,7 +351,7 @@ export const DetailCheckDriverScreen = (
   };
 
   const _renderItem = ({item}) => (
-    <View>
+    <Layout>
       <View style={{flexDirection: 'row'}}>
         <View style={{flex: 1, justifyContent: 'center'}}>
           <View></View>
@@ -360,7 +360,7 @@ export const DetailCheckDriverScreen = (
               name="arrow-back-outline"
               width={28}
               height={28}
-              fill="black"
+              fill={themeContext.theme == 'dark' ? 'white' : 'black'}
             />
           </TouchableOpacity>
         </View>
@@ -440,7 +440,11 @@ export const DetailCheckDriverScreen = (
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
           <TextTicker
-            style={styles.infoRightTitle}
+            style={
+              themeContext.theme == 'dark'
+                ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+            }
             duration={3000}
             loop
             bounce
@@ -450,7 +454,11 @@ export const DetailCheckDriverScreen = (
             {item.startAddrFullArray[2]} {item.startAddrDetail}
           </TextTicker>
           <TextTicker
-            style={styles.infoRightTitle}
+            style={
+              themeContext.theme == 'dark'
+                ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+            }
             duration={3000}
             loop
             bounce
@@ -465,7 +473,7 @@ export const DetailCheckDriverScreen = (
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
-    </View>
+    </Layout>
   );
 
   const renderCallButton = () => {
@@ -555,19 +563,25 @@ export const DetailCheckDriverScreen = (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <FlatList
-        style={{backgroundColor: 'white'}}
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }
         data={data}
         renderItem={_renderItem}
         keyExtractor={(item) => item.key}
       />
-      <View style={styles.ButtonContainter}>
-        <View style={styles.ButtonHalfContainer}>{renderNavButton()}</View>
-        <View style={styles.ButtonHalfContainer}>{renderShowButton()}</View>
-      </View>
-      <View style={styles.ButtonContainter}>
-        <View style={styles.ButtonHalfContainer}>{renderCallButton()}</View>
-        <View style={styles.ButtonHalfContainer}>{renderCompleteButton()}</View>
-      </View>
+      <Layout style={styles.ButtonContainter}>
+        <Layout style={styles.ButtonHalfContainer}>{renderNavButton()}</Layout>
+        <Layout style={styles.ButtonHalfContainer}>{renderShowButton()}</Layout>
+      </Layout>
+      <Layout style={styles.ButtonContainter}>
+        <Layout style={styles.ButtonHalfContainer}>{renderCallButton()}</Layout>
+        <Layout style={styles.ButtonHalfContainer}>
+          {renderCompleteButton()}
+        </Layout>
+      </Layout>
     </React.Fragment>
   );
 };
