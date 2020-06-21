@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   View,
@@ -33,8 +33,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
+import {ThemeContext} from '../../component/theme-context';
 
 const isAndroid = Platform.OS === 'android';
+//const themeContext = React.useContext(ThemeContext);
 
 //export const CheckScreen props: CheckScreenProps,
 export class CheckScreen extends React.Component<CheckScreenProps> {

@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {
-  Text,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import {
+  Text,
   LayoutElement,
   Divider,
   Select,

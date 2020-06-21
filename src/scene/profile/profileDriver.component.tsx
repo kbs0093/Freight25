@@ -1,6 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
-  Text,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import {
+  Text,
   LayoutElement,
   Divider,
   Select,
@@ -40,6 +40,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import {CommonActions} from '@react-navigation/native';
+import {ThemeContext} from '../../component/theme-context';
+import {FlexStyleProps} from '@ui-kitten/components/ui/support/typings';
 
 const resetAction = CommonActions.reset({
   index: 0,
@@ -60,6 +62,8 @@ export const ProfileDriverScreen = (
   const [carNumInput, carNum] = React.useState('');
   const [manNumInput, manNum] = React.useState('');
   const [lock, setLock] = React.useState(0);
+
+  const themeContext = React.useContext(ThemeContext);
 
   useEffect(() => {
     AsyncStorage.getItem('fbToken').then((value) => {
@@ -196,8 +200,13 @@ export const ProfileDriverScreen = (
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <ScrollView>
-        <View style={styles.titleContainer}>
+      <ScrollView
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }>
+        <Layout style={styles.titleContainer}>
           <Text style={styles.Subtitle}>화물차 기사 정보 수정</Text>
           <Button
             onPress={() => {
@@ -209,10 +218,10 @@ export const ProfileDriverScreen = (
             textStyle={styles.ButtonText}>
             수정
           </Button>
-        </View>
-        <View style={styles.infoContainer}>
+        </Layout>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>개인 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>성 명: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -221,8 +230,8 @@ export const ProfileDriverScreen = (
                 onChangeText={name}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>전화 번호: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -231,8 +240,8 @@ export const ProfileDriverScreen = (
                 onChangeText={phoneNum}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>사업자등록번호: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -241,13 +250,13 @@ export const ProfileDriverScreen = (
                 onChangeText={manNum}
               />
             </Layout>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
         <Divider style={{backgroundColor: 'black'}} />
 
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>차량 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 번호 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -256,8 +265,8 @@ export const ProfileDriverScreen = (
                 onChangeText={carNum}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 톤수 : </Text>
             <RNPickerSelect
               onValueChange={(itemValue) => setTonValue(itemValue)}
@@ -274,8 +283,8 @@ export const ProfileDriverScreen = (
                 {label: '25 톤', value: '25'},
               ]}
             />
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 유형 : </Text>
             <RNPickerSelect
               onValueChange={(itemValue, itemIndex) => setTypeValue(itemValue)}
@@ -291,13 +300,13 @@ export const ProfileDriverScreen = (
                 {label: '냉장', value: 'superice'},
               ]}
             />
-          </View>
-        </View>
+          </Layout>
+        </Layout>
         <Divider style={{backgroundColor: 'black'}} />
 
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>거래 은행: </Text>
             <RNPickerSelect
               onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
@@ -312,8 +321,8 @@ export const ProfileDriverScreen = (
                 {label: '농협', value: 'nognhyeob'},
               ]}
             />
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>계좌 번호 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -322,8 +331,8 @@ export const ProfileDriverScreen = (
                 onChangeText={accountNum}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>예금주 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -332,9 +341,10 @@ export const ProfileDriverScreen = (
                 onChangeText={accountOwner}
               />
             </Layout>
-          </View>
-        </View>
-        <View style={styles.withdrawContainer}>
+          </Layout>
+        </Layout>
+
+        <Layout style={styles.withdrawContainer}>
           <Button
             onPress={() => {
               try {
@@ -349,7 +359,7 @@ export const ProfileDriverScreen = (
             textStyle={styles.withdrawButtonText}>
             회원 탈퇴
           </Button>
-        </View>
+        </Layout>
       </ScrollView>
     </React.Fragment>
   );
@@ -389,7 +399,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     borderColor: '#20232a',
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
   },
   infoContainer: {
     flex: 1,
@@ -398,7 +408,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     borderColor: '#20232a',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
   },
   rowContainer: {
     paddingVertical: 8,
@@ -419,7 +429,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: '#20232a',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
   },
   infoTitle: {
     paddingVertical: 2,

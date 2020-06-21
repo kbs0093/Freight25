@@ -62,6 +62,12 @@ export const DetailCheckDriverScreen = (
   const [OppoFreightID, setOppoFreightID] = React.useState('');
   const [latitude, setLatitude] = React.useState('');
   const [longitude, setLongitude] = React.useState('');
+  const [ownerTel, setOwnerTel] = React.useState('');
+  const [ownerName, setOwnerName] = React.useState('');
+  const [recvTel, setRecvTel] = React.useState('');
+  const [recvName, setRecvName] = React.useState('');
+  const [startAddrNoSpace, setStartAddrNoSpace] = React.useState('');
+  const [endAddrNoSpace, setEndAddrNoSpace] = React.useState('');
   const [data, setData] = React.useState([]);
   const [lastState, setState] = React.useState([]);
 
@@ -71,46 +77,6 @@ export const DetailCheckDriverScreen = (
     isAndroid ? requestLocationAndroid() : requestLocationIos();
     requestFirebase();
   }, []);
-
-  const sendDirectSms = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.SEND_SMS,
-          {
-            title: 'Freight25 App Sms Permission',
-            message:
-              'Freight25 App needs access to your inbox ' +
-              'so you can send messages in background.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          DirectSms.sendDirectSms(
-            data.recvTel,
-            'Signup process completed! ' + data.recvName,
-          );
-          console.log('SMS sent successfully');
-        } else {
-          console.log('SMS permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    } else {
-      console.log('Send message');
-      console.log(data.recvTel);
-
-      const url = `sms:${data.recvTel}${
-        Platform.OS === 'ios' ? '&' : '?'
-      }body=${'signup process completed! ' + data.recvName}`;
-      Linking.openURL(url).catch((err) =>
-        console.error('An error occurred', err),
-      );
-    }
-  };
 
   const requestLocationAndroid = async () => {
     try {
@@ -237,32 +203,64 @@ export const DetailCheckDriverScreen = (
 
             recvName: docs.recvName,
             recvTel: docs.recvTel,
-
             ownerId: docs.ownerId,
             ownerTel: docs.ownerTel,
             ownerName: docs.ownerName,
             desc: docs.desc,
           });
 
-          var addiData = {
-            lastState: freightState,
-            dist: docs.dist,
-            expense: docs.expense,
-            ownerId: docs.ownerId,
-            ownerTel: docs.ownerTel,
-            recvName: docs.recvName,
-            recvTel: docs.recvTel,
-            oppositeFreightId: docs.oppositeFreightId,
-            startAddrNoSpace: startAddrNoSpace,
-            endAddrNoSpace: endAddrNoSpace,
-          };
-          //setState({addiData: addiData});
           setData(list);
           setState(freightState);
+          setOwnerTel(docs.ownerTel);
+          setOwnerName(docs.ownerName);
+          setRecvTel(docs.recvTel);
+          setRecvName(docs.recvName);
+          setStartAddrNoSpace(startAddrNoSpace);
+          setEndAddrNoSpace(endAddrNoSpace);
         } else {
           console.log('No such document!');
         }
       });
+    }
+  };
+
+  const sendDirectSms = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.SEND_SMS,
+          {
+            title: 'Freight25 App Sms Permission',
+            message:
+              'Freight25 App needs access to your inbox ' +
+              'so you can send messages in background.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          DirectSms.sendDirectSms(
+            recvTel,
+            'Signup process completed! ' + recvName,
+          );
+          console.log('SMS sent successfully');
+        } else {
+          console.log('SMS permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      console.log('Send message');
+      console.log(recvTel);
+
+      const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
+        'signup process completed! ' + recvName
+      }`;
+      Linking.openURL(url).catch((err) =>
+        console.error('An error occurred', err),
+      );
     }
   };
 
@@ -271,13 +269,13 @@ export const DetailCheckDriverScreen = (
       // Route to start address
       Linking.openURL(
         tmapRouteURL +
-          `&name=${data.startAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
+          `&name=${startAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
       );
     } else if (num == 2) {
       // Route to end address
       Linking.openURL(
         tmapRouteURL +
-          `&name=${data.endAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
+          `&name=${endAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
       );
     }
   };
@@ -301,8 +299,8 @@ export const DetailCheckDriverScreen = (
 
   const callOwner = () => {
     console.log('Call to the owner');
-    console.log(data.ownerTel);
-    Linking.openURL(`tel:${data.ownerTel}`);
+    console.log(ownerTel);
+    Linking.openURL(`tel:${ownerTel}`);
   };
 
   const setComplete = () => {
@@ -318,7 +316,7 @@ export const DetailCheckDriverScreen = (
     props.navigation.navigate(AppRoute.HOME);
   };
 
-  const _twoOptionAlertHandler = () => {
+  const completeHandler = () => {
     //function to make two option alert
     Alert.alert(
       //title
@@ -524,7 +522,7 @@ export const DetailCheckDriverScreen = (
     return (
       <Button
         onPress={() => {
-          _twoOptionAlertHandler();
+          completeHandler();
         }}
         style={styles.button}
         status="danger"
