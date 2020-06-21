@@ -34,19 +34,19 @@ const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey +
 const isAndroid = Platform.OS === 'android';
 
 const carSize = [
-  { label: '1 톤', value: '1 톤'},
-  { label: '1.4 톤', value: '1.4 톤' },
-  { label: '2.5 톤' ,value: '2.5 톤'},
-  { label: '5 톤' ,value: '5 톤'},
-  { label: '11-15 톤' ,value: '11-15 톤'},
-  { label: '18 톤' ,value: '18 톤'},
-  { label: '25 톤' ,value: '25 톤'},
+  { label: '1 톤', value: '1'},
+  { label: '2.5 톤' ,value: '2.5'},
+  { label: '5 톤' ,value: '5'},
+  { label: '11-15 톤' ,value: '11-15'},
+  { label: '18 톤' ,value: '18'},
+  { label: '25 톤' ,value: '25'},
 ];
 const carType = [
-  { label: '카고' ,value: '카고'},
-  { label: '탑차' ,value: '탑차'},
-  { label: '냉동' ,value: '냉동'},
-  { label: '냉장' ,value: '냉장'},
+  { label: '카고' ,value: 'cargo'},
+  { label: '탑차' ,value: 'top'},
+  { label: '윙바디' ,value: 'wing'},
+  { label: '냉동' ,value: 'superice'},
+  { label: '냉장' ,value: 'ice'},
 ];
 const driveType = [
   { label: '독차',value: '독차'},
@@ -304,7 +304,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   return (
     <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      <SafeAreaView style={{flex: 0}} />
       <ScrollView
         style={
           themeContext.theme == 'dark'
@@ -457,13 +457,11 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 크기 : </Text>
             <Input
-              placeholder='숫자로 입력'
+              placeholder='숫자로 입력하세요'
               value={volumeValue}
               onChangeText={nextValue => isDoublePlus(nextValue, setVolumeValue)}
             />
-            <Layout style={{flex:3}}>
-              <Text style={styles.infoTitle}> 파레트</Text>
-            </Layout>
+            <Text style={styles.infoTitle}> 파레트</Text>
           </Layout>
           <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>적재 방식 : </Text>
@@ -510,7 +508,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 onChangeText={nextValue => isInteger(nextValue, setExpenseValue)}
               />
             </Layout>
-
             <Text style={styles.infoTitle}> 원</Text>
           </Layout>
         </Layout>
