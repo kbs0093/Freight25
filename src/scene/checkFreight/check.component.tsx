@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  Text,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,7 +8,14 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import {Icon, LayoutElement, Divider, Button} from '@ui-kitten/components';
+import {
+  Icon,
+  Text,
+  Layout,
+  LayoutElement,
+  Divider,
+  Button,
+} from '@ui-kitten/components';
 import {CheckScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -30,6 +36,7 @@ import RNPickerSelect from 'react-native-picker-select';
 
 const isAndroid = Platform.OS === 'android';
 
+//export const CheckScreen props: CheckScreenProps,
 export class CheckScreen extends React.Component<CheckScreenProps> {
   constructor(props) {
     super(props);
@@ -154,8 +161,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
 
   _renderItem = ({item}) => (
     <TouchableOpacity onPress={this.ClickList(item)}>
-      <View style={styles.container}>
-        <View style={styles.geoContainer}>
+      <Layout style={styles.container}>
+        <Layout style={styles.geoContainer}>
           <View style={styles.geoInfo1}>
             <View style={styles.geoInfo11}>
               <Text style={styles.geoText}>
@@ -189,7 +196,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
               </Text>
             )}
           </View>
-        </View>
+        </Layout>
         <View style={styles.statusInfo}>
           {item.lastState == '배송중' ? (
             <Text style={styles.badgeTextRed}>{item.lastState}</Text>
@@ -207,7 +214,7 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             <Text style={styles.badgeTextMixed}>경유지 O</Text>
           ) : null}
         </View>
-      </View>
+      </Layout>
       <Divider style={{backgroundColor: 'black'}} />
     </TouchableOpacity>
   );
@@ -222,18 +229,18 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
     return (
       <React.Fragment>
         <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <View
+        <Layout
           style={{
             height: '8%',
             flexDirection: 'row',
             backgroundColor: 'white',
           }}>
-          <View style={{flex: 1, justifyContent: 'center'}}>
+          <Layout style={{flex: 1, justifyContent: 'center'}}>
             <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
               검색 조건 :
             </Text>
-          </View>
-          <View
+          </Layout>
+          <Layout
             style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
             <RNPickerSelect
               onValueChange={(value) => {
@@ -249,8 +256,8 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
                 {label: '최근 날짜 순', value: '1'},
               ]}
             />
-          </View>
-        </View>
+          </Layout>
+        </Layout>
         <Divider style={{backgroundColor: 'black'}} />
 
         <FlatList
@@ -275,18 +282,21 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
-    color: 'blue',
+    color: '#2F80ED',
+    //color: 'blue',
   },
   badgeTextMixed: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
-    color: 'green',
+    //color: 'green',
+    color: '#9B51E0',
   },
 
   badgeTextRed: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
-    color: 'red',
+    //color: 'red',
+    color: '#EB5757',
   },
   container: {
     paddingVertical: 10,
