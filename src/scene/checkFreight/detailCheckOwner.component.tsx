@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  Text,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -8,9 +7,11 @@ import {
   FlatList,
   ScrollView,
   Linking,
-  Image
+  Image,
 } from 'react-native';
 import {
+  Text,
+  Layout,
   LayoutElement,
   TopNavigationAction,
   TopNavigation,
@@ -24,7 +25,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import TextTicker from 'react-native-text-ticker'
+import TextTicker from 'react-native-text-ticker';
+import {ThemeContext} from '../../component/theme-context';
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -32,39 +34,34 @@ const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
 const homeIcon = (style) => <Icon {...style} name="home-outline" />;
 const carIcon = (style) => <Icon {...style} name="car-outline" />;
 
-export class DetailCheckOwnerScreen extends React.Component<
-  DetailCheckOwnerScreenProps
-> {
-  // The number of frieght information from 'owner' should be only one.
-  constructor(props) {
-    super(props);
+export const DetailCheckOwnerScreen = (
+  props: DetailCheckOwnerScreenProps,
+): LayoutElement => {
+  const [FreightID, setFreightID] = React.useState('');
+  const [driverTel, setDriverTel] = React.useState('');
+  const [data, setData] = React.useState([]);
+  const [lastState, setState] = React.useState([]);
 
-    this.state = {
-      FreightID: null,
-      data: [],
-      addiData: {
-        lastState: null, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
-        dist: null,
-        expense: null,
-        ownerID: null,
-        driverTel: null,
-      },
-    };
-  }
+  const themeContext = React.useContext(ThemeContext);
 
-  componentDidMount = async () => {
+  useEffect(() => {
+    requestFirebase();
+  }, []);
+
+  const requestFirebase = async () => {
+    var freightID;
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
-        this.setState({FreightID: value});
+        freightID = value;
+        setFreightID(value);
       }
     } catch (error) {}
 
     var user = auth().currentUser;
-    const that = this;
 
     if (user != null) {
-      var docRef = firestore().collection('freights').doc(this.state.FreightID);
+      var docRef = firestore().collection('freights').doc(freightID);
 
       docRef.get().then(function (doc) {
         //doc.data()에 상세정보 저장되어 있습니다.
@@ -137,22 +134,12 @@ export class DetailCheckOwnerScreen extends React.Component<
 
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
-            //endMonth: docEndDate.getMonth() + 1,
-            //endDay: docEndDate.getDate(),
             startDayLabel: doc.startDayLabel,
             endDayLabel: doc.endDayLabel,
           });
-
-          var addiData = {
-            lastState: freightState,
-            dist: docs.dist,
-            expense: docs.expense,
-            ownerId: docs.ownerId,
-            driverTel: docs.driverTel,
-          };
-
-          that.setState({addiData: addiData});
-          that.setState({data: list});
+          setData(list);
+          setState(freightState);
+          setDriverTel(docs.driverTel);
         } else {
           console.log('No such document!');
         }
@@ -160,35 +147,38 @@ export class DetailCheckOwnerScreen extends React.Component<
     }
   };
 
-  callDriver = () => {
+  const callDriver = () => {
     console.log('Call to the driver');
-    console.log(this.state.addiData.driverTel);
-    Linking.openURL(`tel:${this.state.addiData.driverTel}`);
+    console.log(driverTel);
+    Linking.openURL(`tel:${driverTel}`);
   };
 
-  navigateBack = () => {
-    this.props.navigation.goBack()
-  }
-  
-  deleteFreight =() => {
+  const navigateBack = () => {
+    props.navigation.goBack();
+  };
 
-  }
+  const deleteFreight = () => {};
 
-  _renderItem = ({item}) => (
-    <View>
+  const _renderItem = ({item}) => (
+    <Layout>
       <View style={{flexDirection: 'row'}}>
-        <View style={{flex: 1, justifyContent: 'center' }}>
+        <View style={{flex: 1, justifyContent: 'center'}}>
           <View></View>
-          <TouchableOpacity onPress={this.navigateBack}>
-           <Icon name='arrow-back-outline' width={28} height={28} fill='black'/>
+          <TouchableOpacity onPress={navigateBack}>
+            <Icon
+              name="arrow-back-outline"
+              width={28}
+              height={28}
+              fill={themeContext.theme == 'dark' ? 'white' : 'black'}
+            />
           </TouchableOpacity>
         </View>
-        <View style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
-          <Text style={styles.Subtitle}>
-            화물 내역
-          </Text>
+        <View
+          style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
+          <Text style={styles.Subtitle}>화물 내역</Text>
         </View>
-        <View style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
+        <View
+          style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
           {item.lastState == '배송중' ? (
             <Button
               style={styles.Badge}
@@ -201,17 +191,17 @@ export class DetailCheckOwnerScreen extends React.Component<
           ) : (
             <Button
               style={styles.Badge}
-              appearance='outline'
+              appearance="outline"
               textStyle={styles.badgeText}>
               {item.lastState}
             </Button>
           )}
-          <Divider style={{backgroundColor: 'black'}}/>
-        </View>        
+          <Divider style={{backgroundColor: 'black'}} />
+        </View>
       </View>
 
       <Divider style={{backgroundColor: 'black'}} />
-     
+
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -229,8 +219,8 @@ export class DetailCheckOwnerScreen extends React.Component<
             />
           </View>
           <View>
-           <Text style={styles.geoSubText3}>{item.driveOption}</Text>
-          </View>         
+            <Text style={styles.geoSubText3}>{item.driveOption}</Text>
+          </View>
         </View>
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
@@ -238,10 +228,10 @@ export class DetailCheckOwnerScreen extends React.Component<
           </Text>
           <Text style={styles.geoText}>{item.endAddrArray[2]}</Text>
           <Text style={styles.geoSubText2}>{item.endDate}</Text>
-        </View>        
+        </View>
       </View>
 
-      <Divider style={{backgroundColor: 'black'}} />      
+      <Divider style={{backgroundColor: 'black'}} />
 
       <View style={styles.freightInfoTotalContainer}>
         <View style={styles.freightInfoHalfContainer} key="1">
@@ -261,7 +251,7 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.infoTitle}>하차지 주소:</Text>
           <Text style={styles.infoTitle}>화물 설명:</Text>
           {item.lastState == '배송중' ? (
-            <Text style={styles.infoTitle}>화물차 기사 전화번호:</Text>
+            <Text style={styles.infoTitle}>기사 전화번호:</Text>
           ) : null}
         </View>
         <View style={styles.freightInfoHalfRightContainer}>
@@ -272,24 +262,32 @@ export class DetailCheckOwnerScreen extends React.Component<
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
           <Text style={styles.infoRightTitle}>{item.driveOption}</Text>
           <TextTicker
-                style={styles.infoRightTitle}
-                duration={3000}
-                loop
-                bounce
-                repeatSpacer={50}
-                marqueeDelay={1000}
-              >
-                {item.startAddrFullArray[0]} {item.startAddrFullArray[1]} {item.startAddrFullArray[2]} {item.startAddrDetail}
+            style={
+              themeContext.theme == 'dark'
+                ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+            }
+            duration={3000}
+            loop
+            bounce
+            repeatSpacer={50}
+            marqueeDelay={1000}>
+            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
+            {item.startAddrFullArray[2]} {item.startAddrDetail}
           </TextTicker>
           <TextTicker
-                style={styles.infoRightTitle}
-                duration={3000}
-                loop
-                bounce
-                repeatSpacer={50}
-                marqueeDelay={1000}
-              >
-              {item.endAddrFullArray[0]} {item.endAddrFullArray[1]} {item.endAddrFullArray[2]} {item.endAddrDetail}
+            style={
+              themeContext.theme == 'dark'
+                ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+            }
+            duration={3000}
+            loop
+            bounce
+            repeatSpacer={50}
+            marqueeDelay={1000}>
+            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
+            {item.endAddrFullArray[2]} {item.endAddrDetail}
           </TextTicker>
 
           <Text style={styles.infoRightTitle}>{item.desc}</Text>
@@ -299,120 +297,79 @@ export class DetailCheckOwnerScreen extends React.Component<
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
-    </View>
+    </Layout>
   );
 
-  render() {
-    let callButton;
-    let reviewButton;
-
-    if (this.state.addiData.lastState == '배송전') {
-      callButton = (
-        <Button
-          onPress={() => {
-            this.callDriver();
-          }}
-          style={styles.callButton}
-          textStyle={styles.callButtonText}
-          status="success"
-          disabled={true}
-          icon={phoneIcon}>
-          화물차 기사에게 전화
-        </Button>
-      );
-      reviewButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          화물차 기사 평가
-        </Button>
-      );
-    } else if (this.state.addiData.lastState == '배송중') {
-      callButton = (
-        <Button
-          onPress={() => {
-            this.callDriver();
-          }}
-          style={styles.callButton}
-          status="success"
-          textStyle={styles.callButtonText}
-          icon={phoneIcon}>
-          화물차 기사에게 전화
-        </Button>
-      );
-      reviewButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}>
-          화물차 기사 평가
-        </Button>
-      );
-    } else if (this.state.addiData.lastState == '배송완료') {
-      callButton = (
-        <Button
-          onPress={() => {
-            this.callDriver();
-          }}
-          style={styles.callButton}
-          status="success"
-          textStyle={styles.callButtonText}
-          icon={phoneIcon}>
-          화물차 기사에게 전화
-        </Button>
-      );
-      reviewButton = (
-        <Button style={styles.button} textStyle={styles.buttonText}>
-          화물차 기사 평가
-        </Button>
-      );
-    } else {
+  const renderCallButton = () => {
+    var isDisable;
+    if (lastState == '배송전') {
+      isDisable = true;
+    } else if (lastState == '배송중') {
+      isDisable = false;
+    } else if (lastState == '배송완료') {
+      isDisable = false;
     }
 
     return (
-      <React.Fragment>
-        <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <View style={{backgroundColor: 'white', flex: 1}}>
-          <View style={{flex: 4}}>
-            <FlatList
-              style={{backgroundColor: 'white'}}
-              data={this.state.data}
-              renderItem={this._renderItem}
-            />
-          </View>
-
-          <View style={styles.ButtonContainter}>
-            <View style={styles.ButtonHalfContainer}>{callButton}</View>
-            <View style={{flex:1, alignItems: 'center'}}>
-              <Button
-                status='danger'
-                onPress={this.deleteFreight}
-              >
-                삭제
-              </Button>
-            </View>
-            {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
-          </View>
-
-          <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1.6}}>
-            <Image
-              style={styles.adImage}
-              source={require('../../assets/AD/ad2.jpg')}
-            />
-          </View>
-        </View>
-      </React.Fragment>
+      <Button
+        onPress={() => {
+          callDriver();
+        }}
+        style={styles.button}
+        status="success"
+        icon={phoneIcon}
+        disabled={isDisable}
+        textStyle={styles.callButtonText}>
+        화주 전화
+      </Button>
     );
-  }
-}
+  };
+
+  return (
+    <React.Fragment>
+      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      <Layout style={{flex: 1}}>
+        <Layout style={{flex: 4}}>
+          <FlatList
+            style={
+              themeContext.theme == 'dark'
+                ? {backgroundColor: '#222B45'}
+                : {backgroundColor: '#FFFFFF'}
+            }
+            data={data}
+            renderItem={_renderItem}
+          />
+        </Layout>
+
+        <Layout style={styles.ButtonContainter}>
+          <Layout style={styles.ButtonHalfContainer}>
+            {renderCallButton()}
+          </Layout>
+          <Layout style={{flex: 1, alignItems: 'center'}}>
+            <Button status="danger" onPress={deleteFreight}>
+              삭제
+            </Button>
+          </Layout>
+          {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
+        </Layout>
+
+        <View style={{alignItems: 'center', flex: 1.6}}>
+          <Image
+            style={styles.adImage}
+            source={require('../../assets/AD/ad2.jpg')}
+          />
+        </View>
+      </Layout>
+    </React.Fragment>
+  );
+};
 
 const styles = StyleSheet.create({
   Badge: {
     width: RFPercentage(14),
     height: RFPercentage(6),
     borderRadius: 8,
-    margin: 5
+    margin: 5,
   },
   smallBadge: {
     width: RFPercentage(12),
@@ -491,13 +448,13 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
-    color: '#2F80ED'
+    color: '#2F80ED',
   },
   geoSubText2: {
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
-    color: '#EB5757'
+    color: '#EB5757',
   },
   geoSubText3: {
     fontSize: RFPercentage(2.5),
@@ -514,26 +471,23 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   totalInfoContainer: {
-    backgroundColor: 'white',
     flexDirection: 'row',
     flex: 1,
     borderColor: '#20232a',
     marginTop: -30,
   },
   totalInfoHalfContainer: {
-    backgroundColor: 'white',
     flex: 1,
   },
   ButtonContainter: {
     flex: 0.5,
-    backgroundColor: 'white',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 5
+    margin: 5,
   },
   ButtonHalfContainer: {
     flex: 2,
