@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
@@ -6,11 +6,11 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  Platform,
 } from 'react-native';
 import {
   LayoutElement, 
   Divider,
-  Select,
   Button,
   Input,  
 } from '@ui-kitten/components';
@@ -19,10 +19,11 @@ import { AppRoute } from '../../navigation/app-routes';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { StackActions, NavigationActions } from 'react-navigation';
 import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
+
+const isAndroid = Platform.OS === 'android';
 
 const HomeNavigate = CommonActions.reset({
   index: 0,
@@ -221,20 +222,26 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               <View style={styles.detailTitle}>
                 <Text style={styles.textStyle}>차량 톤수 :</Text>
               </View>
-              <View style={{flex: 3}}>
+              <View style={{flex: 3, justifyContent:'center', alignItems:'center'}}>
                 <RNPickerSelect
                   onValueChange={(itemValue, itemIndex) => setTonValue(itemValue)}
                   placeholder={{
                     label: '차량 톤수를 선택하세요',
                     value: null,
                   }}
-                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    placeholder:{
+                      color: 'black'
+                    }
+                  }}
+                  useNativeAndroidPickerStyle={isAndroid? true: false}
                   items={[
-                    {label: '1 톤', value: '1'},
-                    {label: '2.5 톤', value: '2.5'},
-                    {label: '5 톤', value: '5'},
-                    {label: '11-15 톤', value: '15'},
-                    {label: '25 톤', value: '25'},
+                    { label: '1 톤', value: '1'},
+                    { label: '2.5 톤' ,value: '2.5'},
+                    { label: '5 톤' ,value: '5'},
+                    { label: '11-15 톤' ,value: '11-15'},
+                    { label: '18 톤' ,value: '18'},
+                    { label: '25 톤' ,value: '25'},
                   ]}
                 />          
               </View>
@@ -243,17 +250,23 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               <View style={styles.detailTitle}>
                 <Text style={styles.textStyle}>차량 유형 :</Text>
               </View>
-              <View style={{flex: 3 }}>
+              <View style={{flex: 3, justifyContent:'center', alignItems:'center'}}>
                 <RNPickerSelect
                     onValueChange={(itemValue, itemIndex) => setTypeValue(itemValue)}
                     placeholder={{
                       label: '차량 유형을 선택하세요',
                       value: null,
                     }}
-                    useNativeAndroidPickerStyle={false}
+                    style={{
+                      placeholder:{
+                        color: 'black'
+                      }
+                    }}
+                    useNativeAndroidPickerStyle={isAndroid? true: false}
                     items={[
                       {label: '카고', value: 'cargo'},
-                      {label: '윙카', value: 'wing'},
+                      { label: '탑차' ,value: 'top'},
+                      { label: '윙바디' ,value: 'wing'},
                       {label: '냉동', value: 'superice'},
                       {label: '냉장', value: 'ice'},
                     ]}
@@ -269,14 +282,19 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
               <View style={styles.detailTitle}>
                 <Text style={styles.textStyle}>거래 은행 :</Text>
               </View>
-              <View style={{flex: 3 }}>
+              <View style={{flex: 3, justifyContent:'center', alignItems:'center'}}>
                 <RNPickerSelect
                   onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
                   placeholder={{
                     label: '은행을 선택하세요',
                     value: null,
                   }}
-                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    placeholder:{
+                      color: 'black'
+                    }
+                  }}
+                  useNativeAndroidPickerStyle={isAndroid? true: false}
                   items={[
                     {label: '국민', value: 'kukmin'},
                     {label: '신한', value: 'shinhan'},
