@@ -128,6 +128,9 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                           messageToken : messageToken
                         })
                       }
+                      AsyncStorage.setItem('userUID', user.uid).then(() =>{
+                        console.log(user.uid+" Async Storage 등록 완료");                 
+                      });
                       AsyncStorage.setItem('userType', 'driver')
                       .then( ()=>{
                         console.log("auth AsyncStorage Type: driver");
@@ -137,6 +140,9 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
                       props.navigation.dispatch(HomeNavigate);
                     }
                     else{
+                      AsyncStorage.setItem('userUID', user.uid).then(() =>{
+                        console.log(user.uid+" Async Storage 등록 완료");                 
+                      });
                       AsyncStorage.setItem('userType', 'owner')
                       .then(()=>{
                         var ref = firestore().collection('owners').doc(user.uid);

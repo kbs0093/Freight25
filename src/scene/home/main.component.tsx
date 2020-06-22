@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
-import {Image, StyleSheet, View, TouchableOpacity, Alert, AppRegistry} from 'react-native';
-import {LayoutElement, Text, ViewPager} from '@ui-kitten/components';
+import React, { useEffect } from 'react';
+import {Image, StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
+import {LayoutElement, Text, Layout} from '@ui-kitten/components';
 import {OwnerScreenProps} from '../../navigation/home.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -41,7 +41,7 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
 
   return (
     <React.Fragment>
-      <View style={styles.viewForm}>
+      <Layout style={styles.viewForm}>
         <TouchableOpacity onPress={clickButtonType} style={styles.Button}>
           <Image
             style={styles.Image}
@@ -55,18 +55,18 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
           />
         </TouchableOpacity>
              
-      </View>
+      </Layout>
 
-      <View style={{backgroundColor: 'white'}}>
+      <Layout>
         <Text style={styles.adtitle}> 스폰서 광고 </Text>
-      </View>
+      </Layout>
 
-      <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+      <Layout style={{alignItems: 'center', flex: 1}}>
         <Image
           style={styles.adImage}
           source={require('../../assets/AD/ad.jpg')}
         />
-      </View>
+      </Layout>
     </React.Fragment>
   );
 };
@@ -104,7 +104,7 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
 
   return (
     <React.Fragment>
-      <View style={styles.viewForm}>
+      <Layout style={styles.viewForm}>
       <TouchableOpacity onPress={clickButtonType} style={styles.Button}>
           <Image
             style={styles.Image}
@@ -117,18 +117,18 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
             source={require('../../assets/CheckButton-round.png')}
           />
         </TouchableOpacity>
-      </View>
+      </Layout>
 
-      <View style={{backgroundColor: 'white'}}>
+      <Layout>
         <Text style={styles.adtitle}> 스폰서 광고 </Text>
-      </View>
+      </Layout>
 
-      <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+      <Layout style={{alignItems: 'center', flex: 1}}>
         <Image
           style={styles.adImage}
           source={require('../../assets/AD/ad.jpg')}
         />
-      </View>
+      </Layout>
     </React.Fragment>
   );
 };
@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
   },
   viewForm: {
     flex: 2,
-    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },

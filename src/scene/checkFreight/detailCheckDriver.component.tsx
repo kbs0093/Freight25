@@ -1,6 +1,5 @@
-import React, {useState, Fragment} from 'react';
+import React, {useState, Fragment, useEffect} from 'react';
 import {
-  Text,
   PermissionsAndroid,
   StyleSheet,
   View,
@@ -13,7 +12,14 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import {Icon, Button, Divider} from '@ui-kitten/components';
+import {
+  Icon,
+  Button,
+  Divider,
+  Text,
+  Layout,
+  LayoutElement,
+} from '@ui-kitten/components';
 import {DetailCheckDriverScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -33,7 +39,9 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 import Geolocation from 'react-native-geolocation-service';
-import TextTicker from 'react-native-text-ticker'
+import TextTicker from 'react-native-text-ticker';
+import {ThemeContext} from '../../component/theme-context';
+import {DetailCheckOwnerScreen} from './detailCheckOwner.component';
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -47,72 +55,30 @@ const tmapRouteURL =
   'https://apis.openapi.sk.com/tmap/app/routes?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 const DirectSms = NativeModules.DirectSms;
 
-export class DetailCheckDriverScreen extends React.Component<
-  DetailCheckDriverScreenProps
-> {
-  // The number of frieght information from 'driver' could be more than one.
-  constructor(props) {
-    super(props);
-    this.state = {
-      FreightID: null,
-      OppoFreightID: null,
-      data: [],
-      addiData: {
-        lastState: null, // 0 -> 배송중, 1 -> 배송완료
-        dist: null,
-        expense: null,
-        ownerId: null,
-        ownerTel: null,
-        oppositeFreightId: null,
-        startAddrNoSpace: null,
-        endAddrNoSpace: null,
-      },
-      latitude: 'unknown',
-      longitude: 'unknown',
-    };
-  }
+export const DetailCheckDriverScreen = (
+  props: DetailCheckDriverScreenProps,
+): LayoutElement => {
+  const [FreightID, setFreightID] = React.useState('');
+  const [OppoFreightID, setOppoFreightID] = React.useState('');
+  const [latitude, setLatitude] = React.useState('');
+  const [longitude, setLongitude] = React.useState('');
+  const [ownerTel, setOwnerTel] = React.useState('');
+  const [ownerName, setOwnerName] = React.useState('');
+  const [recvTel, setRecvTel] = React.useState('');
+  const [recvName, setRecvName] = React.useState('');
+  const [startAddrNoSpace, setStartAddrNoSpace] = React.useState('');
+  const [endAddrNoSpace, setEndAddrNoSpace] = React.useState('');
+  const [data, setData] = React.useState([]);
+  const [lastState, setState] = React.useState([]);
 
-  sendDirectSms = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.SEND_SMS,
-          {
-            title: 'Freight25 App Sms Permission',
-            message:
-              'Freight25 App needs access to your inbox ' +
-              'so you can send messages in background.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          DirectSms.sendDirectSms(
-            this.state.addiData.recvTel,
-            '화물차 기사가 ' + this.state.addiData.recvName +'님께 안전하게 운송을 완료하였습니다.',
-          );
-          console.log('SMS sent successfully');
-        } else {
-          console.log('SMS permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    } else {
-      console.log('Send message');
-      console.log(this.state.addiData.recvTel);
+  const themeContext = React.useContext(ThemeContext);
 
-      const url = `sms:${this.state.addiData.recvTel}${
-        Platform.OS === 'ios' ? '&' : '?'
-      }body=${'화물차 기사가 ' + this.state.addiData.recvName +'님께 안전하게 운송을 완료하였습니다.'}`;
-      Linking.openURL(url).catch((err) =>
-        console.error('An error occurred', err),
-      );
-    }
-  };
+  useEffect(() => {
+    isAndroid ? requestLocationAndroid() : requestLocationIos();
+    requestFirebase();
+  }, []);
 
-  requestLocationAndroid = async () => {
+  const requestLocationAndroid = async () => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -122,8 +88,8 @@ export class DetailCheckDriverScreen extends React.Component<
           (position) => {
             let latitude = JSON.stringify(position.coords.latitude);
             let longitude = JSON.stringify(position.coords.longitude);
-            this.setState({latitude: latitude});
-            this.setState({longitude: longitude});
+            setLatitude(latitude);
+            setLongitude(longitude);
           },
           (error) => Alert.alert('Error', JSON.stringify(error)),
           {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
@@ -135,7 +101,7 @@ export class DetailCheckDriverScreen extends React.Component<
     }
   };
 
-  requestLocationIos = () => {
+  const requestLocationIos = () => {
     var latitude;
     var longitude;
 
@@ -143,38 +109,38 @@ export class DetailCheckDriverScreen extends React.Component<
       (position) => {
         latitude = JSON.stringify(position.coords.latitude);
         longitude = JSON.stringify(position.coords.longitude);
-        this.setState({latitude: latitude});
-        this.setState({longitude: longitude});
+        setLatitude(latitude);
+        setLongitude(longitude);
       },
       (error) => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
   };
 
-  componentDidMount = async () => {
-    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos();
-
+  const requestFirebase = async () => {
+    var freightID;
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
-        this.setState({FreightID: value});
+        freightID = value;
+        setFreightID(value);
       }
     } catch (error) {}
     try {
       const value = await AsyncStorage.getItem('OppoFreightID');
       if (value !== null) {
-        this.setState({OppoFreightID: value});
+        setOppoFreightID(value);
       }
     } catch (error) {}
 
     var user = auth().currentUser;
-    const that = this;
+    //const that = this;
 
     if (user != null) {
-      var docRef = firestore().collection('freights').doc(this.state.FreightID);
+      var docRef = firestore().collection('freights').doc(freightID);
 
       // Get the selected(original) freight info from Firebase.
-      docRef.get().then(function (doc) {
+      docRef.get().then(async function (doc) {
         var list = [];
 
         if (doc.exists) {
@@ -197,22 +163,23 @@ export class DetailCheckDriverScreen extends React.Component<
           for (j = 3; j < endAddrFullArray.length; j++) {
             endAddrDetail += endAddrFullArray[j] + ' ';
           }
+          var startAddrNoSpace = docs.startAddr.replace(/\s/g, '');
+          var endAddrNoSpace = docs.endAddr.replace(/\s/g, '');
 
           if (docs.state == 0) freightState = '배송전';
           else if (docs.state == 1) freightState = '배송중';
           else if (docs.state == 2) freightState = '배송완료';
 
           var docStartDate = new Date(docs.timeStampAssigned._seconds * 1000);
-          //var docEndDate = new Date(docs.endDay._seconds * 1000);
 
           var moneyprint = docs.expense + '';
           moneyprint = moneyprint
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-
           list.push({
             key: docs.id,
+            oppositeFreightId: docs.oppositeFreightId,
             lastState: freightState, // 0 -> 배송전, 1 -> 배송중, 2 -> 배송완료
             dist: docs.dist,
             startDate: docs.startDate, // 배송 출발 날짜 -> UI 고치기
@@ -226,34 +193,30 @@ export class DetailCheckDriverScreen extends React.Component<
             endAddrArray: endAddrArray,
             startAddrDetail: startAddrDetail,
             endAddrDetail: endAddrDetail,
+            startAddrNoSpace: startAddrNoSpace,
+            endAddrNoSpace: endAddrNoSpace,
 
             startMonth: docStartDate.getMonth() + 1,
             startDay: docStartDate.getDate(),
-            // endMonth: docEndDate.getMonth() + 1,
-            startDayLabel: doc.startDayLabel,
+            startDayLabel: docs.startDayLabel,
             driveOption: docs.driveOption,
 
+            recvName: docs.recvName,
+            recvTel: docs.recvTel,
+            ownerId: docs.ownerId,
             ownerTel: docs.ownerTel,
             ownerName: docs.ownerName,
             desc: docs.desc,
           });
 
-          var startAddrNoSpace = docs.startAddr.replace(/\s/g, '');
-          var endAddrNoSpace = docs.endAddr.replace(/\s/g, '');
-          var addiData = {
-            lastState: freightState,
-            dist: docs.dist,
-            expense: docs.expense,
-            ownerId: docs.ownerId,
-            ownerTel: docs.ownerTel,
-            recvName: docs.recvName,
-            recvTel: docs.recvTel,
-            oppositeFreightId: docs.oppositeFreightId,
-            startAddrNoSpace: startAddrNoSpace,
-            endAddrNoSpace: endAddrNoSpace,
-          };
-          that.setState({addiData: addiData});
-          that.setState({data: list});
+          setData(list);
+          setState(freightState);
+          setOwnerTel(docs.ownerTel);
+          setOwnerName(docs.ownerName);
+          setRecvTel(docs.recvTel);
+          setRecvName(docs.recvName);
+          setStartAddrNoSpace(startAddrNoSpace);
+          setEndAddrNoSpace(endAddrNoSpace);
         } else {
           console.log('No such document!');
         }
@@ -261,29 +224,69 @@ export class DetailCheckDriverScreen extends React.Component<
     }
   };
 
-  invokeTmap = (num) => {
+  const sendDirectSms = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.SEND_SMS,
+          {
+            title: 'Freight25 App Sms Permission',
+            message:
+              'Freight25 App needs access to your inbox ' +
+              'so you can send messages in background.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          DirectSms.sendDirectSms(
+            recvTel,
+            'Signup process completed! ' + recvName,
+          );
+          console.log('SMS sent successfully');
+        } else {
+          console.log('SMS permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      console.log('Send message');
+      console.log(recvTel);
+
+      const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
+        'signup process completed! ' + recvName
+      }`;
+      Linking.openURL(url).catch((err) =>
+        console.error('An error occurred', err),
+      );
+    }
+  };
+
+  const invokeTmap = (num) => {
     if (num == 1) {
       // Route to start address
       Linking.openURL(
         tmapRouteURL +
-          `&name=${this.state.addiData.startAddrNoSpace}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+          `&name=${startAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
       );
     } else if (num == 2) {
       // Route to end address
       Linking.openURL(
         tmapRouteURL +
-          `&name=${this.state.addiData.endAddrNoSpace}&lat=${this.state.latitude}&lon=${this.state.longitude}`,
+          `&name=${endAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
       );
     }
   };
 
-  navHandler = () => {
+  const navHandler = () => {
     Alert.alert(
       '내비게이션 연결',
       '연결 하시겠습니까?',
       [
-        {text: '상차지 경로', onPress: () => this.invokeTmap(1)},
-        {text: '하차지 경로', onPress: () => this.invokeTmap(2)},
+        {text: '상차지 경로', onPress: () => invokeTmap(1)},
+        {text: '하차지 경로', onPress: () => invokeTmap(2)},
         {
           text: 'Cancel',
           onPress: () => console.log('canceled'),
@@ -294,26 +297,26 @@ export class DetailCheckDriverScreen extends React.Component<
     );
   };
 
-  callOwner = () => {
+  const callOwner = () => {
     console.log('Call to the owner');
-    console.log(this.state.addiData.ownerTel);
-    Linking.openURL(`tel:${this.state.addiData.ownerTel}`);
+    console.log(ownerTel);
+    Linking.openURL(`tel:${ownerTel}`);
   };
 
-  setComplete = () => {
-    this.sendDirectSms();
+  const setComplete = () => {
+    sendDirectSms();
     console.log('운송 완료');
     try {
-      var ref = firestore().collection('freights').doc(this.state.FreightID);
+      var ref = firestore().collection('freights').doc(FreightID);
       ref.update({
         state: 2,
       });
     } catch (error) {}
     Toast.showSuccess('운송 완료');
-    this.props.navigation.navigate(AppRoute.HOME);
+    props.navigation.navigate(AppRoute.HOME);
   };
 
-  _twoOptionAlertHandler = () => {
+  const completeHandler = () => {
     //function to make two option alert
     Alert.alert(
       //title
@@ -321,7 +324,7 @@ export class DetailCheckDriverScreen extends React.Component<
       //body
       '운송 완료 하시겠습니까?',
       [
-        {text: '네', onPress: () => this.setComplete()},
+        {text: '네', onPress: () => setComplete()},
         {
           text: '취소',
           onPress: () => console.log('No Pressed'),
@@ -333,33 +336,43 @@ export class DetailCheckDriverScreen extends React.Component<
     );
   };
 
-  _showStopoverFreight = () => {
-    if (this.state.addiData.oppositeFreightId != null) {
-      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_STOPOVER);
+  const _showStopoverFreight = () => {
+    if (OppoFreightID != null) {
+      props.navigation.navigate(AppRoute.CHECK_DETAIL_STOPOVER);
     } else {
       Toast.show('경유지 화물이 없습니다');
     }
   };
 
-  navigateBack = () => {
-    this.props.navigation.goBack()
-  }
+  const navigateBack = () => {
+    props.navigation.goBack();
+  };
 
-  _renderItem = ({item}) => (
-    <View>
+  const _renderItem = ({item}) => (
+    <Layout>
       <View style={{flexDirection: 'row'}}>
-        <View style={{flex: 1, justifyContent: 'center' }}>
+        {/* <View style={{flex: 1, justifyContent: 'center'}}>
           <View></View>
-          <TouchableOpacity onPress={this.navigateBack}>
-           <Icon name='arrow-back-outline' width={28} height={28} fill='black'/>
+          <TouchableOpacity onPress={navigateBack}>
+            <Icon
+              name="arrow-back-outline"
+              width={28}
+              height={28}
+              fill={themeContext.theme == 'dark' ? 'white' : 'black'}
+            />
           </TouchableOpacity>
+        </View> */}
+        <View
+          style={{
+            flex: 3,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            paddingHorizontal: 10,
+          }}>
+          <Text style={styles.Subtitle}> 화물 내역</Text>
         </View>
-        <View style={{flex: 3, alignItems: 'flex-start', justifyContent: 'center'}}>
-          <Text style={styles.Subtitle}>
-            화물 내역
-          </Text>
-        </View>
-        <View style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
+        <View
+          style={{flex: 3, alignItems: 'flex-end', justifyContent: 'center'}}>
           {item.lastState == '배송중' ? (
             <Button
               style={styles.Badge}
@@ -372,18 +385,17 @@ export class DetailCheckDriverScreen extends React.Component<
           ) : (
             <Button
               style={styles.Badge}
-              appearance='outline'
+              appearance="outline"
               textStyle={styles.badgeText}>
               {item.lastState}
             </Button>
           )}
-        </View>        
+        </View>
       </View>
 
-      <Divider style={{backgroundColor: 'black'}} />
+      {/* <Divider style={{backgroundColor: 'black'}} /> */}
 
       <View style={styles.geoContainer}>
-        
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
             {item.startAddrArray[0]} {item.startAddrArray[1]}{' '}
@@ -401,9 +413,9 @@ export class DetailCheckDriverScreen extends React.Component<
           </View>
           <View>
             <Text style={styles.geoSubText3}>{item.driveOption}</Text>
-          </View>         
+          </View>
         </View>
-  
+
         <View style={styles.geoInfoContainer}>
           <Text style={styles.geoText}>
             {item.endAddrArray[0]} {item.endAddrArray[1]}
@@ -431,24 +443,32 @@ export class DetailCheckDriverScreen extends React.Component<
           <Text style={styles.infoRightTitle}>{item.dist} KM</Text>
           <Text style={styles.infoRightTitle}>{item.expense} 원</Text>
           <TextTicker
-                style={styles.infoRightTitle}
-                duration={3000}
-                loop
-                bounce
-                repeatSpacer={50}
-                marqueeDelay={1000}
-              >
-                {item.startAddrFullArray[0]} {item.startAddrFullArray[1]} {item.startAddrFullArray[2]} {item.startAddrDetail}
+            style={
+              themeContext.theme == 'dark'
+                ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+            }
+            duration={3000}
+            loop
+            bounce
+            repeatSpacer={50}
+            marqueeDelay={1000}>
+            {item.startAddrFullArray[0]} {item.startAddrFullArray[1]}{' '}
+            {item.startAddrFullArray[2]} {item.startAddrDetail}
           </TextTicker>
           <TextTicker
-                style={styles.infoRightTitle}
-                duration={3000}
-                loop
-                bounce
-                repeatSpacer={50}
-                marqueeDelay={1000}
-              >
-              {item.endAddrFullArray[0]} {item.endAddrFullArray[1]} {item.endAddrFullArray[2]} {item.endAddrDetail}
+            style={
+              themeContext.theme == 'dark'
+                ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+            }
+            duration={3000}
+            loop
+            bounce
+            repeatSpacer={50}
+            marqueeDelay={1000}>
+            {item.endAddrFullArray[0]} {item.endAddrFullArray[1]}{' '}
+            {item.endAddrFullArray[2]} {item.endAddrDetail}
           </TextTicker>
           <Text style={styles.infoRightTitle}>{item.ownerName}</Text>
           <Text style={styles.infoRightTitle}>{item.ownerTel}</Text>
@@ -456,17 +476,14 @@ export class DetailCheckDriverScreen extends React.Component<
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
-    </View>
+    </Layout>
   );
 
-  render() {
-    let navButton;
-    let completeButton;
-    let showStopoverButton;
-    let callButton = (
+  const renderCallButton = () => {
+    return (
       <Button
         onPress={() => {
-          this.callOwner();
+          callOwner();
         }}
         style={styles.button}
         status="success"
@@ -475,112 +492,109 @@ export class DetailCheckDriverScreen extends React.Component<
         화주 전화
       </Button>
     );
+  };
 
-    if (this.state.addiData.oppositeFreightId != null) {
-      showStopoverButton = (
-        <Button
-          onPress={() => {
-            this._showStopoverFreight();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={cartIcon}>
-          경유지
-        </Button>
-      );
-    } else {
-      showStopoverButton = (
-        <Button
-          onPress={() => {
-            this._showStopoverFreight();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          disabled={true}
-          status="info"
-          icon={cartIcon}>
-          경유지
-        </Button>
-      );
+  const renderNavButton = () => {
+    var isDisable;
+    if (lastState == '배송중') {
+      isDisable = false;
+    } else if (lastState == '배송완료') {
+      isDisable = true;
     }
-    if (this.state.addiData.lastState == '배송중') {
-      navButton = (
-        <Button
-          onPress={() => {
-            this.navHandler();
-          }}
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          icon={naviIcon}>
-          내비 연결
-        </Button>
-      );
-      completeButton = (
-        <Button
-          onPress={() => {
-            this._twoOptionAlertHandler();
-          }}
-          style={styles.button}
-          status="danger"
-          icon={homeIcon}
-          textStyle={styles.buttonText}>
-          운송 완료
-        </Button>
-      );
-    } else if (this.state.addiData.lastState == '배송완료') {
-      navButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="info"
-          disabled={true}
-          icon={naviIcon}>
-          내비 연결
-        </Button>
-      );
-      completeButton = (
-        <Button
-          style={styles.button}
-          textStyle={styles.buttonText}
-          status="danger"
-          icon={homeIcon}
-          disabled={true}>
-          운송 완료
-        </Button>
-      );
-    } else {
-    }
-
     return (
-      <React.Fragment>
-        <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <FlatList
-          style={{backgroundColor: 'white'}}
-          data={this.state.data}
-          renderItem={this._renderItem}
-          keyExtractor={(item) => item.key}
-        />
-        <View style={styles.ButtonContainter}>
-          <View style={styles.ButtonHalfContainer}>{navButton}</View>
-          <View style={styles.ButtonHalfContainer}>{showStopoverButton}</View>
-        </View>
-        <View style={styles.ButtonContainter}>
-          <View style={styles.ButtonHalfContainer}>{callButton}</View>
-          <View style={styles.ButtonHalfContainer}>{completeButton}</View>
-        </View>
-      </React.Fragment>
+      <Button
+        onPress={() => {
+          navHandler();
+        }}
+        style={styles.button}
+        textStyle={styles.buttonText}
+        status="info"
+        disabled={isDisable}
+        icon={naviIcon}>
+        내비 연결
+      </Button>
     );
-  }
-}
+  };
+
+  const renderCompleteButton = () => {
+    var isDisable;
+
+    if (lastState == '배송중') {
+      isDisable = false;
+    } else if (lastState == '배송완료') {
+      isDisable = true;
+    }
+    return (
+      <Button
+        onPress={() => {
+          completeHandler();
+        }}
+        style={styles.button}
+        status="danger"
+        icon={homeIcon}
+        disabled={isDisable}
+        textStyle={styles.buttonText}>
+        운송 완료
+      </Button>
+    );
+  };
+
+  const renderShowButton = () => {
+    var isDisable;
+
+    if (OppoFreightID != '') {
+      isDisable = false;
+    } else if (OppoFreightID == '') {
+      isDisable = true;
+    }
+    return (
+      <Button
+        onPress={() => {
+          _showStopoverFreight();
+        }}
+        style={styles.button}
+        textStyle={styles.buttonText}
+        disabled={isDisable}
+        status="info"
+        icon={cartIcon}>
+        경유지
+      </Button>
+    );
+  };
+
+  return (
+    <React.Fragment>
+      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      <FlatList
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }
+        data={data}
+        renderItem={_renderItem}
+        keyExtractor={(item) => item.key}
+      />
+      <Layout style={styles.ButtonContainter}>
+        <Layout style={styles.ButtonHalfContainer}>{renderNavButton()}</Layout>
+        <Layout style={styles.ButtonHalfContainer}>{renderShowButton()}</Layout>
+      </Layout>
+      <Layout style={styles.ButtonContainter}>
+        <Layout style={styles.ButtonHalfContainer}>{renderCallButton()}</Layout>
+        <Layout style={styles.ButtonHalfContainer}>
+          {renderCompleteButton()}
+        </Layout>
+      </Layout>
+    </React.Fragment>
+  );
+};
 
 const styles = StyleSheet.create({
   Badge: {
     width: RFPercentage(14),
     height: RFPercentage(6),
     borderRadius: 8,
-    margin: 5
+    margin: 5,
   },
   smallBadge: {
     width: RFPercentage(12),
@@ -668,13 +682,13 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
-    color: '#2F80ED'
+    color: '#2F80ED',
   },
   geoSubText2: {
     fontSize: RFPercentage(2.5),
     fontWeight: 'bold',
     paddingVertical: 15,
-    color: '#EB5757'
+    color: '#EB5757',
   },
   geoSubText3: {
     fontSize: RFPercentage(2.5),

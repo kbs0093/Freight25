@@ -1,17 +1,18 @@
-import React, {Component} from 'react';
-import {
-  Text,
+import React, {useState, Component, useEffect} from 'react';
+import {  
   StyleSheet,
-  View,
   Platform,
   FlatList,
   SafeAreaView,
   Alert,
   PermissionsAndroid,
+  Linking,
 } from 'react-native';
 import {
+  Text,
   Icon,
   Divider,
+  Layout,
 } from '@ui-kitten/components';
 import { AppRoute } from '../../navigation/app-routes';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -22,99 +23,124 @@ import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
 import Geolocation from 'react-native-geolocation-service';
 import TextTicker from 'react-native-text-ticker'
+import { ThemeContext } from '../../component/theme-context';
 
 
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 const isAndroid = Platform.OS === 'android';
 
-export class SearchScreen extends Component <SearchScreenProps> {
+export const SearchScreen = (props): SearchScreenProps => {  
+  const themeContext = React.useContext(ThemeContext);
+
+  const [latitude, setlatitude] = useState('');
+  const [longitude, setlongitude] = useState('');
+  const [city, setcity] = useState('');
+  const [gu, setgu] = useState('');
+  const [myeon, setmyeon] = useState('');
+  const [dong, setdong] = useState('');
+  const [data, setData] = useState([]);
+  const [data2, setData2] = useState([]);
+  const [filter, setfilter] = useState(0);
+  const [sorting, setsorting] = useState(0);
+
+  useEffect(() => {
+    isAndroid ? requestLocationAndroid() : requestLocationIos()
+  }, []);
   
-  constructor(props) {
-    super(props);       
+  useEffect(() => {
+    filtering();
+    ListSort();
+  },[filter, sorting]);
 
-    this.state = {
-      latitude: 'unknown',
-      longitude: 'unknown',
-      city: '',
-      gu: '',
-      myeon: '',
-      dong: '',
-      value: '1',
-      value2: '1',
-      data: [],
-      data2: [],
-      distance: []
+  const hasLocationPermissionIOS = async () => {
+    const openSetting = () => {
+      Linking.openSettings().catch(() => {
+        Alert.alert('Unable to open settings');
+      });
     };
-  }
+    
+    const status = await Geolocation.requestAuthorization() + '';
 
-  requestLocationAndroid = async () => {
+    if (status === 'granted') {
+      return true;
+    }
+
+    if (status === 'denied') {
+      Alert.alert('Location permission denied');
+    }
+
+    if (status === 'disabled') {
+      Alert.alert(
+        `Turn on Location Services to allow 화물25 to determine your location.`,
+        '',
+        [
+          { text: 'Go to Settings', onPress: openSetting },
+          { text: "Don't Use Location", onPress: () => {} },
+        ],
+      );
+    }
+
+    return false;
+  };
+
+  const requestLocationAndroid = async() => {
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      )
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
+        
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {             
         Geolocation.getCurrentPosition(
-          (position) => {
+          (position) => {            
+            let Templatitude = JSON.stringify(position.coords.latitude);
+            let Templongitude = JSON.stringify(position.coords.longitude);   
+            setlatitude(Templatitude)
+            setlongitude(Templongitude)
             
-            let latitude = JSON.stringify(position.coords.latitude);
-            let longitude = JSON.stringify(position.coords.longitude);
-   
-            this.setState({latitude});
-            this.setState({longitude});
-            
-            fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+            fetch(server + `&lat=${Templatitude}&lon=${Templongitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
             .then(response => response.json())
-            .then(response => {
-              
+            .then(response => {              
               const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
               const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
               const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
-              const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
-    
-              this.setState({city});
-              this.setState({gu});
-              this.setState({myeon});
-              this.setState({dong});
-              this.FirebaseRequest();                   
+              const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");    
+              setcity(city);
+              setgu(gu);
+              setmyeon(myeon);
+              setdong(dong);
+              FirebaseRequest();                   
             })   
             .catch(err => console.log(err));     
-          },
-          error => Alert.alert('Error', JSON.stringify(error)),
-          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},     
-        );
-      } else {
-        
+          }, error => Alert.alert('Error', JSON.stringify(error)),
+          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000});
       }
     } catch (err) {
       console.warn(err)
     }
   }
 
-  requestLocationIos = () => {
-    var latitude;
-    var longitude;
-
+  const requestLocationIos = async() => {
+    hasLocationPermissionIOS();
     Geolocation.getCurrentPosition(
       position => {
-        latitude = JSON.stringify(position.coords.latitude);
-        longitude = JSON.stringify(position.coords.longitude);
+        var Templatitude = JSON.stringify(position.coords.latitude);
+        var Templongitude = JSON.stringify(position.coords.longitude);
 
-        this.setState({latitude});
-        this.setState({longitude});
+        setlatitude(Templatitude)
+        setlongitude(Templongitude)
         
-        fetch(server + `&lat=${this.state.latitude}&lon=${this.state.longitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+        fetch(server + `&lat=${Templatitude}&lon=${Templongitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
         .then(response => response.json())
         .then(response => {
           const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
           const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
           const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
-          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
+          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");    
+          setcity(city);
+          setgu(gu);
+          setmyeon(myeon);
+          setdong(dong);
+          FirebaseRequest();   
 
-          this.setState({city});
-          this.setState({gu});
-          this.setState({myeon});
-          this.setState({dong});
-          this.FirebaseRequest();       
         })   
         .catch(err => console.log(err));     
       },
@@ -123,10 +149,8 @@ export class SearchScreen extends Component <SearchScreenProps> {
     );
   };
 
-  FirebaseRequest = async() => {
-    var user = auth().currentUser;
-    const that = this;
-    
+  const FirebaseRequest = async() => {
+    var user = auth().currentUser;    
     if(user != null){
       try {
         firestore().collection('freights').where("state", "==", 0)
@@ -142,12 +166,11 @@ export class SearchScreen extends Component <SearchScreenProps> {
             var parseEnd = doc.endAddr + "";
             var endArr = parseEnd.split(" ");
             var moneyprint = doc.expense + "";
-            var distance;
-            var distance = 100 * (Math.acos(Math.sin(that.state.latitude)*Math.sin(doc.startAddr_lat) + Math.cos(that.state.latitude)*Math.cos(doc.startAddr_lat)*Math.cos(that.state.longitude - doc.startAddr_lon)));;
+            var distance = 100 * (Math.acos(Math.sin(Number(latitude))*Math.sin(doc.startAddr_lat) + Math.cos(Number(latitude))*Math.cos(doc.startAddr_lat)*Math.cos(Number(longitude) - doc.startAddr_lon)));;
             
             distance = Math.floor(distance);
             moneyprint = moneyprint.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            await that.RegionCode(endArr[0]).then((result)=>{smart = result});
+            await RegionCode(endArr[0]).then((result)=>{smart = result});
 
             list.push({
               id: doc.id,
@@ -168,22 +191,18 @@ export class SearchScreen extends Component <SearchScreenProps> {
               time: null,
               smart: smart,
               money: doc.expense,
-              moneyPrint: moneyprint,
-              
-            });                 
-          }          
-          that.setState({data: list});
-          that.setState({data2: list});
-        })
-
-      } 
+              moneyPrint: moneyprint,              
+            })}          
+          setData(list)
+          setData2(list)
+      })} 
       catch (error) {
         console.log(error);
       }      
     }   
   }
 
-  RegionCode = async(address) =>{
+  const RegionCode = async(address) =>{
     var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
     var date = new Date();
     var dayName = week[date.getDay()];
@@ -231,74 +250,81 @@ export class SearchScreen extends Component <SearchScreenProps> {
     return smart;
   }
 
-
-  componentDidMount = () => {
-    isAndroid ? this.requestLocationAndroid() : this.requestLocationIos()
-
-  }
-
-  ClickList = item => () => {
+  const ClickList = item => () => {
     AsyncStorage.setItem('FreightID', item.id);
-    this.props.navigation.navigate(AppRoute.SEARCH_DETAIL);
+    props.navigation.navigate(AppRoute.SEARCH_DETAIL);
   };
 
-  moneySort(a, b) {
-    if(a.money == b.money){ return 0} return a.money < b.money ? 1 : -1;
+  const ListSort = () => {
+    if(sorting == 4){
+      data2.sort((a,b) => {
+        return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;        
+      })
+    } //운행거리 낮음
+    else if(sorting == 3){
+      data2.sort((a,b) => {
+        return Number(a.distanceY) > Number(b.distanceY) ? -1 : Number(a.distanceY) < Number(b.distanceY) ? 1: 0;
+      })
+    }
+    else if(sorting == 2){
+      data2.sort((a,b) => {
+        return Number(a.money) > Number(b.money) ? -1 : Number(a.money) > Number(b.money) ? 1: 0;
+      })
+    }
+    else if(sorting == 1){
+      data2.sort((a,b) => {
+        return Number(a.smart) > Number(b.smart) ? -1 : Number(a.smart) > Number(b.smart) ? 1: 0;
+      })
+    }
   };
 
-  distanceSort(a, b) {
-    return Number(a.distanceY) > Number(b.distanceY) ? -1 : Number(a.distanceY) < Number(b.distanceY) ? 1: 0;
-  };
-
-  distanceSort2(a, b) {
-    return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;
-  };    
-
-  smartSort(a, b) {
-    if(a.smart == b.smart){ return 0} return a.smart < b.smart ? 1 : -1;
-  };
-
-  filtering(value) {
+  const filtering = () => {
     var temp = [];
-    temp = JSON.parse(JSON.stringify(this.state.data));
+    temp = JSON.parse(JSON.stringify(data));
      
-    if(value == '1'){        
+    if(filter == 1){        
       let result = temp.filter(element => {
         return element.distanceX <= 100
       });
-      this.setState({data2: result})    
+      setData2(result)   
     }
-    else if(value == '2'){
+    else if(filter == 2){
       let result = temp.filter(element => {
         return element.distanceX <= 50
       });
-      this.setState({data2: result})   
+      setData2(result)    
     }
-    else if(value == '3'){
+    else if(filter == 3){
       let result = temp.filter(element => {
         return element.distanceX <= 30
       });
-      this.setState({data2: result})   
+      setData2(result)      
     }
-    else if(value == '4'){
+    else if(filter == 4){
       let result = temp.filter(element => {
         return element.distanceX <= 10
       });
-      this.setState({data2: result})   
+      setData2(result)     
+    }
+    else if(filter == 5){
+      let result = temp.filter(element => {
+        return element.distanceX >= 0
+      });
+      setData2(result)     
     }    
   };
-  
-  _renderItem = ({item}) => (
 
-    <TouchableOpacity onPress={this.ClickList(item)}>    
-    <View style={styles.container}>
-      <View style={styles.geoInfo}>
+  
+  const _renderItem = ({item}) => (
+    <TouchableOpacity onPress={ClickList(item)}>    
+    <Layout style={styles.container}>
+      <Layout style={styles.geoInfo}>
         
-        <View style={styles.geoInfo1}>
-          <View style={styles.geoInfo11}>
-          <View style={{flex: 1, justifyContent: 'flex-end'}}>
+        <Layout style={styles.geoInfo1}>
+          <Layout style={styles.geoInfo11}>
+          <Layout style={{flex: 1, justifyContent: 'flex-end'}}>
             <TextTicker
-                style={styles.geoTitleText}
+                style={(themeContext.theme == 'dark')? {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'white'} : {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'black'}}
                 duration={3000}
                 loop
                 bounce
@@ -308,23 +334,23 @@ export class SearchScreen extends Component <SearchScreenProps> {
                 {item.startAddress[0]} {item.startAddress[1]}
               </TextTicker>            
               
-            </View>
-            <View>
+            </Layout>
+            <Layout>
               <Text style={styles.geoTitleText}>{item.startAddress[2]}</Text>
-            </View>             
-          </View>
+            </Layout>             
+          </Layout>
 
-          <View style={styles.geoInfo12}>
-            <View>
+          <Layout style={styles.geoInfo12}>
+            <Layout>
               <Icon style={styles.icon} fill='#8F9BB3' name='arrow-forward-outline'/>
-            </View>
-            <View><Text style={styles.Type}>{item.Type}</Text></View>      
-          </View>
+            </Layout>
+            <Layout><Text style={styles.Type}>{item.Type}</Text></Layout>      
+          </Layout>
           
-          <View style={styles.geoInfo11}>
-            <View style={{flex: 1, justifyContent: 'flex-end'}}>
+          <Layout style={styles.geoInfo11}>
+            <Layout style={{flex: 1, justifyContent: 'flex-end'}}>
               <TextTicker
-                style={styles.geoTitleText}
+                style={(themeContext.theme == 'dark') ? {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'white'} : {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'black'}}
                 duration={3000}
                 loop
                 bounce
@@ -333,21 +359,21 @@ export class SearchScreen extends Component <SearchScreenProps> {
               >
                 {item.endAddress[0]} {item.endAddress[1]}
               </TextTicker>              
-            </View>
-            <View>
+            </Layout>
+            <Layout>
               <Text style={styles.geoTitleText}>{item.endAddress[2]}</Text>
-            </View> 
-          </View>          
-        </View>
+            </Layout> 
+          </Layout>          
+        </Layout>
 
-        <View style={styles.geoInfo2}> 
-          <View style={styles.geoInfo21}><Text style={styles.startType}>{item.startType}</Text></View>
-          <View style={styles.geoInfo12}></View>
-          <View style={styles.geoInfo21}><Text style={styles.endType}>{item.endType}</Text></View>
-        </View>
+        <Layout style={styles.geoInfo2}> 
+          <Layout style={styles.geoInfo21}><Text style={styles.startType}>{item.startType}</Text></Layout>
+          <Layout style={styles.geoInfo12}></Layout>
+          <Layout style={styles.geoInfo21}><Text style={styles.endType}>{item.endType}</Text></Layout>
+        </Layout>
 
-          <View style={styles.geoInfo3}/>                        
-            <View style={styles.freightTypeText}>
+          <Layout style={styles.geoInfo3}/>                        
+            <Layout>
               <TextTicker
                 style={styles.freightTypeText}
                 duration={3000}
@@ -358,19 +384,19 @@ export class SearchScreen extends Component <SearchScreenProps> {
               >
                 {item.carType} / {item.carType2} / {item.freightSize} 파렛 / {item.freightWeight} 톤 / {item.loadType}
               </TextTicker>
-            </View>
-      </View>
+            </Layout>
+      </Layout>
 
-      <View style={styles.driveInfo}>
-        <View style={styles.driveInfo1}>
+      <Layout style={styles.driveInfo}>
+        <Layout style={styles.driveInfo1}>
             <Text style={{fontSize: 8}}></Text>
             <Text style={styles.driveText2}>{item.distanceY} Km</Text>
             <Text style={styles.timeText}>스마트 확률 : {item.smart} %</Text>
             <Text style={styles.distance}>{item.distanceX} Km</Text>      
-        </View>
-        <View style={styles.moneyInfo}>
+        </Layout>
+        <Layout style={styles.moneyInfo}>
             <TextTicker
-              style={styles.driveText}
+              style={(themeContext.theme == 'dark')? {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'white'} : {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'black'}}
               duration={3000}
               loop
               bounce
@@ -380,129 +406,113 @@ export class SearchScreen extends Component <SearchScreenProps> {
               {item.moneyPrint} 원
             </TextTicker>
           
-        </View>
-      </View>                          
-    </View>
+        </Layout>
+      </Layout>                          
+    </Layout>
     </TouchableOpacity>
-  );
-  
-  render(){
-    if(this.state.value == '1'){  
-      this.state.data2.sort(this.smartSort);
-    }
-    else if(this.state.value == '2'){
-      this.state.data2.sort(this.moneySort);
-    }
-    else if(this.state.value == '3'){
-      this.state.data2.sort(this.distanceSort);
-    }
-    else if(this.state.value == '4'){
-      this.state.data2.sort(this.distanceSort2);
-    }
-    
-    
-    return (
-    <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
-        <View style={{flex: 3, justifyContent: 'center'}}>
-          <View style={{flexDirection: "row"}}>
-            <View>
-              <Text style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}>검색 위치 : </Text>
-            </View>
-            <View>
-              <TextTicker
-                style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}
-                duration={3000}
-                loop
-                bounce
-                repeatSpacer={50}
-                marqueeDelay={1000}
-              >
-                {this.state.city} {this.state.gu} {this.state.myeon} {this.state.dong}
-              </TextTicker>
-            </View>         
-          </View>
-         
+  );  
 
-        </View>
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          
-        </View>      
-      </View>
-      <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-          검색 조건 : 
-          </Text>
-        </View>
-        <View style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
-          <RNPickerSelect
-              onValueChange={(value) => {
-                this.setState({value})  
-              }}
-              placeholder={{
-                label: '정렬 순서',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={isAndroid? true: false}
-              items={[
-                {label: '운행거리 순 (낮음)', value: '4'},
-                {label: '운행거리 순 (높음)', value: '3'},
-                {label: '운임 순', value: '2'},
-                {label: '스마트 확률 순', value: '1'},
-              ]}
-              style={{
-                placeholder: {
-                  color: 'orange'
-                },
-              }}
-      
-            />
-        </View>      
-      </View>
-      <View style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-            검색 반경 : 
-          </Text>
-        </View>
-        <View style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
-          <RNPickerSelect
-              onValueChange={(value) => {
-                this.filtering(value) 
-              }}
-              placeholder={{
-                label: '검색 반경 Km를 선택하세요',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={isAndroid? true: false}
-              items={[
-                {label: '10Km', value: '4'},
-                {label: '30Km', value: '3'},
-                {label: '50Km', value: '2'},
-                {label: '100Km', value: '1'},
-              ]}
-              style={{
-                placeholder: {
-                  color: 'orange'
-                },
-              }}
-            />
-        </View>      
-      </View>     
-      <Divider style={{backgroundColor: 'black'}}/>     
-        <FlatList 
-          style={{backgroundColor : 'white'}}
-          data={this.state.value? this.state.data2 : this.state.data2}
-          renderItem={this._renderItem}
-          keyExtractor={item => item.id}
-        />                             
-    </React.Fragment>
+
+  return (  
+  <React.Fragment>
+    <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />    
+    <Layout style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
+      <Layout style={{flex: 3, justifyContent: 'center'}}>
+        <Layout style={{flexDirection: "row"}}>
+          <Layout style={{justifyContent: 'center'}}>
+            <Text style={{ fontWeight: 'bold', fontSize: 18, margin: 5 }}>검색 위치 : </Text>
+          </Layout>
+          <Layout style={{justifyContent: 'center'}}>
+            <TextTicker
+              style={(themeContext.theme == 'dark')? {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'white'} : {fontWeight: 'bold', fontSize: 18, margin: 2,color: 'black'}}
+              duration={3000}
+              loop
+              bounce
+              repeatSpacer={50}
+              marqueeDelay={1000}
+            >
+              {city} {gu} {myeon} {dong}
+            </TextTicker>
+          </Layout>         
+        </Layout>      
+      </Layout>
+      <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}/>  
+    </Layout>
     
-    );
-  }
+    <Layout style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
+      <Layout style={{flex: 1, justifyContent: 'center'}}>
+        <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+        검색 조건 : 
+        </Text>
+      </Layout>
+      <Layout style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+        <RNPickerSelect
+            onValueChange={(value) => {
+              setsorting(value)
+            }}
+            placeholder={{
+              label: '정렬 순서',
+              value: null,
+            }}
+            useNativeAndroidPickerStyle={isAndroid? true: false}
+            items={[
+              {label: '운행거리 순 (낮음)', value: '4'},
+              {label: '운행거리 순 (높음)', value: '3'},
+              {label: '운임 순', value: '2'},
+              {label: '스마트 확률 순', value: '1'},
+            ]}
+            style={{
+              placeholder: {
+                color: 'orange'
+              },
+            }}
+    
+          />
+      </Layout>      
+    </Layout>
+    <Layout style={{height: "8%", flexDirection: "row", backgroundColor : 'white'}}>
+      <Layout style={{flex: 1, justifyContent: 'center'}}>
+        <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+          검색 반경 : 
+        </Text>
+      </Layout>
+      <Layout style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+        <RNPickerSelect
+            onValueChange={(value) => {
+              setfilter(value)
+            }}
+            placeholder={{
+              label: '검색 반경 Km를 선택하세요',
+              value: null,
+            }}
+            useNativeAndroidPickerStyle={isAndroid? true: false}
+            items={[
+              {label: '전체 검색', value: '5'},
+              {label: '10Km', value: '4'},
+              {label: '30Km', value: '3'},
+              {label: '50Km', value: '2'},
+              {label: '100Km', value: '1'},
+            ]}
+            style={{
+              placeholder: {
+                color: 'orange'
+              },
+            }}
+          />
+      </Layout>      
+    </Layout>     
+    <Divider style={{backgroundColor: 'black'}}/>     
+      <FlatList
+        style={(themeContext.theme == 'dark')? {backgroundColor: '#222B45'} : {backgroundColor: '#FFFFFF'}}
+        data={data2}
+        renderItem={_renderItem}
+        keyExtractor={item => item.id}
+      />                             
+  </React.Fragment>
+    
+  );
 };
+
 
 
 
@@ -550,11 +560,11 @@ const styles = StyleSheet.create({
   geoTitleText: {    
     fontWeight: 'bold',
     fontSize: 18,
-    margin: 2,    
+    margin: 2,
   },
   timeText: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 13,
   },
   driveText: {
     fontWeight: 'bold',

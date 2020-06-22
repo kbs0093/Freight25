@@ -92,5 +92,17 @@ export const CARIcon = (style): IconElement => (
   <Icon {...style} name='car'/>
 );
 
+export const FLIPIcon = (style): IconElement => (
+  <Icon {...style} name='flip-outline'/>
+);
+
+export const POWERIcon = (style): IconElement => (
+  <Icon {...style} name='power-outline'/>
+);
+
+
+
+
+
 
 

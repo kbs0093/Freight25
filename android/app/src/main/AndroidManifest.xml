@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
       android:name=".MainApplication"
@@ -28,6 +30,7 @@
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyB9iMOqpFb_Sl4t9j9M65ftTHG58cKqUCQ"/>
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+      <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
-  Text,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,7 +8,14 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import {Icon, LayoutElement, Divider, Button} from '@ui-kitten/components';
+import {
+  Icon,
+  Text,
+  Layout,
+  LayoutElement,
+  Divider,
+  Button,
+} from '@ui-kitten/components';
 import {CheckScreenProps} from '../../navigation/check.navigator';
 import {MainScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
@@ -27,39 +33,44 @@ import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
+import {ThemeContext} from '../../component/theme-context';
 
 const isAndroid = Platform.OS === 'android';
 
-export class CheckScreen extends React.Component<CheckScreenProps> {
-  constructor(props) {
-    super(props);
+export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
+  const [data, setData] = React.useState([]);
+  const [userType, setUserType] = React.useState('');
+  const [sorting, setSorting] = React.useState('');
+  const themeContext = React.useContext(ThemeContext);
 
-    this.state = {
-      data: [],
-      userType: null,
-      value: '1',
-    };
-  }
+  useEffect(() => {
+    requestFirebase();
+  }, []);
 
-  componentDidMount = async () => {
+  useEffect(() => {
+    listSort();
+  }, []);
+
+  const requestFirebase = async () => {
+    var userType;
     try {
       const value = await AsyncStorage.getItem('userType');
       if (value !== null) {
-        this.setState({userType: value});
+        userType = value;
+        setUserType(value);
       }
     } catch (error) {}
 
     var user = auth().currentUser;
-    const that = this;
 
     if (user != null) {
       //var ref = firestore().collection('freights');
       var ref = null;
-      if (this.state.userType == 'driver') {
+      if (userType == 'driver') {
         ref = firestore()
           .collection('freights')
           .where('driverId', '==', user.uid);
-      } else if ((this.state.userType = 'owner')) {
+      } else if ((userType = 'owner')) {
         ref = firestore()
           .collection('freights')
           .where('ownerId', '==', user.uid);
@@ -123,39 +134,60 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
             endDayLabel: doc.endDayLabel,
           });
         }
-        that.setState({data: list});
+        setData(list);
       });
     }
   };
 
-  ClickList = (item) => () => {
+  const ClickList = (item) => () => {
     AsyncStorage.setItem('FreightID', item.id);
     AsyncStorage.setItem('OppoFreightID', item.oppositeFreightId);
-    if (this.state.userType == 'owner') {
-      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
-    } else if (this.state.userType == 'driver') {
-      this.props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
+    if (userType == 'owner') {
+      props.navigation.navigate(AppRoute.CHECK_DETAIL_OWNER);
+    } else if (userType == 'driver') {
+      props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
     } else {
       console.log('undefined usertype');
     }
   };
 
-  dateSort(a, b) {
-    if (a.startMonth == b.startMonth) {
-      return a.startDay < b.startDay ? 1 : -1;
-    } else {
-      return a.startMonth < b.startMonth ? 1 : -1;
+  const listSort = () => {
+    var value = sorting;
+    if (value == '1') {
+      console.log(value);
+      if (data.startMonth == data.startMonth) {
+        data.sort((a, b) => {
+          return a.startDay < b.startDay ? 1 : -1;
+        });
+      } else {
+        data.sort((a, b) => {
+          return a.startMonth < b.startMonth ? 1 : -1;
+        });
+      }
+    } else if (value == '2') {
+      console.log(value);
+      if (data.startMonth == data.startMonth) {
+        data.sort((a, b) => {
+          return a.startDay > b.startDay ? 1 : -1;
+        });
+      } else {
+        data.sort((a, b) => {
+          return a.startMonth > b.startMonth ? 1 : -1;
+        });
+      }
+    } else if (value == '3') {
+      console.log(value);
+      data.sort((a, b) => {
+        return a.stateNum > b.stateNum ? 1 : -1;
+      });
     }
-  }
+  };
+  listSort();
 
-  statusSort(a, b) {
-    return a.stateNum > b.stateNum ? 1 : -1;
-  }
-
-  _renderItem = ({item}) => (
-    <TouchableOpacity onPress={this.ClickList(item)}>
-      <View style={styles.container}>
-        <View style={styles.geoContainer}>
+  const _renderItem = ({item}) => (
+    <TouchableOpacity onPress={ClickList(item)}>
+      <Layout style={styles.container}>
+        <Layout style={styles.geoContainer}>
           <View style={styles.geoInfo1}>
             <View style={styles.geoInfo11}>
               <Text style={styles.geoText}>
@@ -189,82 +221,78 @@ export class CheckScreen extends React.Component<CheckScreenProps> {
               </Text>
             )}
           </View>
-        </View>
+        </Layout>
         <View style={styles.statusInfo}>
           {item.lastState == '배송중' ? (
             <Text style={styles.badgeTextRed}>{item.lastState}</Text>
           ) : (
-            // <Button
-            //   style={styles.Badge}
-            //   appearance="ghost"
-            //   status="primary"
-            //   textStyle={styles.badgeText}>
-            //   {item.lastState}
-            // </Button>
             <Text style={styles.badgeText}>{item.lastState}</Text>
           )}
           {item.oppositeFreightId != '' ? (
             <Text style={styles.badgeTextMixed}>경유지 O</Text>
           ) : null}
         </View>
-      </View>
+      </Layout>
       <Divider style={{backgroundColor: 'black'}} />
     </TouchableOpacity>
   );
 
-  render() {
-    //this.state.data.sort(this.dateSort);
-    if (this.state.value == '1') {
-      this.state.data.sort(this.dateSort);
-    } else if (this.state.value == '2') {
-      this.state.data.sort(this.statusSort);
-    }
-    return (
-      <React.Fragment>
-        <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-        <View
-          style={{
-            height: '8%',
-            flexDirection: 'row',
-            backgroundColor: 'white',
-          }}>
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
-              검색 조건 :
-            </Text>
-          </View>
-          <View
-            style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
-            <RNPickerSelect
-              onValueChange={(value) => {
-                this.setState({value});
-              }}
-              placeholder={{
-                label: '정렬 순서',
-                value: null,
-              }}
-              useNativeAndroidPickerStyle={isAndroid ? true : false}
-              items={[
-                {label: '상태별 정렬', value: '2'},
-                {label: '최근 날짜 순', value: '1'},
-              ]}
-            />
-          </View>
-        </View>
-        <Divider style={{backgroundColor: 'black'}} />
+  return (
+    <React.Fragment>
+      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      <Layout
+        style={{
+          height: '8%',
+          flexDirection: 'row',
+          backgroundColor: 'white',
+        }}>
+        <Layout style={{flex: 1, justifyContent: 'center'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18, margin: 5}}>
+            검색 조건 :
+          </Text>
+        </Layout>
+        <Layout
+          style={{flex: 3, justifyContent: 'center', alignItems: 'center'}}>
+          <RNPickerSelect
+            onValueChange={(value) => {
+              setSorting(value);
+              //listSort();
+            }}
+            placeholder={{
+              label: '정렬 순서',
+              value: null,
+            }}
+            useNativeAndroidPickerStyle={isAndroid ? true : false}
+            items={[
+              {label: '최근 날짜 순', value: '1'},
+              {label: '예전 날짜 순', value: '2'},
+              {label: '상태별 정렬', value: '3'},
+            ]}
+            style={{
+              placeholder: {
+                color: 'orange',
+              },
+            }}
+          />
+        </Layout>
+      </Layout>
+      <Divider style={{backgroundColor: 'black'}} />
 
-        <FlatList
-          style={{backgroundColor: 'white'}}
-          data={this.state.data}
-          renderItem={this._renderItem}
-          keyExtractor={(item) => item.key}
-          showsVerticalScrollIndicator={false}
-        />
-        {/* </ScrollView> */}
-      </React.Fragment>
-    );
-  }
-}
+      <FlatList
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }
+        data={data}
+        renderItem={_renderItem}
+        keyExtractor={(item) => item.key}
+        showsVerticalScrollIndicator={false}
+      />
+      {/* </ScrollView> */}
+    </React.Fragment>
+  );
+};
 
 const styles = StyleSheet.create({
   Badge: {
@@ -275,18 +303,21 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
-    color: 'blue',
+    color: '#2F80ED',
+    //color: 'blue',
   },
   badgeTextMixed: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
-    color: 'green',
+    //color: 'green',
+    color: '#9B51E0',
   },
 
   badgeTextRed: {
     fontSize: RFPercentage(1.8),
     fontWeight: 'bold',
-    color: 'red',
+    //color: 'red',
+    color: '#EB5757',
   },
   container: {
     paddingVertical: 10,
