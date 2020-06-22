@@ -31,7 +31,7 @@ const OwnerNavigate = CommonActions.reset({
   routes: [{name: AppRoute.OWNER}],
 });
 
-const serverUrl = 'http://49.50.162.128:8000/';
+const serverUrl = 'http://49.50.162.50:8000/';
 
 // Postcode API를 위한 URL선언
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';

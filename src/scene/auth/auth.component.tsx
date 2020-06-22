@@ -31,7 +31,7 @@ import messaging from '@react-native-firebase/messaging'
 if (!KakaoLogins) {
   console.error('Module is Not Linked');
 }
-const serverUrl = 'http://49.50.162.128:8000/';
+const serverUrl = 'http://49.50.162.50:8000/';
 
 const logCallback = (log, callback) => {
   console.log(log);
