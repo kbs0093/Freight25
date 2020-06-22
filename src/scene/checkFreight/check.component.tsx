@@ -155,26 +155,22 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
     var value = sorting;
     if (value == '1') {
       console.log(value);
-      if (data.startMonth == data.startMonth) {
-        data.sort((a, b) => {
+      data.sort((a, b) => {
+        if (a.startMonth == b.startMonth) {
           return a.startDay < b.startDay ? 1 : -1;
-        });
-      } else {
-        data.sort((a, b) => {
+        } else {
           return a.startMonth < b.startMonth ? 1 : -1;
-        });
-      }
+        }
+      });
     } else if (value == '2') {
       console.log(value);
-      if (data.startMonth == data.startMonth) {
-        data.sort((a, b) => {
+      data.sort((a, b) => {
+        if (a.startMonth == b.startMonth) {
           return a.startDay > b.startDay ? 1 : -1;
-        });
-      } else {
-        data.sort((a, b) => {
+        } else {
           return a.startMonth > b.startMonth ? 1 : -1;
-        });
-      }
+        }
+      });
     } else if (value == '3') {
       console.log(value);
       data.sort((a, b) => {
