@@ -446,9 +446,10 @@ export const DetailCheckOwnerScreen = (
       </Button>
     );
   };
+
   return (
     <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      {/* <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} /> */}
       <Layout style={{flex: 1}}>
         <Layout style={{flex: 4}}>
           <FlatList

@@ -1,9 +1,6 @@
 import React from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-import {
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import {StyleSheet, SafeAreaView} from 'react-native';
 import {
   Button,
   Layout,
@@ -21,7 +18,7 @@ import {
   FLIPIcon,
   LogoutIcon,
   PersonIcon,
-  POWERIcon
+  POWERIcon,
 } from '../assets/icons';
 import {AppRoute} from '../navigation/app-routes';
 import {TopTapBarProps} from '../navigation/TopTabBarNavigator';
@@ -30,7 +27,7 @@ import KakaoLogins from '@react-native-seoul/kakao-login';
 import {useRoute} from '@react-navigation/native';
 import {CommonActions} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
-import { ThemeContext } from './theme-context';
+import {ThemeContext} from './theme-context';
 
 let userType;
 const resetAction = CommonActions.reset({
@@ -129,9 +126,9 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
           props.navigation.navigate(AppRoute.PROFILE_DRIVER);
         }
       });
-    } else if (index ==2) {
+    } else if (index == 2) {
       // 주간 야간 모드 전환
-      themeContext.toggleTheme()
+      themeContext.toggleTheme();
     } else if (index == 3) {
       AsyncStorage.clear().then(() => {
         kakaoLogout();
@@ -140,7 +137,6 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
       props.navigation.dispatch(resetAction);
       console.log('Logout Success');
     } else {
-
     }
   };
 
@@ -169,7 +165,13 @@ export const TopTapBar = (props: TopTapBarProps): LayoutElement => {
 
   return (
     <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      <SafeAreaView
+        style={
+          themeContext.theme == 'dark'
+            ? {flex: 0, backgroundColor: '#222B45'}
+            : {flex: 0, backgroundColor: 'black'}
+        }
+      />
       <TopNavigation
         title="   화물 25"
         titleStyle={styles.titleStyles}

@@ -551,7 +551,7 @@ export const DetailCheckDriverScreen = (
 
   return (
     <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+      {/* <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} /> */}
       <FlatList
         style={
           themeContext.theme == 'dark'
