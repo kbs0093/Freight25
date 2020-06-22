@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { YellowBox, StyleSheet, Platform, PermissionsAndroid, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -94,8 +94,6 @@ const App = () => {
     });
   };
 
-
-
   const requestLocationAndroid = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -146,7 +144,9 @@ const App = () => {
     }
   }
 
-  //toggleBackground();
+  useEffect(() => {
+    //toggleBackground();
+  }, []);
 
   return (
     <React.Fragment>

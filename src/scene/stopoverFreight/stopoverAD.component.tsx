@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {StyleSheet, View, Image} from 'react-native';
-import {Button, LayoutElement} from '@ui-kitten/components';
+import {StyleSheet, Image} from 'react-native';
+import {Button, Layout} from '@ui-kitten/components';
 import {StopoverADScreenProps} from '../../navigation/home.navigator';
 import {AppRoute} from '../../navigation/app-routes';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -55,37 +55,37 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
   render() {
     return (
       <React.Fragment>
-        <View style={{backgroundColor: 'white', alignItems: 'center', flex: 4}}>
+        <Layout style={{alignItems: 'center', flex: 4}}>
           <Image
             style={styles.adImage}
             source={require('../../assets/StopoverAD.jpg')}
           />
-        </View>
+        </Layout>
 
-        <View
+        <Layout
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             backgroundColor: 'white',
             flex: 1,
           }}>
-          <View style={{flex: 1}}>
+          <Layout style={{flex: 1}}>
             <Button
               style={{margin: 8}}
               onPress={this.ApplyButton}
               status="success">
               수 락
             </Button>
-          </View>
-          <View style={{flex: 1}}>
+          </Layout>
+          <Layout style={{flex: 1}}>
             <Button
               style={{margin: 8}}
               onPress={this.DenyButton}
               status="danger">
               거 부
             </Button>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
       </React.Fragment>
     );
   }
@@ -93,6 +93,7 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
 
 const styles = StyleSheet.create({
   adImage: {
+    flex: 1,
     width: '100%',
     height: '100%',
     alignItems: 'center',

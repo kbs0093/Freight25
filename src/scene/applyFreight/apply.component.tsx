@@ -1,18 +1,15 @@
-import React, {useState} from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
+import React, {useState, useContext} from 'react';
 import {
-  Text,
   StyleSheet,
-  View,
-  Linking,
   Platform,
   SafeAreaView,
   ScrollView,
   Alert,
 } from 'react-native';
 import {
-  LayoutElement, TopNavigation,
-  Button, Layout, Input, DateService,
+  LayoutElement,
+  Button, Layout, Input,
+  Text,
 } from '@ui-kitten/components';
 
 import Modal from 'react-native-modal'
@@ -25,7 +22,7 @@ import firestore from '@react-native-firebase/firestore';
 import axios from 'axios';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
-import { color } from 'react-native-reanimated';
+import {ThemeContext} from '../../component/theme-context';
 
 const tmap_FullTextGeocodingQueryUrl = 'https://apis.openapi.sk.com/tmap/geo/fullAddrGeo?version=1&format=json&callback=result&appKey=';
 const tmap_appKey = 'l7xx0b0704eb870a4fcab71e48967b1850dd';
@@ -37,19 +34,19 @@ const tmap_FullTextGeocodingUrl = tmap_FullTextGeocodingQueryUrl + tmap_appKey +
 const isAndroid = Platform.OS === 'android';
 
 const carSize = [
-  { label: '1 톤', value: '1 톤'},
-  { label: '1.4 톤', value: '1.4 톤' },
-  { label: '2.5 톤' ,value: '2.5 톤'},
-  { label: '5 톤' ,value: '5 톤'},
-  { label: '11-15 톤' ,value: '11-15 톤'},
-  { label: '18 톤' ,value: '18 톤'},
-  { label: '25 톤' ,value: '25 톤'},
+  { label: '1 톤', value: '1'},
+  { label: '2.5 톤' ,value: '2.5'},
+  { label: '5 톤' ,value: '5'},
+  { label: '11-15 톤' ,value: '11-15'},
+  { label: '18 톤' ,value: '18'},
+  { label: '25 톤' ,value: '25'},
 ];
 const carType = [
-  { label: '카고' ,value: '카고'},
-  { label: '탑차' ,value: '탑차'},
-  { label: '냉동' ,value: '냉동'},
-  { label: '냉장' ,value: '냉장'},
+  { label: '카고' ,value: 'cargo'},
+  { label: '탑차' ,value: 'top'},
+  { label: '윙바디' ,value: 'wing'},
+  { label: '냉동' ,value: 'superice'},
+  { label: '냉장' ,value: 'ice'},
 ];
 const driveType = [
   { label: '독차',value: '독차'},
@@ -110,6 +107,12 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   // 화물 수신자 part
   const [recvName, setRecvName] = useState<string>('');
   const [recvTel, setRecvTel] = useState<string>('');
+
+  // 화물 수신자 part
+  const [recvName, setRecvName] = useState<string>('');
+  const [recvTel, setRecvTel] = useState<string>('');
+
+  const themeContext = React.useContext(ThemeContext);
 
   //날짜,요일 계산 
   var startDay = new Date();
@@ -306,12 +309,18 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   return (
     <React.Fragment>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <ScrollView>
-        <View style={styles.infoContainer}>
+      <SafeAreaView style={{flex: 0}} />
+      <ScrollView
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.subTitle}>위치 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>상차지 : {startAddrCompact}</Text>
+          <Layout style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>상 차 지  : </Text>
+            <Text style={styles.infoTitle}>{startAddrCompact}</Text>
             <Button 
               appearance='outline' 
               size='small'
@@ -319,10 +328,10 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 loadStartNEndFavoriteAddr();
               }}
             >변경</Button>
-          </View>
-          <View style={styles.rowContainerWithLine}>
+          </Layout>
+          <Layout style={styles.rowContainerWithLine}>
           <Text style={styles.infoTitle}>상차유형 : </Text>
-            <View style={{flex:3, justifyContent:'center', alignItems:'center'}}>
+            <Layout style={{flex:3, justifyContent:'center', alignItems:'center'}}>
               <RNPickerSelect
                 onValueChange={(itemValue, itemIndex) => 
                   setSelectedStartDate(itemValue)  
@@ -333,16 +342,17 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder:{
-                    color: 'black'
+                    color: 'orange'
                   }
                 }}
                 useNativeAndroidPickerStyle={isAndroid? true: false}
                 items={freightStartDate}
               />
-            </View>
-          </View>
-          <View style={styles.rowContainer}>
-              <Text style={styles.infoTitle}>하차지 : {endAddrCompact}</Text>
+            </Layout>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>하 차 지  : </Text>
+            <Text style={styles.infoTitle}>{endAddrCompact}</Text>
             <Button 
               appearance='outline'
               size='small'
@@ -350,10 +360,10 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 setmodalEndAddrVisible(true);
               }}
             >변경</Button>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
           <Text style={styles.infoTitle}>하차유형 : </Text>
-            <View style={{flex:3}}>
+            <Layout style={{flex:3}}>
               <RNPickerSelect
                 onValueChange={(itemValue, itemIndex) => 
                   setSelectedEndDate(itemValue)  
@@ -364,21 +374,21 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder:{
-                    color: 'black'
+                    color: 'orange'
                   }
                 }}
                 useNativeAndroidPickerStyle={isAndroid? true: false}
                 items={freightEndDate}
               />
-            </View>
-          </View>
-        </View>
+            </Layout>
+          </Layout>
+        </Layout>
 
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.subTitle}>화물 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 정보 : </Text>
-            <View style={{flex:3}}>
+            <Layout style={{flex:3}}>
               <RNPickerSelect
                 onValueChange={(itemValue, itemIndex) => 
                   setSelectedCarSize(itemValue)  
@@ -389,14 +399,14 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder:{
-                    color: 'black'
+                    color: 'orange'
                   }
                 }}
                 useNativeAndroidPickerStyle={isAndroid? true: false}
                 items={carSize}
               />
-            </View>
-            <View style={{flex:3}}>
+            </Layout>
+            <Layout style={{flex:3}}>
               <RNPickerSelect
                 onValueChange={(itemValue, itemIndex) => 
                   setSelectedCarType(itemValue)  
@@ -407,17 +417,17 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder:{
-                    color: 'black'
+                    color: 'orange'
                   }
                 }}
                 useNativeAndroidPickerStyle={isAndroid? true: false}
                 items={carType}
               />
-            </View>
-          </View>
-          <View style={styles.rowContainer}>
+            </Layout>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>운행 방식 : </Text>
-            <View style={{flex:3}}>
+            <Layout style={{flex:3}}>
               <RNPickerSelect
                 onValueChange={(itemValue, itemIndex) => 
                   setSelectedDrive(itemValue)  
@@ -428,15 +438,15 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder:{
-                    color: 'black'
+                    color: 'orange'
                   }
                 }}
                 useNativeAndroidPickerStyle={isAndroid? true: false}
                 items={driveType}
               />
-            </View>
-          </View>
-          <View style={styles.rowContainer}>
+            </Layout>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 무게 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -446,19 +456,17 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               />
             </Layout>
             <Text style={styles.infoTitle}> 톤</Text>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 크기 : </Text>
             <Input
-              placeholder='숫자로 입력'
+              placeholder='숫자로 입력하세요'
               value={volumeValue}
               onChangeText={nextValue => isDoublePlus(nextValue, setVolumeValue)}
             />
-            <View style={{flex:3}}>
-              <Text style={styles.infoTitle}> 파레트</Text>
-            </View>
-          </View>
-          <View style={styles.rowContainer}>
+            <Text style={styles.infoTitle}> 파레트</Text>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>적재 방식 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -467,8 +475,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 onChangeText={nextValue => setFreightLoadTypeValue(nextValue)}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>화물 설명 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -477,36 +485,12 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 onChangeText={nextValue => setDescValue(nextValue)}
               />
             </Layout>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.subTitle}>화물 수신자 정보</Text>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>이름 : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder='수신자 이름/업체명 입력'
-                value={recvName}
-                onChangeText={nextValue => setRecvName(nextValue)}
-              />
-            </Layout>
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>Tel : </Text>
-            <Layout style={styles.selectContainer}>
-              <Input
-                placeholder='전화번호를 입력하세요'
-                value={recvTel}
-                onChangeText={nextValue => isInteger(nextValue, setRecvTel)}
-              />
-            </Layout>
-          </View>
-        </View>
-
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.subTitle}>요금 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>운행거리 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -517,9 +501,9 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             </Layout>
             <Text style={styles.infoTitle}>km</Text>
             <Button onPress={calcDist} >자동계산</Button>
-          </View>
-          <View style={styles.rowContainer}>
-          <Text style={styles.infoTitle}>요       금 : </Text>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>요금 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
                 placeholder='화물 요금을 입력하세요'
@@ -527,17 +511,16 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 onChangeText={nextValue => isInteger(nextValue, setExpenseValue)}
               />
             </Layout>
-
             <Text style={styles.infoTitle}> 원</Text>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
         
-        <View style={styles.infoContainer}>          
-          <View style={styles.buttonsContainer}>
+        <Layout style={styles.infoContainer}>          
+          <Layout style={styles.buttonsContainer}>
             <Button style={styles.IconButton} onPress={cancelButtonPressed} status='danger'>취소</Button>
             <Button style={styles.IconButton} onPress={applyFreightToDb} >등록</Button>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
 
         <Modal
           //isVisible Props에 State 값을 물려주어 On/off control
@@ -547,13 +530,13 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           hideModalContentWhileAnimating={true}
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
+          <SafeAreaView style={{flex: 0}} />
 
-          <View style ={{flex : 1}}>
-            <View style = {styles.modalContainer}>
+          <Layout style ={{flex : 1}}>
+            <Layout style = {styles.modalContainer}>
               <Text style = {styles.subTitle}>자주쓰는 상차지로 설정하기 </Text>
               <Text style = {styles.textHyperlink} onPress = {setStartFavoriteToStartAddr}>{favoriteStartAddr}</Text>
-            </View>
+            </Layout>
             <Postcode
               style={styles.postcodeContainer}
               jsOptions={{ animated: true }}
@@ -599,7 +582,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 setmodalStartAddrVisible(false)
               }}>
             뒤로 돌아가기</Button>
-          </View>
+          </Layout>
         </Modal>
 
         <Modal
@@ -610,12 +593,12 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           hideModalContentWhileAnimating={true}
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <View style ={{flex : 1}}>
-            <View style = {styles.modalContainer}>
+          <SafeAreaView style={{flex: 0}} />
+          <Layout style ={{flex : 1}}>
+            <Layout style = {styles.modalContainer}>
               <Text style = {styles.subTitle}>자주쓰는 하차지로 설정하기 </Text>
               <Text style = {styles.textHyperlink} onPress = {setEndFavoriteToStartAddr}>{favoriteEndAddr}</Text>
-            </View>
+            </Layout>
 
             <Postcode
               style={styles.postcodeContainer}
@@ -660,7 +643,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 setmodalEndAddrVisible(false)
               }}>
             뒤로 돌아가기</Button>
-          </View>
+          </Layout>
         </Modal>
 
         
@@ -715,7 +698,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   infoContainer: {
-    backgroundColor: 'white',
     paddingHorizontal: 25,
     paddingVertical: 10,
     alignItems: 'flex-start',
@@ -745,7 +727,6 @@ const styles = StyleSheet.create({
     borderColor: '#0000FF',
     borderWidth: 3,
     alignItems: "center",
-    backgroundColor: '#FFFFFF'
   },
 
   textHyperlink: {

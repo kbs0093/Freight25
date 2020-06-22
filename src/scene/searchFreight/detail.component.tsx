@@ -28,39 +28,61 @@ export const DetailScreen = (props) : DetailScreenProps => {
   const [mapVisible, setmapVisible] = useState(true);
   const [stopoverVisible, setstopoverVisible] = useState(true);
   const [FreightID, setFreightID] = useState('');
-  const [totalTime, settotalTime] = useState('');
-  const [data, setdata] = useState({});
-  const [region, setRegion] = useState({});
-  setRegion({
+  const [totalTime, settotalTime] = useState();
+  const [region, setRegion] = useState({
     latitude: 37.78825,
     longitude: -122.4324,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  })
+  });
+  const [data, setdata] = useState({
+    startAddress: ['','',''],
+    endAddress: ['','',''],
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+    startType: '',
+    endType: '',
+    Type: '',
+    carType: '',
+    carType2: '',
+    freightSize: '',
+    freightWeight: '',
+    loadType: '',
+    distanceY: '',
+    time: null,
+    smart: undefined,
+    money: 0,
+    moneyPrint: '',
+    startFull: '',
+    endFull: '',
+    desc: '',
+    day: '',
+  });
+
   useEffect(() => {
-    FirebaseRequest(); // 한번만 실행
-  })
+    FirebaseRequest(); // 한번만 실행    
+  }, [])
 
 
   const FirebaseRequest = async () => {
+    var user = auth().currentUser;
+    var week = new Array('일요일','월요일', '화요일', '수요일', '목요일', '금요일', '토요일');
+    var date = new Date();
+    var dayName = week[date.getDay()];
+    var FreightID
     try {
       const value = await AsyncStorage.getItem('FreightID');
       if (value !== null) {
-        setFreightID(value);
+        FreightID = value;
       }
     } catch (error) {
       console.log(error)
     }
 
-    var user = auth().currentUser;
-    const that = this;
-    var week = new Array('일요일','월요일', '화요일', '수요일', '목요일', '금요일', '토요일');
-    var date = new Date();
-    var dayName = week[date.getDay()];
-
     if (user != null) {
       var docRef = firestore().collection('freights').doc(FreightID);
-
       docRef.get().then(async function (doc) {
         if (doc.exists) {
           var parseStart = doc.data().startAddr + '';
@@ -72,7 +94,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
           var smart;
-          await that.RegionCode(endArr[0]).then((result)=>{smart = result});
+          await RegionCode(endArr[0]).then((result)=>{smart = result});
 
           var detaildata = {
             startAddress: startArr,
@@ -96,7 +118,6 @@ export const DetailScreen = (props) : DetailScreenProps => {
             moneyPrint: moneyprint,
             startFull: doc.data().startAddr_Full,
             endFull: doc.data().endAddr_Full,
-            isShowLocation: true,
             desc: doc.data().desc,
             day: dayName,
           };
@@ -107,8 +128,9 @@ export const DetailScreen = (props) : DetailScreenProps => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           };
-          that.onRegionChange(region);
-          that.setState({data: detaildata});
+          
+          onRegionChange(region);
+          setdata(detaildata);
 
           var data = fetch(
             'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
@@ -175,7 +197,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
                   }
                 }
               }
-              that.setState({apiInfo: coordinates});
+              setApiInfo(coordinates);
               return JSON.stringify(jsonData);
             });
 
@@ -211,10 +233,10 @@ export const DetailScreen = (props) : DetailScreenProps => {
                 return response.json();
               })
               .then(function (jsonData) {                         
-                that.setState({totalTime: jsonData.features[0].properties.totalTime});
+                settotalTime(jsonData.features[0].properties.totalTime);
               });
 
-
+              console.log('파이어베이스 함수 끝')
         } else {
           console.log('No such document!');
         }
@@ -239,7 +261,8 @@ export const DetailScreen = (props) : DetailScreenProps => {
   };
 
   const onRegionChange = (region) => {
-    setRegion({region});
+    console.log(region)
+    setRegion(region);
   };
 
   const ClickApply = async () => {
@@ -405,12 +428,17 @@ export const DetailScreen = (props) : DetailScreenProps => {
             <Divider style={{backgroundColor: 'black'}} />
           </Layout>
         </TouchableOpacity>
-        {data.isShowLocation ? (
-          <Layout style={{height: 200, backgroundColor: 'white'}}>
+          <Layout style={{height: 200}}>
             <MapView
+              region={region}
               style={{flex: 1}}
-              provider={PROVIDER_GOOGLE}
-              initialRegion={region}
+              provider={PROVIDER_GOOGLE}              
+              initialRegion={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}              
               onRegionChange={onRegionChange}>
               <Polyline
                 coordinates={apiInfo}
@@ -420,7 +448,6 @@ export const DetailScreen = (props) : DetailScreenProps => {
             </MapView>
             <Divider style={{backgroundColor: 'black'}} />
           </Layout>
-        ) : null}
 
         <TouchableOpacity onPress={hideStopvoer}>
           <Layout>
@@ -489,7 +516,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
             </Layout>
             <Layout style={{flex: 5, alignItems: 'center'}}>
               <TextTicker
-                style={styles.freightTitle}
+                style={(themeContext.theme == 'dark')? {fontWeight: 'bold', fontSize: 16, margin: 5,color: 'white'} : {fontWeight: 'bold', fontSize: 16, margin: 5,color: 'black'}}
                 duration={3000}
                 loop
                 bounce
@@ -506,7 +533,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
             </Layout>
             <Layout style={{flex: 5, alignItems: 'center'}}>
               <TextTicker
-                style={styles.freightTitle}
+                style={(themeContext.theme == 'dark')? {fontWeight: 'bold', fontSize: 16, margin: 5,color: 'white'} : {fontWeight: 'bold', fontSize: 16, margin: 5,color: 'black'}}
                 duration={3000}
                 loop
                 bounce
@@ -529,7 +556,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
         </Layout>
 
         <Divider style={{backgroundColor: 'black'}} />
-        <Layout style={{backgroundColor: 'white', flexDirection: 'row'}}>
+        <Layout style={{flexDirection: 'row'}}>
           <Layout style={{flex: 3}}>
             <Text style={{fontWeight: 'bold', fontSize: 16, margin: 5}}>
               {' '}
@@ -563,7 +590,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
 
       <Divider style={{backgroundColor: 'black'}} />
 
-      <Layout style={{backgroundColor: 'white', flexDirection: 'row'}}>
+      <Layout style={{flexDirection: 'row'}}>
         <Layout style={{flex: 5, justifyContent: 'center'}}>
           <Text style={styles.freightTitle}>
             {' '}
@@ -634,7 +661,8 @@ const styles = StyleSheet.create({
   },
   icon: {
     width: 32,
-    height: 24,
+    height: 28,
+   
   },
   icon2: {
     justifyContent: 'center',
