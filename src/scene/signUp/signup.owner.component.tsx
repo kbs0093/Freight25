@@ -104,7 +104,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                 try {
                   ref.update({
                     name: nameInput,
-                    accountOwner: accountNumInput,
+                    accountOwner: accountOwnerInput,
 
                     companyNumber: manNumInput, 
                     account: accountNumInput, 
@@ -186,7 +186,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>사업자 등록번호 :</Text>
+                <Text style={styles.textStyle}>사업자번호:</Text>
               </View>
               <View style={{flex: 3}}>
                 <Input
@@ -222,7 +222,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
               <View style={styles.detailTitle}>
               <Text style={styles.textStyle}>상차지 :</Text>
               </View>
-              <View style={{flex: 2.3}}>
+              <View style={{flex: 2.3, justifyContent: 'center'}}>
                 <Text style={styles.textStyle}>{addrCompact}</Text>
               </View>
               <View style={{flex: 0.7}}>
@@ -448,13 +448,13 @@ const styles = StyleSheet.create({
     margin: 8
   },
   detailTitle: {
-    flex: 2,
+    flex: 1.4,
     flexDirection: 'row', 
     alignItems:'center',
     justifyContent: 'flex-end'
   },
   input: {
-    flex: 1,
+    flex: 3,
     margin: 2,
   },
 });

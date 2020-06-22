@@ -332,7 +332,7 @@ export const ProfileOwnerScreen = (
         <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
           <Layout style={styles.rowContainer}>
-            <Text style={styles.infoTitle}>거래 은행: </Text>
+            <Text style={styles.infoTitle}>거래 은행 : </Text>
             <RNPickerSelect
               onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
               placeholder={{
@@ -559,6 +559,7 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
+    lineHeight: 25
   },
   titleContainer: {
     paddingHorizontal: 20,

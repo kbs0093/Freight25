@@ -47,7 +47,6 @@ const App = () => {
   const currentTheme = themes[theme];
 
   const toggleTheme = () => {
-    console.log("hellow")
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
   };
@@ -86,6 +85,7 @@ const App = () => {
           if(value == 'driver'){
             requestLocationAndroid();
           } else {
+            console.log('드라이버가 아니므로 위치추적 기능을 종료합니다')
             BackgroundJob.stop();
           }
         })
@@ -125,6 +125,7 @@ const App = () => {
         const user = auth().currentUser;
         if (user != null) {
           if (uid != null) {
+            console.log("Firebase 위치 추적 update");
             var locationRef = firestore().collection('location').doc(uid);
             try {
               locationRef.set({
@@ -145,7 +146,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    //toggleBackground();
+    toggleBackground();
   }, []);
 
   return (

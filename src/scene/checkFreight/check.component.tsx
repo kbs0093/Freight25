@@ -335,6 +335,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: RFPercentage(3),
+    lineHeight: 25
   },
   timeText: {
     fontWeight: 'bold',

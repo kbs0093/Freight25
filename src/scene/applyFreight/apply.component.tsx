@@ -786,8 +786,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   subTitle: {
+    lineHeight: 30,
     fontSize: 20,
     fontWeight: 'bold',
+    
   },
   infoContainer: {
     paddingHorizontal: 25,
@@ -796,6 +798,7 @@ const styles = StyleSheet.create({
     borderColor: '#20232a',
     borderWidth: 1,
     justifyContent: 'space-between',
+
   },
 
   infoTitle: {

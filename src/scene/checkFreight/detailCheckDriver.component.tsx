@@ -627,6 +627,7 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
+    lineHeight: 25
   },
   container: {
     flex: 1,
@@ -677,6 +678,7 @@ const styles = StyleSheet.create({
   geoText: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
+    lineHeight: 25
   },
   geoSubText: {
     fontSize: RFPercentage(2.5),

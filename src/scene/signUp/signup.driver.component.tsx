@@ -186,7 +186,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
             </View>
             <View style={{flexDirection: 'row'}}>
               <View style={styles.detailTitle}>
-                <Text style={styles.textStyle}>사업자 등록번호 :</Text>
+                <Text style={styles.textStyle}>사업자 번호 :</Text>
               </View>
               <View style={{flex: 3}}>
                 <Input

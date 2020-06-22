@@ -407,6 +407,7 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
+    lineHeight: 30
   },
   freightContainer: {
     paddingHorizontal: 20,
@@ -448,6 +449,7 @@ const styles = StyleSheet.create({
   geoText: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
+    lineHeight: 25
   },
   geoSubText: {
     fontSize: RFPercentage(2.5),
