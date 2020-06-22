@@ -103,6 +103,10 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   const [favoriteStartAddr, setFavoriteStartAddr] = useState<string>("자주쓰는 주소가 등록되어있지 않습니다.");
   const [favoriteEndAddr, setFavoriteEndAddr] = useState<string>("자주쓰는 주소가 등록되어있지 않습니다.");
+  
+  // 화물 수신자 part
+  const [recvName, setRecvName] = useState<string>('');
+  const [recvTel, setRecvTel] = useState<string>('');
 
   // 화물 수신자 part
   const [recvName, setRecvName] = useState<string>('');
@@ -236,6 +240,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       console.log(snapShot.data().savedStartCompact);
       Toast.hide(toastLoading);
     });
+    setmodalStartAddrVisible(true);
   }
 
   const setStartFavoriteToStartAddr = () => {
@@ -321,7 +326,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               size='small'
               onPress={() => {
                 loadStartNEndFavoriteAddr();
-                setmodalStartAddrVisible(true);
               }}
             >변경</Button>
           </Layout>
@@ -349,7 +353,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>하 차 지  : </Text>
             <Text style={styles.infoTitle}>{endAddrCompact}</Text>
-
             <Button 
               appearance='outline'
               size='small'

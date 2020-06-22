@@ -1,6 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
-  Text,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -9,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import {
+  Text,
   LayoutElement,
   Divider,
   Select,
@@ -40,6 +40,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import KakaoLogins from '@react-native-seoul/kakao-login';
 import {CommonActions} from '@react-navigation/native';
+import {ThemeContext} from '../../component/theme-context';
 
 const resetAction = CommonActions.reset({
   index: 0,
@@ -85,6 +86,8 @@ export const ProfileOwnerScreen = (
 
   const [lock, setLock] = React.useState(0);
   const [userID, setUserID] = React.useState('');
+
+  const themeContext = React.useContext(ThemeContext);
 
   useEffect(() => {
     AsyncStorage.getItem('fbToken').then((value) => {
@@ -224,8 +227,13 @@ export const ProfileOwnerScreen = (
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-      <ScrollView>
-        <View style={styles.titleContainer}>
+      <ScrollView
+        style={
+          themeContext.theme == 'dark'
+            ? {backgroundColor: '#222B45'}
+            : {backgroundColor: '#FFFFFF'}
+        }>
+        <Layout style={styles.titleContainer}>
           <Text style={styles.Subtitle}>화주 정보 수정</Text>
           <Button
             onPress={() => {
@@ -237,11 +245,11 @@ export const ProfileOwnerScreen = (
             textStyle={styles.ButtonText}>
             수정
           </Button>
-        </View>
+        </Layout>
 
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>개인 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>성 명: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -250,8 +258,8 @@ export const ProfileOwnerScreen = (
                 onChangeText={name}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>전화 번호: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -260,8 +268,8 @@ export const ProfileOwnerScreen = (
                 onChangeText={phoneNum}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>사업자등록번호: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -270,8 +278,8 @@ export const ProfileOwnerScreen = (
                 onChangeText={manNum}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>업체명: </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -280,18 +288,18 @@ export const ProfileOwnerScreen = (
                 onChangeText={companyName}
               />
             </Layout>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
         <Divider style={{backgroundColor: 'black'}} />
 
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>자주 쓰는 상차 / 하차지 설정</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>상차지: </Text>
-            <View style={{flex: 2.3}}>
+            <Layout style={{flex: 2.3}}>
               <Text style={styles.textStyle}>{addrCompact}</Text>
-            </View>
-            <View style={{flex: 0.7}}>
+            </Layout>
+            <Layout style={{flex: 0.7}}>
               <Button
                 appearance="outline"
                 size="small"
@@ -300,14 +308,14 @@ export const ProfileOwnerScreen = (
                 }}>
                 변경
               </Button>
-            </View>
-          </View>
-          <View style={styles.rowContainer}>
+            </Layout>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>하차지: </Text>
-            <View style={{flex: 2.3}}>
+            <Layout style={{flex: 2.3}}>
               <Text style={styles.textStyle}>{endAddrCompact}</Text>
-            </View>
-            <View style={{flex: 0.7}}>
+            </Layout>
+            <Layout style={{flex: 0.7}}>
               <Button
                 appearance="outline"
                 size="small"
@@ -316,14 +324,14 @@ export const ProfileOwnerScreen = (
                 }}>
                 변경
               </Button>
-            </View>
-          </View>
-        </View>
+            </Layout>
+          </Layout>
+        </Layout>
         <Divider style={{backgroundColor: 'black'}} />
 
-        <View style={styles.infoContainer}>
+        <Layout style={styles.infoContainer}>
           <Text style={styles.Subtitle}>계좌 정보</Text>
-          <View style={styles.rowContainer}>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>거래 은행: </Text>
             <RNPickerSelect
               onValueChange={(itemValue, itemIndex) => setBankValue(itemValue)}
@@ -338,8 +346,8 @@ export const ProfileOwnerScreen = (
                 {label: '농협', value: 'nognhyeob'},
               ]}
             />
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>계좌 번호 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -348,8 +356,8 @@ export const ProfileOwnerScreen = (
                 onChangeText={accountNum}
               />
             </Layout>
-          </View>
-          <View style={styles.rowContainer}>
+          </Layout>
+          <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>예금주 : </Text>
             <Layout style={styles.selectContainer}>
               <Input
@@ -358,10 +366,10 @@ export const ProfileOwnerScreen = (
                 onChangeText={accountOwner}
               />
             </Layout>
-          </View>
-        </View>
+          </Layout>
+        </Layout>
 
-        <View style={styles.withdrawContainer}>
+        <Layout style={styles.withdrawContainer}>
           <Button
             onPress={() => {
               try {
@@ -376,7 +384,7 @@ export const ProfileOwnerScreen = (
             textStyle={styles.withdrawButtonText}>
             회원 탈퇴
           </Button>
-        </View>
+        </Layout>
 
         <Modal
           //isVisible Props에 State 값을 물려주어 On/off control
@@ -386,7 +394,7 @@ export const ProfileOwnerScreen = (
           hideModalContentWhileAnimating={true}
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <View>
+          <Layout>
             <Postcode
               style={{width: 350, height: 600}}
               jsOptions={{animated: true}}
@@ -447,7 +455,7 @@ export const ProfileOwnerScreen = (
               }}>
               뒤로 돌아가기
             </Button>
-          </View>
+          </Layout>
         </Modal>
 
         <Modal
@@ -458,7 +466,7 @@ export const ProfileOwnerScreen = (
           hideModalContentWhileAnimating={true}
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
-          <View>
+          <Layout>
             <Postcode
               style={{width: 350, height: 600}}
               jsOptions={{animated: true}}
@@ -519,7 +527,7 @@ export const ProfileOwnerScreen = (
               }}>
               뒤로 돌아가기
             </Button>
-          </View>
+          </Layout>
         </Modal>
       </ScrollView>
     </React.Fragment>
@@ -560,7 +568,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     borderColor: '#20232a',
-    backgroundColor: 'white',
   },
   infoContainer: {
     flex: 1,
@@ -569,7 +576,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     borderColor: '#20232a',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
   },
   rowContainer: {
     paddingVertical: 8,
@@ -596,7 +602,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: '#20232a',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
   },
   iconSize: {
     width: 32,

@@ -17,17 +17,26 @@ export const CheckNavigator = (): React.ReactElement => (
   </TopTab.Navigator>
 );
 export const CheckDetailOwnerNavigator = (): React.ReactElement => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name={AppRoute.CHECK_DETAIL_OWNER} component={DetailCheckOwnerScreen}/>  
-  </Stack.Navigator>  
+  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
+    <Stack.Screen
+      name={AppRoute.CHECK_DETAIL_OWNER}
+      component={DetailCheckOwnerScreen}
+    />
+  </TopTab.Navigator>
 );
 export const CheckDetailDriverNavigator = (): React.ReactElement => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name={AppRoute.CHECK_DETAIL_DRIVER} component={DetailCheckDriverScreen}/>
-  </Stack.Navigator>
+  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
+    <Stack.Screen
+      name={AppRoute.CHECK_DETAIL_DRIVER}
+      component={DetailCheckDriverScreen}
+    />
+  </TopTab.Navigator>
 );
 export const CheckDetailStopoverNavigator = (): React.ReactElement => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name={AppRoute.CHECK_DETAIL_DRIVER} component={DetailCheckStopoverScreen}/>
-  </Stack.Navigator>
+  <TopTab.Navigator tabBar={(props) => <TopTapBar {...props} />}>
+    <Stack.Screen
+      name={AppRoute.CHECK_DETAIL_STOPOVER}
+      component={DetailCheckStopoverScreen}
+    />
+  </TopTab.Navigator>
 );
