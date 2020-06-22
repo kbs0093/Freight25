@@ -5,9 +5,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
+  Alert,
   ScrollView,
   Linking,
   Image,
+  requireNativeComponent,
 } from 'react-native';
 import {
   Text,
@@ -21,12 +23,17 @@ import {
   Divider,
 } from '@ui-kitten/components';
 import {DetailCheckOwnerScreenProps} from '../../navigation/check.navigator';
+import {AppRoute} from '../../navigation/app-routes';
+import Toast from 'react-native-tiny-toast';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import TextTicker from 'react-native-text-ticker';
 import {ThemeContext} from '../../component/theme-context';
+
+const tmapLocURL =
+  'https://apis.openapi.sk.com/tmap/app/map?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
@@ -39,6 +46,11 @@ export const DetailCheckOwnerScreen = (
 ): LayoutElement => {
   const [FreightID, setFreightID] = React.useState('');
   const [driverTel, setDriverTel] = React.useState('');
+  const [driverID, setDriverID] = React.useState('');
+  const [driverLat, setDriverLat] = React.useState('');
+  const [driverLong, setDriverLong] = React.useState('');
+  const [driverAddr, setDriverAddr] = React.useState('');
+  const [driverAddrNoSpace, setDriverAddrNoSpace] = React.useState('');
   const [data, setData] = React.useState([]);
   const [lastState, setState] = React.useState([]);
 
@@ -64,10 +76,8 @@ export const DetailCheckOwnerScreen = (
       var docRef = firestore().collection('freights').doc(freightID);
 
       docRef.get().then(function (doc) {
-        //doc.data()에 상세정보 저장되어 있습니다.
-        //화물의 배정 기사 변수: driverId
-        //화물 배정 상태 변수: state
         var list = [];
+        var driverID;
 
         if (doc.exists) {
           const docs = doc.data();
@@ -80,6 +90,7 @@ export const DetailCheckOwnerScreen = (
 
           var startAddrFullArray = docs.startAddr_Full.split(' ');
           var endAddrFullArray = docs.endAddr_Full.split(' ');
+          driverID = docs.driverId;
 
           var i = 2,
             j = 2;
@@ -140,9 +151,25 @@ export const DetailCheckOwnerScreen = (
           setData(list);
           setState(freightState);
           setDriverTel(docs.driverTel);
+          setDriverID(docs.driverId);
         } else {
           console.log('No such document!');
         }
+        console.log(driverID);
+        var docLoc = firestore().collection('location').doc(driverID);
+        docLoc.get().then(function (doc2) {
+          if (doc2.exists) {
+            const docs = doc2.data();
+            var addrNoSpace = docs.address.replace(/\s/g, '');
+
+            setDriverLat(docs.latitude);
+            setDriverLong(docs.longitude);
+            setDriverAddr(docs.address);
+            setDriverAddrNoSpace(addrNoSpace);
+          } else {
+            console.log('No location document!');
+          }
+        });
       });
     }
   };
@@ -153,26 +180,70 @@ export const DetailCheckOwnerScreen = (
     Linking.openURL(`tel:${driverTel}`);
   };
 
-  const navigateBack = () => {
+  const requestDriverLoc = () => {
+    if (driverID == '') {
+      console.log('기사 ID 실패');
+    } else {
+      Linking.openURL(
+        tmapLocURL +
+          `&name=${driverAddrNoSpace}&lat=${driverLat}&lon=${driverLong}`,
+      );
+    }
+  };
+
+  const locHandler = () => {
+    Alert.alert(
+      'TMap으로 이동',
+      'TMap에서 기사 위치를 확인할까요?',
+      [
+        {text: '네', onPress: () => requestDriverLoc()},
+        {
+          text: '취소',
+          onPress: () => console.log('canceled'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const deleteFreight = () => {
+    var ref = firestore().collection('freights').doc(FreightID);
+
+    try {
+      ref.delete().then(() => {
+        console.log('deleted');
+      });
+    } catch {
+      (error) => {
+        console.log(error);
+      };
+    }
+    Toast.show('삭제 완료');
+    //props.navigation.navigate(AppRoute.HOME);
+    props.navigation.goBack();
     props.navigation.goBack();
   };
 
-  const deleteFreight = () => {};
+  const delHandler = () => {
+    Alert.alert(
+      '화물 삭제',
+      '선택한 화물을 삭제할까요?',
+      [
+        {text: '네', onPress: () => deleteFreight()},
+        {
+          text: '취소',
+          onPress: () => console.log('canceled'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+    );
+  };
 
   const _renderItem = ({item}) => (
     <Layout>
       <View style={{flexDirection: 'row'}}>
-        {/* <View style={{flex: 1, justifyContent: 'center'}}>
-          <View></View>
-          <TouchableOpacity onPress={navigateBack}>
-            <Icon
-              name="arrow-back-outline"
-              width={28}
-              height={28}
-              fill={themeContext.theme == 'dark' ? 'white' : 'black'}
-            />
-          </TouchableOpacity>
-        </View> */}
         <View
           style={{
             flex: 3,
@@ -201,7 +272,6 @@ export const DetailCheckOwnerScreen = (
               {item.lastState}
             </Button>
           )}
-          {/* <Divider style={{backgroundColor: 'black'}} /> */}
         </View>
       </View>
 
@@ -258,6 +328,9 @@ export const DetailCheckOwnerScreen = (
           {item.lastState == '배송중' ? (
             <Text style={styles.infoTitle}>기사 전화번호:</Text>
           ) : null}
+          {item.lastState == '배송중' ? (
+            <Text style={styles.infoTitle}>기사 현재위치:</Text>
+          ) : null}
         </View>
         <View style={styles.freightInfoHalfRightContainer}>
           <Text style={styles.infoRightTitle}>
@@ -299,11 +372,35 @@ export const DetailCheckOwnerScreen = (
           {item.lastState == '배송중' ? (
             <Text style={styles.infoTitle}>{item.driverTel}</Text>
           ) : null}
+          {item.lastState == '배송중' ? (
+            <Text style={styles.infoTitle}>{driverAddr}</Text>
+          ) : null}
         </View>
       </View>
       <Divider style={{backgroundColor: 'black'}} />
     </Layout>
   );
+
+  const renderLocButton = () => {
+    var isDisable;
+    if (lastState == '배송전') {
+      isDisable = true;
+    } else if (lastState == '배송중') {
+      isDisable = false;
+    } else if (lastState == '배송완료') {
+      isDisable = false;
+    }
+    return (
+      <Button
+        onPress={() => {
+          locHandler();
+        }}
+        icon={naviIcon}
+        disabled={isDisable}>
+        기사 위치
+      </Button>
+    );
+  };
 
   const renderCallButton = () => {
     var isDisable;
@@ -314,22 +411,41 @@ export const DetailCheckOwnerScreen = (
     } else if (lastState == '배송완료') {
       isDisable = false;
     }
-
     return (
       <Button
         onPress={() => {
           callDriver();
         }}
-        style={styles.button}
+        //style={styles.button}
         status="success"
         icon={phoneIcon}
-        disabled={isDisable}
-        textStyle={styles.callButtonText}>
-        화주 전화
+        //textStyle={styles.callButtonText}
+        disabled={isDisable}>
+        기사 전화
       </Button>
     );
   };
 
+  const renderDelButton = () => {
+    var isDisable;
+    if (lastState == '배송전') {
+      isDisable = false;
+    } else if (lastState == '배송중') {
+      isDisable = true;
+    } else if (lastState == '배송완료') {
+      isDisable = true;
+    }
+    return (
+      <Button
+        onPress={() => {
+          delHandler();
+        }}
+        status="danger"
+        disabled={isDisable}>
+        삭제
+      </Button>
+    );
+  };
   return (
     <React.Fragment>
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
@@ -350,12 +466,12 @@ export const DetailCheckOwnerScreen = (
           <Layout style={styles.ButtonHalfContainer}>
             {renderCallButton()}
           </Layout>
-          <Layout style={{flex: 1, alignItems: 'center'}}>
-            <Button status="danger" onPress={deleteFreight}>
-              삭제
-            </Button>
+          <Layout style={{flex: 2, alignItems: 'center'}}>
+            {renderLocButton()}
           </Layout>
-          {/* <View style={styles.ButtonHalfContainer}>{reviewButton}</View> */}
+          <Layout style={{flex: 1, alignItems: 'center'}}>
+            {renderDelButton()}
+          </Layout>
         </Layout>
 
         <View style={{alignItems: 'center', flex: 1.6}}>
@@ -407,7 +523,7 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
-    lineHeight: 30
+    lineHeight: 30,
   },
   freightContainer: {
     paddingHorizontal: 20,
@@ -449,7 +565,7 @@ const styles = StyleSheet.create({
   geoText: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
-    lineHeight: 25
+    lineHeight: 25,
   },
   geoSubText: {
     fontSize: RFPercentage(2.5),

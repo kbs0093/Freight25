@@ -351,17 +351,6 @@ export const DetailCheckDriverScreen = (
   const _renderItem = ({item}) => (
     <Layout>
       <View style={{flexDirection: 'row'}}>
-        {/* <View style={{flex: 1, justifyContent: 'center'}}>
-          <View></View>
-          <TouchableOpacity onPress={navigateBack}>
-            <Icon
-              name="arrow-back-outline"
-              width={28}
-              height={28}
-              fill={themeContext.theme == 'dark' ? 'white' : 'black'}
-            />
-          </TouchableOpacity>
-        </View> */}
         <View
           style={{
             flex: 3,
@@ -392,8 +381,6 @@ export const DetailCheckDriverScreen = (
           )}
         </View>
       </View>
-
-      {/* <Divider style={{backgroundColor: 'black'}} /> */}
 
       <View style={styles.geoContainer}>
         <View style={styles.geoInfoContainer}>
@@ -627,7 +614,7 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
-    lineHeight: 25
+    lineHeight: 25,
   },
   container: {
     flex: 1,
@@ -678,7 +665,7 @@ const styles = StyleSheet.create({
   geoText: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
-    lineHeight: 25
+    lineHeight: 25,
   },
   geoSubText: {
     fontSize: RFPercentage(2.5),
