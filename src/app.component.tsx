@@ -83,6 +83,7 @@ const App = () => {
         AsyncStorage.getItem('userType')
         .then((value) => {
           if(value == 'driver'){
+            console.log('driver GPS 작동')
             requestLocationAndroid();
           } else {
             console.log('드라이버가 아니므로 위치추적 기능을 종료합니다')
@@ -124,8 +125,8 @@ const App = () => {
         
         const user = auth().currentUser;
         if (user != null) {
-          if (uid != null) {
-            console.log("Firebase 위치 추적 update");
+          if (uid != '') {
+            console.log("Firebase 위치 추적 update : ", uid);
             var locationRef = firestore().collection('location').doc(uid);
             try {
               locationRef.set({

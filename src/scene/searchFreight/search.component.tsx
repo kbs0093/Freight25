@@ -44,14 +44,11 @@ export const SearchScreen = (props): SearchScreenProps => {
   const [sorting, setsorting] = useState(0);
 
   useEffect(() => {
-    isAndroid ? requestLocationAndroid() : requestLocationIos()
+    isAndroid ? requestLocationAndroid() : requestLocationIos()    
   }, []);
-  
-  useEffect(() => {
-    filtering();
-    ListSort();
-  },[filter, sorting]);
 
+  
+  
   const hasLocationPermissionIOS = async () => {
     const openSetting = () => {
       Linking.openSettings().catch(() => {
@@ -256,7 +253,17 @@ export const SearchScreen = (props): SearchScreenProps => {
   };
 
   const ListSort = () => {
-    if(sorting == 4){
+    if(sorting == 6){
+      data2.sort((a,b) => {
+        return Number(a.distanceX) < Number(b.distanceX) ? -1 : Number(a.distanceX) > Number(b.distanceX) ? 1: 0;        
+      })
+    }
+    else if(sorting == 5){
+      data2.sort((a,b) => {
+        return Number(a.distanceX) > Number(b.distanceX) ? -1 : Number(a.distanceX) > Number(b.distanceX) ? 1: 0;        
+      })
+    }
+    else if(sorting == 4){
       data2.sort((a,b) => {
         return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;        
       })
@@ -412,6 +419,8 @@ export const SearchScreen = (props): SearchScreenProps => {
     </TouchableOpacity>
   );  
 
+  filtering();
+  ListSort();
 
   return (  
   <React.Fragment>
@@ -456,6 +465,8 @@ export const SearchScreen = (props): SearchScreenProps => {
             }}
             useNativeAndroidPickerStyle={isAndroid? true: false}
             items={[
+              {label: '상차지 거리순 (낮음)', value: '6'},
+              {label: '상차지 거리순 (높음)', value: '5'},
               {label: '운행거리 순 (낮음)', value: '4'},
               {label: '운행거리 순 (높음)', value: '3'},
               {label: '운임 순', value: '2'},
