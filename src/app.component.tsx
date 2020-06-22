@@ -22,6 +22,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 const themes = { light, dark };
+const isAndroid = Platform.OS === 'android';
 const server = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&"
 
 const options = {
@@ -83,8 +84,7 @@ const App = () => {
         AsyncStorage.getItem('userType')
         .then((value) => {
           if(value == 'driver'){
-            console.log('driver GPS 작동')
-            requestLocationAndroid();
+            isAndroid ? requestLocationAndroid() : requestLocationIos()    
           } else {
             console.log('드라이버가 아니므로 위치추적 기능을 종료합니다')
             BackgroundJob.stop();
@@ -145,6 +145,52 @@ const App = () => {
       console.warn(err)
     }
   }
+
+  const requestLocationIos = async() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        var Templatitude = JSON.stringify(position.coords.latitude);
+        var Templongitude = JSON.stringify(position.coords.longitude);
+
+        setLatitude(Templatitude)
+        setlongitude(Templongitude)
+        
+        fetch(server + `&lat=${Templatitude}&lon=${Templongitude}&coordType=WGS84GEO&addressType=A10&callback=callback&appKey=l7xxce3558ee38884b2da0da786de609a5be`)
+        .then(response => response.json())
+        .then(response => {
+          const city = JSON.stringify(response.addressInfo.city_do).replace(/\"/gi, "");
+          const gu = JSON.stringify(response.addressInfo.gu_gun).replace(/\"/gi, "");
+          const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
+          const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");    
+          const address = city + ' ' +gu + ' ' +myeon + ' ' + dong;
+          setAddress(address); 
+        })   
+        .catch(err => console.log(err));     
+      },
+      error => Alert.alert('Error', JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000});
+    
+      const user = auth().currentUser;
+      if (user != null) {
+        if (uid != '') {
+          console.log("Firebase 위치 추적 update : ", uid);
+          var locationRef = firestore().collection('location').doc(uid);
+          try {
+            locationRef.set({
+              address: address,
+              latitude: latitude,
+              longitude: longitude
+            });
+          } catch {
+            console.log('Failed assign to ' + locationRef.id);
+          }
+        }
+      }
+      
+  };
+
+  
+
 
   useEffect(() => {
     toggleBackground();
