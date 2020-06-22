@@ -19,9 +19,9 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
       if (value !== null) {
         var freightID = value + '';
         //const freightID = {FrightID: value + ''};
-        var url = '49.50.172.39:8000/stopover?freightId=' + value;
+        var url = '49.50.172.81:8000/stopover?freightId=' + value;
         var data = fetch(
-          'http://49.50.172.39:8000/stopover?freightId=' + value,
+          'http://49.50.172.81:8000/stopover?freightId=' + value,
           {},
         )
           .then((response) => response.json())
