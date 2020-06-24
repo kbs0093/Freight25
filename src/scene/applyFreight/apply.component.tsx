@@ -344,17 +344,38 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
     return reg.test(v);
   }
 
-  const chkFreight = (props, setterProps) => {
+  const chkFreightWeight = (props, setterProps) => {
     if (selectedCarSize == ''){
-      Alert.alert('차량 정보를 먼저 선택해주세요.')
+      Alert.alert('차량 정보(톤수)를 먼저 선택해주세요.')
     }
     else if (is_double_plus(props)) {
-      setterProps(props);
+      if (Number(props) <= Number(selectedCarSize)*2) setterProps(props);
+      else {
+        Alert.alert('요청 차량 크기에 비해 너무 과도한 적재량입니다. ' + Number(selectedCarSize)*2 +' 이내로 설정해주세요.')
+        setterProps('');
+      }
     } else {
       Alert.alert("숫자만 입력하세요")
       setterProps(props.slice(0, props.length - 1));
     }
   }
+
+  const chkFreightValue = (props, setterProps) => {
+    if (selectedCarSize == ''){
+      Alert.alert('차량 정보(톤수)를 먼저 선택해주세요.')
+    }
+    else if (is_double_plus(props)) {
+      if (Number(props) <= Number(selectedCarSize)*3) setterProps(props);
+      else {
+        Alert.alert('요청 차량 크기에 비해 너무 과도한 적재량입니다. ' + Number(selectedCarSize)*3 +' 이내로 설정해주세요.')
+        setterProps('');
+      }
+    } else {
+      Alert.alert("숫자만 입력하세요")
+      setterProps(props.slice(0, props.length - 1));
+    }
+  }
+
 
   function is_letter(v) {
     var reg = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+$/;
@@ -567,7 +588,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               <Input
                 placeholder="화물 무게를 입력하세요"
                 value={weightValue}
-                onChangeText={nextValue => chkFreight(nextValue, setWeightValue)}
+                onChangeText={nextValue => chkFreightWeight(nextValue, setWeightValue)}
               />
             </Layout>
             <Text style={styles.infoTitle}> 톤</Text>
@@ -577,7 +598,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             <Input
               placeholder="숫자로 입력하세요"
               value={volumeValue}
-              onChangeText={nextValue => chkFreight(nextValue, setVolumeValue)}
+              onChangeText={nextValue => chkFreightValue(nextValue, setVolumeValue)}
               />
             <Text style={styles.infoTitle}> 파레트</Text>
           </Layout>
