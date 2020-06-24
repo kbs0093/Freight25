@@ -29,6 +29,10 @@
       <meta-data
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyB9iMOqpFb_Sl4t9j9M65ftTHG58cKqUCQ"/>
+      <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/ic_notification" />
+
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />
     </application>
