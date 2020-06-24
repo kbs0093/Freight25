@@ -70,6 +70,14 @@ export const DetailCheckDriverScreen = (
   const [endAddrNoSpace, setEndAddrNoSpace] = React.useState('');
   const [data, setData] = React.useState([]);
   const [lastState, setState] = React.useState([]);
+  const [start, setStart] = React.useState({
+    lon: '',
+    lat: ''
+  });
+  const [end, setEnd] = React.useState({
+    lon: '',
+    lat: ''
+  });
 
   const themeContext = React.useContext(ThemeContext);
 
@@ -209,6 +217,9 @@ export const DetailCheckDriverScreen = (
             desc: docs.desc,
           });
 
+          setStart({lat: docs.startAddr_lat, lon: docs.startAddr_lon})
+          setEnd({lat: docs.endAddr_lat, lon: docs.endAddr_lon})
+
           setData(list);
           setState(freightState);
           setOwnerTel(docs.ownerTel);
@@ -269,13 +280,13 @@ export const DetailCheckDriverScreen = (
       // Route to start address
       Linking.openURL(
         tmapRouteURL +
-          `&name=${startAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
+          `&name=${startAddrNoSpace}&lat=${start.lat}&lon=${start.lon}`,
       );
     } else if (num == 2) {
       // Route to end address
       Linking.openURL(
         tmapRouteURL +
-          `&name=${endAddrNoSpace}&lat=${latitude}&lon=${longitude}`,
+          `&name=${endAddrNoSpace}&lat=${end.lat}&lon=${end.lon}`,
       );
     }
   };

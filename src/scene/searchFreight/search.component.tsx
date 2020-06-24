@@ -267,6 +267,7 @@ export const SearchScreen = (props): SearchScreenProps => {
       data2.sort((a,b) => {
         return Number(a.distanceY) < Number(b.distanceY) ? -1 : Number(a.distanceY) > Number(b.distanceY) ? 1: 0;        
       })
+
     } //운행거리 낮음
     else if(sorting == 3){
       data2.sort((a,b) => {
@@ -288,36 +289,36 @@ export const SearchScreen = (props): SearchScreenProps => {
   const filtering = () => {
     var temp = [];
     temp = JSON.parse(JSON.stringify(data));
-     
+    
     if(filter == 1){        
       let result = temp.filter(element => {
         return element.distanceX <= 100
       });
-      setData2(result)   
+      setData2(result);   
     }
     else if(filter == 2){
       let result = temp.filter(element => {
         return element.distanceX <= 50
       });
-      setData2(result)    
+      setData2(result);    
     }
     else if(filter == 3){
       let result = temp.filter(element => {
         return element.distanceX <= 30
       });
-      setData2(result)      
+      setData2(result);      
     }
     else if(filter == 4){
       let result = temp.filter(element => {
         return element.distanceX <= 10
       });
-      setData2(result)     
+      setData2(result);     
     }
     else if(filter == 5){
       let result = temp.filter(element => {
         return element.distanceX >= 0
       });
-      setData2(result)     
+      setData2(result);     
     }    
   };
 
@@ -419,8 +420,13 @@ export const SearchScreen = (props): SearchScreenProps => {
     </TouchableOpacity>
   );  
 
-  filtering();
+  useEffect(() => {
+    filtering();
+  }, [filter]);
+
   ListSort();
+ 
+
 
   return (  
   <React.Fragment>
