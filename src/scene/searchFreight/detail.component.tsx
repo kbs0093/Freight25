@@ -288,7 +288,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           DirectSms.sendDirectSms(
             recvTel,
-            ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.',
+            ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString().split(" ")[4] +' 입니다.',
           );
           console.log('SMS sent successfully to ', recvTel);
         } else {
@@ -302,7 +302,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
       console.log(recvTel);
 
       const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
-        ownerName + '님이 보내신 배차가 완료되어' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.'
+        ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString().split(" ")[4] +' 입니다.'
       }`;
       Linking.openURL(url).catch((err) =>
         console.error('An error occurred', err),
@@ -313,7 +313,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
   const ClickApply = async () => {
     let date = new Date()
     date.setSeconds(date.getSeconds() + totalTime);
-
+    console.log('date값 : ', date.toString())
     const user = auth().currentUser;
     const value = await AsyncStorage.getItem('FreightID');
      
@@ -347,7 +347,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
             Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
             props.navigation.navigate(AppRoute.HOME);
           }
-          sendDirectSms(recvName, ownerName, recvTel, date)
+          await sendDirectSms(recvName, ownerName, recvTel, date)
         } catch {
           console.log('Failed assign to ' + freightRef.id);
         }
