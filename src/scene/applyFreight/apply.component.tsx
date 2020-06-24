@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   StyleSheet,
   Platform,
@@ -70,9 +70,9 @@ const freightEndDate = [
 
 const week = new Array('일', '월', '화', '수', '목', '금', '토');
 export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
-  const [selectedCarSize, setSelectedCarSize] = React.useState(null);
-  const [selectedCarType, setSelectedCarType] = React.useState(null);
-  const [selectedDrive, setSelectedDrive] = React.useState(null);
+  const [selectedCarSize, setSelectedCarSize] = React.useState('');
+  const [selectedCarType, setSelectedCarType] = React.useState('');
+  const [selectedDrive, setSelectedDrive] = React.useState('');
 
   const [weightValue, setWeightValue] = React.useState('');
   const [volumeValue, setVolumeValue] = React.useState('');
@@ -110,8 +110,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   const [endAddr_lon, setEndAddr_lon] = useState<string>('');
 
   // Select - 당상/내상/당착/내착
-  const [selectedStartDate, setSelectedStartDate] = React.useState(null);
-  const [selectedEndDate, setSelectedEndDate] = React.useState(null);
+  const [selectedStartDate, setSelectedStartDate] = useState<string>("");
+  const [selectedEndDate, setSelectedEndDate] = useState<string>("");
 
   const [favoriteStartAddr, setFavoriteStartAddr] = useState<string>(
     '자주쓰는 주소가 등록되어있지 않습니다.',
@@ -123,8 +123,34 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
   // 화물 수신자 part
   const [recvName, setRecvName] = useState<string>('');
   const [recvTel, setRecvTel] = useState<string>('');
+  const toastLoading = Toast
 
   const themeContext = React.useContext(ThemeContext);
+  var textColor = 'black'
+  var hypertextColor = 'blue'
+  if (themeContext.theme == 'dark') {
+    textColor = 'orange'
+    hypertextColor = 'orange'
+  }
+
+  const loadStartNEndFavoriteAddr = () => {
+    toastLoading.showLoading('Loading...');
+    firestore().collection('owners').doc(user.uid).get()
+      .then(function (snapShot) {
+        setFavoriteStartAddr(snapShot.data().savedStartFull);
+        setFavoriteEndAddr(snapShot.data().savedEndFull);
+        console.log(snapShot.data().savedStartCompact);
+        Toast.hide(toastLoading);
+      })
+      .catch(error => {
+        console.log('Favorite addr loading failed : ', error)
+        Toast.hide(toastLoading);
+      })
+  }
+
+  useEffect(() => {
+    loadStartNEndFavoriteAddr()
+  }, []);
 
   //날짜,요일 계산
   var startDay = new Date();
@@ -148,87 +174,90 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   //화물 db에 등록
   const applyFreightToDb = () => {
-    Alert.alert('화물 추가', '정말 화물을 추가하시겠습니까?', [
-      {
-        text: '예',
-        onPress: () => {
-          if (user != null) {
-            //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
-            var ref = firestore().collection('freights').doc();
-            getDate();
+    if(validation_check()){
+
+      Alert.alert('화물 추가', '정말 화물을 추가하시겠습니까?', [
+        {
+          text: '예',
+          onPress: () => {
             if (user != null) {
-              try {
-                ref.set({
-                  id: ref.id,
-                  ownerId: auth().currentUser?.uid,
-                  //              ownerTel: p
-                  carSize: selectedCarSize,
-                  carType: selectedCarType,
-                  driveOption: selectedDrive,
-                  weight: weightValue,
-                  volume: volumeValue,
-                  freightLoadType: freightLoadTypeValue,
-                  desc: descValue,
-                  dist: distValue,
-                  expense: expenseValue,
-                  startAddr: startAddrCompact,
-                  startAddr_Full: startAddrFull,
-                  startAddr_lat: startAddr_lat,
-                  startAddr_lon: startAddr_lon,
-                  startDate: selectedStartDate,
-                  endAddr: endAddrCompact,
-                  endAddr_Full: endAddrFull,
-                  endAddr_lat: endAddr_lat,
-                  endAddr_lon: endAddr_lon,
-                  endDate: selectedEndDate,
-                  timeStampCreated: new Date(),
-                  startDay: startDay,
-                  endDay: endDay,
-                  startDayLabel: startDayLabel,
-                  endDayLabel: endDayLabel,
-                  state: 0,
-                  driverId: '',
-                  oppoisteFreightId: '',
-                  recvName: recvName,
-                  recvTel: recvTel,
-                });
-                firestore()
-                  .collection('owners')
-                  .doc(user.uid)
-                  .get()
-                  .then(function (snapShot) {
-                    ref.update({
-                      ownerTel: snapShot.data().tel,
-                      ownerName: snapShot.data().name,
-                    });
-                    console.log(snapShot.data().tel);
+              //현재 로그인된 auth가 존재하는 경우만 접근가능하도록 규칙테스트 완료
+              var ref = firestore().collection('freights').doc();
+              getDate();
+              if (user != null) {
+                try {
+                  ref.set({
+                    id: ref.id,
+                    ownerId: auth().currentUser?.uid,
+                    //              ownerTel: p
+                    carSize: selectedCarSize,
+                    carType: selectedCarType,
+                    driveOption: selectedDrive,
+                    weight: weightValue,
+                    volume: volumeValue,
+                    freightLoadType: freightLoadTypeValue,
+                    desc: descValue,
+                    dist: distValue,
+                    expense: expenseValue,
+                    startAddr: startAddrCompact,
+                    startAddr_Full: startAddrFull,
+                    startAddr_lat: startAddr_lat,
+                    startAddr_lon: startAddr_lon,
+                    startDate: selectedStartDate,
+                    endAddr: endAddrCompact,
+                    endAddr_Full: endAddrFull,
+                    endAddr_lat: endAddr_lat,
+                    endAddr_lon: endAddr_lon,
+                    endDate: selectedEndDate,
+                    timeStampCreated: new Date(),
+                    startDay: startDay,
+                    endDay: endDay,
+                    startDayLabel: startDayLabel,
+                    endDayLabel: endDayLabel,
+                    state: 0,
+                    driverId: '',
+                    oppoisteFreightId: '',
+                    recvName: recvName,
+                    recvTel: recvTel,
                   });
-                props.navigation.navigate(AppRoute.OWNER);
-                console.log(
-                  auth().currentUser?.uid +
-                    ' Added document with ID: ' +
-                    ref.id +
-                    ' at ' +
-                    new Date(),
-                );
-                Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
-              } catch (error) {
-                //오류 출력
-                console.log(error);
-                Toast.show('화물이 등록되지 않았습니다.');
+                  firestore()
+                    .collection('owners')
+                    .doc(user.uid)
+                    .get()
+                    .then(function (snapShot) {
+                      ref.update({
+                        ownerTel: snapShot.data().tel,
+                        ownerName: snapShot.data().name,
+                      });
+                      console.log(snapShot.data().tel);
+                    });
+                  props.navigation.navigate(AppRoute.OWNER);
+                  console.log(
+                    auth().currentUser?.uid +
+                      ' Added document with ID: ' +
+                      ref.id +
+                      ' at ' +
+                      new Date(),
+                  );
+                  Toast.showSuccess('화물이 정상적으로 등록되었습니다.');
+                } catch (error) {
+                  //오류 출력
+                  console.log(error);
+                  Toast.show('화물이 등록되지 않았습니다.');
+                }
               }
             }
-          }
+          },
         },
-      },
-      {
-        text: '아니오',
-        onPress: () => {
-          console.log('화물 추가를 취소');
+        {
+          text: '아니오',
+          onPress: () => {
+            console.log('화물 추가를 취소');
+          },
         },
-      },
-    ]);
-  };
+      ]);
+    }
+  }
 
   const cancelButtonPressed = () => {
     props.navigation.navigate(AppRoute.OWNER);
@@ -236,8 +265,12 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
   // Calculate distance between startAddr and endAddr
   const calcDist = () => {
+    if (startAddrFull == '' || endAddrFull == ''){
+      Toast.show('상/하차지 정보가 제대로 설정되지 않았습니다.')
+      return;
+    }
     let tmap_distCalcUrl_rest = `&startX=${startAddr_lon}&startY=${startAddr_lat}&endX=${endAddr_lon}&endY=${endAddr_lat}&truckType=1&truckWidth=100&truckHeight=100&truckWeight=35000&truckTotalWeight=35000&truckLength=200`;
-    const toastLoading = Toast.showLoading('Loading...');
+    toastLoading.showLoading('Loading...');
     axios
       .post(tmap_distCalcUrl + tmap_distCalcUrl_rest)
       .then((response) => {
@@ -260,23 +293,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       .catch((err) => {
         console.log(err);
         Toast.hide(toastLoading);
-        Toast.show('상/하차지 정보가 제대로 설정되지 않았습니다.');
+        Toast.show('경로가 탐색되지 않습니다. 상/하차지를 확인해주세요.')
       });
-  };
-
-  const loadStartNEndFavoriteAddr = () => {
-    const toastLoading = Toast.showLoading('Loading...');
-    firestore()
-      .collection('owners')
-      .doc(user.uid)
-      .get()
-      .then(function (snapShot) {
-        setFavoriteStartAddr(snapShot.data().savedStartFull);
-        setFavoriteEndAddr(snapShot.data().savedEndFull);
-        console.log(snapShot.data().savedStartCompact);
-        Toast.hide(toastLoading);
-      });
-    setmodalStartAddrVisible(true);
   };
 
   const setStartFavoriteToStartAddr = () => {
@@ -317,7 +335,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       setterProps(props);
     } else {
       Alert.alert('숫자만 입력하세요');
-      setterProps('');
+      setterProps(props.slice(0, props.length - 1));
     }
   };
 
@@ -326,14 +344,17 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
     return reg.test(v);
   }
 
-  const isDoublePlus = (props, setterProps) => {
-    if (is_double_plus(props)) {
+  const chkFreight = (props, setterProps) => {
+    if (selectedCarSize == ''){
+      Alert.alert('차량 정보를 먼저 선택해주세요.')
+    }
+    else if (is_double_plus(props)) {
       setterProps(props);
     } else {
-      Alert.alert('숫자만 입력하세요');
-      setterProps('');
+      Alert.alert("숫자만 입력하세요")
+      setterProps(props.slice(0, props.length - 1));
     }
-  };
+  }
 
   function is_letter(v) {
     var reg = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+$/;
@@ -345,9 +366,58 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
       setterProps(props);
     } else {
       Alert.alert('문자만 입력하세요');
-      setterProps('');
+      setterProps(props.slice(0, props.length - 1));
     }
   };
+
+  const validation_check = () => {
+    if (startAddrFull == ''){
+      Alert.alert('상차지가 설정되지 않았습니다.')
+      return false
+    }
+    else if (selectedStartDate == ''){
+      Alert.alert('상차유형이 설정되지 않았습니다.')
+      return false
+    }
+    else if (endAddrFull == ''){
+      Alert.alert('하차지가 설정되지 않았습니다.')
+      return false
+    }
+    else if (selectedEndDate == ''){
+      Alert.alert('하차유형이 설정되지 않았습니다.')
+      return false
+    }
+    else if (selectedCarSize == ''){
+      Alert.alert('차량 정보(톤수)가 설정되지 않았습니다.')
+      return false
+    }
+    else if (selectedCarType == ''){
+      Alert.alert('차량 정보(타입)이 설정되지 않았습니다.')
+      return false
+    }
+    else if (selectedDrive == ''){
+      Alert.alert('운행 방식이 설정되지 않았습니다.')
+      return false
+    }
+    else if (weightValue == ''){
+      Alert.alert('화물 무게가 입력되지 않았습니다.')
+      return false
+    }
+    else if (volumeValue == ''){
+      Alert.alert('화물 크기가 입력되지 않았습니다.')
+      return false
+    }
+    // 적재방식, 화물설명, 수신자정보는 validation check 안함.
+    else if (distValue == ''){
+      Alert.alert('운행 거리를 입력해주세요. 자동계산 기능을 이용하시면 간편합니다.')
+      return false
+    }
+    else if (expenseValue == ''){
+      Alert.alert('화물 요금을 입력해주세요.')
+      return false
+    }
+    return true
+  }
 
   return (
     <React.Fragment>
@@ -359,7 +429,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             : {backgroundColor: '#FFFFFF'}
         }>
         <Layout style={styles.infoContainer}>
-          <Text style={styles.subTitle}>위치 정보</Text>
+          <Text style={styles.titleStyle}>위치 정보</Text>
           <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>상 차 지 : </Text>
             <Text style={styles.infoTitle}>{startAddrCompact}</Text>
@@ -367,7 +437,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               appearance="outline"
               size="small"
               onPress={() => {
-                loadStartNEndFavoriteAddr();
+                setmodalStartAddrVisible(true);
               }}>
               변경
             </Button>
@@ -386,7 +456,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder: {
-                    color: 'orange',
+                    color: textColor
                   },
                 }}
                 useNativeAndroidPickerStyle={isAndroid ? true : false}
@@ -419,7 +489,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder: {
-                    color: 'orange',
+                    color: textColor
                   },
                 }}
                 useNativeAndroidPickerStyle={isAndroid ? true : false}
@@ -430,7 +500,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         </Layout>
 
         <Layout style={styles.infoContainer}>
-          <Text style={styles.subTitle}>화물 정보</Text>
+          <Text style={styles.titleStyle}>화물 정보</Text>
           <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>차량 정보 : </Text>
             <Layout style={{flex: 3}}>
@@ -444,7 +514,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder: {
-                    color: 'orange',
+                    color: textColor
                   },
                 }}
                 useNativeAndroidPickerStyle={isAndroid ? true : false}
@@ -462,7 +532,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder: {
-                    color: 'orange',
+                    color: textColor
                   },
                 }}
                 useNativeAndroidPickerStyle={isAndroid ? true : false}
@@ -483,7 +553,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                 }}
                 style={{
                   placeholder: {
-                    color: 'orange',
+                    color: textColor
                   },
                 }}
                 useNativeAndroidPickerStyle={isAndroid ? true : false}
@@ -497,9 +567,7 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
               <Input
                 placeholder="화물 무게를 입력하세요"
                 value={weightValue}
-                onChangeText={(nextValue) =>
-                  isDoublePlus(nextValue, setWeightValue)
-                }
+                onChangeText={nextValue => chkFreight(nextValue, setWeightValue)}
               />
             </Layout>
             <Text style={styles.infoTitle}> 톤</Text>
@@ -509,10 +577,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
             <Input
               placeholder="숫자로 입력하세요"
               value={volumeValue}
-              onChangeText={(nextValue) =>
-                isDoublePlus(nextValue, setVolumeValue)
-              }
-            />
+              onChangeText={nextValue => chkFreight(nextValue, setVolumeValue)}
+              />
             <Text style={styles.infoTitle}> 파레트</Text>
           </Layout>
           <Layout style={styles.rowContainer}>
@@ -538,7 +604,31 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
         </Layout>
 
         <Layout style={styles.infoContainer}>
-          <Text style={styles.subTitle}>요금 정보</Text>
+          <Text style={styles.titleStyle}>화물 수신자 정보</Text>
+          <Layout style={styles.rowContainer}>
+            <Text style={styles.infoTitle}>이름 : </Text>
+            <Layout style={styles.selectContainer}>
+              <Input
+                placeholder='수신자 이름/업체명 입력'
+                value={recvName}
+                onChangeText={nextValue => isName(nextValue, setRecvName)}
+              />
+            </Layout>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Text style={styles.infoTitle}> Tel  : </Text>
+            <Layout style={styles.selectContainer}>
+              <Input
+                placeholder='전화번호를 입력하세요'
+                value={recvTel}
+                onChangeText={nextValue => isInteger(nextValue, setRecvTel)}
+              />
+            </Layout>
+          </Layout>
+        </Layout>
+
+        <Layout style={styles.infoContainer}>
+          <Text style={styles.titleStyle}>요금 정보</Text>
           <Layout style={styles.rowContainer}>
             <Text style={styles.infoTitle}>운행거리 : </Text>
             <Layout style={styles.selectContainer}>
@@ -568,15 +658,8 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
 
         <Layout style={styles.infoContainer}>
           <Layout style={styles.buttonsContainer}>
-            <Button
-              style={styles.IconButton}
-              onPress={cancelButtonPressed}
-              status="danger">
-              취소
-            </Button>
-            <Button style={styles.IconButton} onPress={applyFreightToDb}>
-              등록
-            </Button>
+            <Button style={styles.IconButton} onPress={cancelButtonPressed} status='danger'>취  소</Button>
+            <Button style={styles.IconButton} onPress={applyFreightToDb} >등  록</Button>
           </Layout>
         </Layout>
 
@@ -590,13 +673,9 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           <SafeAreaView style={{flex: 0}} />
 
           <Layout style={{flex: 1}}>
-            <Layout style={styles.modalContainer}>
-              <Text style={styles.subTitle}>자주쓰는 상차지로 설정하기 </Text>
-              <Text
-                style={styles.textHyperlink}
-                onPress={setStartFavoriteToStartAddr}>
-                {favoriteStartAddr}
-              </Text>
+            <Layout style={{ width: 350, alignItems: 'flex-start', borderColor: hypertextColor, borderWidth: 3, alignItems: "center", }}>
+              <Text style={styles.titleStyle}>자주쓰는 상차지로 설정하기 </Text>
+              <Text style={{ fontSize: 18, textDecorationLine: 'underline', fontStyle: 'normal', color: hypertextColor }} onPress={setStartFavoriteToStartAddr}>{favoriteStartAddr}</Text>
             </Layout>
             <Postcode
               style={styles.postcodeContainer}
@@ -670,13 +749,9 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <SafeAreaView style={{flex: 0}} />
           <Layout style={{flex: 1}}>
-            <Layout style={styles.modalContainer}>
-              <Text style={styles.subTitle}>자주쓰는 하차지로 설정하기 </Text>
-              <Text
-                style={styles.textHyperlink}
-                onPress={setEndFavoriteToStartAddr}>
-                {favoriteEndAddr}
-              </Text>
+            <Layout style={{ width: 350, alignItems: 'flex-start', borderColor: hypertextColor, borderWidth: 3, alignItems: "center", }}>
+              <Text style={styles.titleStyle}>자주쓰는 하차지로 설정하기 </Text>
+              <Text style={{ fontSize: 18, textDecorationLine: 'underline', fontStyle: 'normal', color: hypertextColor }} onPress={setEndFavoriteToStartAddr}>{favoriteEndAddr}</Text>
             </Layout>
 
             <Postcode
@@ -751,19 +826,21 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 10,
   },
-  descInputHolder: {
-    width: 250,
-    height: 50,
-    margin: 10,
-  },
   selectContainer: {
     flex: 1,
   },
-  titleStyles: {
-    paddingHorizontal: 20,
-    fontSize: 20,
+  titleStyle: {
+    lineHeight: 30,
+    fontSize: 22,
     fontWeight: 'bold',
   },
+  subTitle: {
+    lineHeight: 30,
+    fontSize: 20,
+    fontWeight: 'bold',
+    
+  },
+
   rowContainer: {
     width: '100%',
     flexDirection: 'row',
@@ -785,12 +862,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  subTitle: {
-    lineHeight: 30,
-    fontSize: 20,
-    fontWeight: 'bold',
-    
-  },
+
   infoContainer: {
     paddingHorizontal: 25,
     paddingVertical: 10,
@@ -814,24 +886,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'black',
     margin: 10,
-  },
-
-  modalContainer: {
-    width: 350,
-    alignItems: 'flex-start',
-    borderColor: '#0000FF',
-    borderWidth: 3,
-    alignItems: 'center',
-  },
-
-  textHyperlink: {
-    paddingVertical: 5,
-    paddingHorizontal: 5,
-    //fontSize: RFPercentage(2),
-    fontSize: 18,
-    textDecorationLine: 'underline',
-    fontStyle: 'normal',
-    color: 'blue',
   },
 
   postcodeContainer: {
