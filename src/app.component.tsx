@@ -67,8 +67,12 @@ const App = () => {
         console.log('Error', e);
       }
     } else {
-      console.log('Stop background service');
+      console.log('백그라운드를 다시시작합니다');
+      playing = !playing;
       await BackgroundJob.stop();
+      console.log("백그라운드 서비스 종료 완료");
+      await BackgroundJob.start(taskRandom, options);
+      console.log("백그라운드 서비스 재시작");
     }
   };  
 
