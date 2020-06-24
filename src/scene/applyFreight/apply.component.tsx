@@ -42,7 +42,7 @@ const carSize = [
   {label: '1 톤', value: '1'},
   {label: '2.5 톤', value: '2.5'},
   {label: '5 톤', value: '5'},
-  {label: '11-15 톤', value: '11-15'},
+  {label: '11-15 톤', value: '15'},
   {label: '18 톤', value: '18'},
   {label: '25 톤', value: '25'},
 ];
@@ -189,7 +189,6 @@ export const ApplyScreen = (props: ApplyScreenProps): LayoutElement => {
                   ref.set({
                     id: ref.id,
                     ownerId: auth().currentUser?.uid,
-                    //              ownerTel: p
                     carSize: selectedCarSize,
                     carType: selectedCarType,
                     driveOption: selectedDrive,
