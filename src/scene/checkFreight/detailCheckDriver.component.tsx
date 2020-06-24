@@ -242,7 +242,7 @@ export const DetailCheckDriverScreen = (
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           DirectSms.sendDirectSms(
             recvTel,
-            'Signup process completed! ' + recvName,
+            '화물차 기사가 ' + recvName +'님께 안전하게 운송을 완료하였습니다.',
           );
           console.log('SMS sent successfully');
         } else {
@@ -256,7 +256,7 @@ export const DetailCheckDriverScreen = (
       console.log(recvTel);
 
       const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
-        'signup process completed! ' + recvName
+        '화물차 기사가 ' + recvName +'님께 안전하게 운송을 완료하였습니다.'
       }`;
       Linking.openURL(url).catch((err) =>
         console.error('An error occurred', err),
