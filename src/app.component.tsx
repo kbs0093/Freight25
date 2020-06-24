@@ -35,7 +35,7 @@ const options = {
     },
     color: '#ffffff',
     parameters: {
-        delay: 60000, // 1000 = 1s
+        delay: 30000, // 1000 = 1s
     },
 };
 
@@ -76,14 +76,12 @@ const App = () => {
     await new Promise(async resolve => {
       // For loop with a delay
       const {delay} = taskData;
+      
       for (let i = 0; BackgroundJob.isRunning(); i++) {        
-        AsyncStorage.getItem('userUID')
-        .then((value) => {
-          setuid(value);
-        })
         AsyncStorage.getItem('userType')
         .then((value) => {
           if(value == 'driver'){
+            console.log('위치 추적 시작')
             isAndroid ? requestLocationAndroid() : requestLocationIos()    
           } else {
             console.log('드라이버가 아니므로 위치추적 기능을 종료합니다')
@@ -117,29 +115,32 @@ const App = () => {
               const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
               const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");
               const address = city + ' ' +gu + ' ' +myeon + ' ' + dong;
-              setAddress(address);             
+              
+              const user = auth().currentUser;
+              AsyncStorage.getItem('userUID')
+              .then((value) => {
+                if (user != null) {
+                  if (value != null) {
+                    console.log("Firebase 위치 추적 update : ", value);
+                    var locationRef = firestore().collection('location').doc(value);
+                    try {
+                      locationRef.set({
+                        address: address,
+                        latitude: Templatitude,
+                        longitude: Templongitude
+                      });
+                    } catch {
+                      console.log('Failed assign to ' + locationRef.id);
+                    }
+                  }
+                }
+              })            
             })   
             .catch(err => console.log(err));     
           }, error => Alert.alert('Error', JSON.stringify(error)),
           {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000});
         
-        const user = auth().currentUser;
-        if (user != null) {
-          if (uid != '') {
-            console.log("Firebase 위치 추적 update : ", uid);
-            var locationRef = firestore().collection('location').doc(uid);
-            try {
-              locationRef.set({
-                address: address,
-                latitude: latitude,
-                longitude: longitude
-              });
-            } catch {
-              console.log('Failed assign to ' + locationRef.id);
-            }
-          }
-        }
-        
+                
       }
     } catch (err) {
       console.warn(err)
@@ -163,36 +164,41 @@ const App = () => {
           const myeon = JSON.stringify(response.addressInfo.eup_myun).replace(/\"/gi, "");
           const dong = JSON.stringify(response.addressInfo.adminDong).replace(/\"/gi, "");    
           const address = city + ' ' +gu + ' ' +myeon + ' ' + dong;
-          setAddress(address); 
+          setAddress(address);
+
+          const user = auth().currentUser;
+          AsyncStorage.getItem('userUID')
+          .then((value) => {
+          if (user != null) {
+            if (value != null) {
+              console.log("Firebase 위치 추적 update : ", value);
+              var locationRef = firestore().collection('location').doc(value);
+              try {
+                locationRef.set({
+                  address: address,
+                  latitude: Templatitude,
+                  longitude: Templongitude
+                });
+              } catch {
+                console.log('Failed assign to ' + locationRef.id);
+              }
+            }
+          }
+        }) 
         })   
         .catch(err => console.log(err));     
       },
       error => Alert.alert('Error', JSON.stringify(error)),
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000});
     
-      const user = auth().currentUser;
-      if (user != null) {
-        if (uid != '') {
-          console.log("Firebase 위치 추적 update : ", uid);
-          var locationRef = firestore().collection('location').doc(uid);
-          try {
-            locationRef.set({
-              address: address,
-              latitude: latitude,
-              longitude: longitude
-            });
-          } catch {
-            console.log('Failed assign to ' + locationRef.id);
-          }
-        }
-      }
+      
       
   };
 
   
 
 
-  useEffect(() => {
+  useEffect(() => {    
     toggleBackground();
   }, []);
 
