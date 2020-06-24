@@ -3,6 +3,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {  
   StyleSheet,
   ScrollView,
+  NativeModules,
+  PermissionsAndroid,
+  Platform,
+  Linking,
 } from 'react-native';
 import {
   Text,
@@ -20,6 +24,7 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-tiny-toast';
 import TextTicker from 'react-native-text-ticker'
 import { ThemeContext } from '../../component/theme-context';
+const DirectSms = NativeModules.DirectSms;
 
 export const DetailScreen = (props) : DetailScreenProps => {
 
@@ -264,6 +269,46 @@ export const DetailScreen = (props) : DetailScreenProps => {
     console.log(region)
     setRegion(region);
   };
+  
+  const sendDirectSms = async (recvName, ownerName, recvTel, date) => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.SEND_SMS,
+          {
+            title: 'Freight25 App Sms Permission',
+            message:
+              'Freight25 App needs access to your inbox ' +
+              'so you can send messages in background.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          DirectSms.sendDirectSms(
+            recvTel,
+            ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.',
+          );
+          console.log('SMS sent successfully to ', recvTel);
+        } else {
+          console.log('SMS permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      console.log('Send message');
+      console.log(recvTel);
+
+      const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
+        ownerName + '님이 보내신 배차가 완료되어' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.'
+      }`;
+      Linking.openURL(url).catch((err) =>
+        console.error('An error occurred', err),
+      );
+    }
+  };
 
   const ClickApply = async () => {
     let date = new Date()
@@ -276,7 +321,13 @@ export const DetailScreen = (props) : DetailScreenProps => {
       if (value != null) {
         var freightRef = firestore().collection('freights').doc(value);
         var driverRef = firestore().collection('drivers').doc(user.uid);
-        var driverTel = (await driverRef.get()).data().tel;
+        var driver_data = (await driverRef.get()).data();
+        var freight_data = (await freightRef.get()).data()
+        var driverTel = driver_data.tel
+        var recvName = freight_data.recvName
+        var recvTel = freight_data.recvTel
+        var ownerName = freight_data.ownerName
+
         console.log('target Freight ID:' + freightRef.id);
         try {
           freightRef.update({
@@ -296,7 +347,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
             Toast.showSuccess('화물이 정상적으로 배차되었습니다.');
             props.navigation.navigate(AppRoute.HOME);
           }
-          
+          sendDirectSms(recvName, ownerName, recvTel, date)
         } catch {
           console.log('Failed assign to ' + freightRef.id);
         }
