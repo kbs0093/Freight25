@@ -264,11 +264,11 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                     }}
                     useNativeAndroidPickerStyle={isAndroid? true: false}
                     items={[
-                      {label: '카고', value: 'cargo'},
-                      { label: '탑차' ,value: 'top'},
-                      { label: '윙바디' ,value: 'wing'},
-                      {label: '냉동', value: 'superice'},
-                      {label: '냉장', value: 'ice'},
+                      {label: '카고', value: '카고'},
+                      { label: '탑차' ,value: '탑차'},
+                      { label: '윙바디' ,value: '윙바디'},
+                      {label: '냉동', value: '냉동'},
+                      {label: '냉장', value: '냉장'},
                     ]}
                   />
               </View>
