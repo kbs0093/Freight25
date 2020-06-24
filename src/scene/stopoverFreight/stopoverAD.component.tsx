@@ -58,7 +58,7 @@ export class StopoverADScreen extends React.Component<StopoverADScreenProps> {
         <Layout style={{alignItems: 'center', flex: 4}}>
           <Image
             style={styles.adImage}
-            source={require('../../assets/StopoverAD.jpg')}
+            source={require('../../assets/StopoverAD.png')}
           />
         </Layout>
 

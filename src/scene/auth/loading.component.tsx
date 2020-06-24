@@ -89,7 +89,7 @@ export const LoadingScreen = (props: LoadingScreenProps): LayoutElement => {
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <ImageBackground
         style={styles.appBar}
-        source={require('../../assets/image-background.jpeg')}>
+        source={require('../../assets/image-background.png')}>
         <View style={styles.viewForm}>
           <Text style={styles.TextStyle}></Text>
         </View>

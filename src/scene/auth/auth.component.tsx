@@ -194,7 +194,7 @@ export const AuthScreen = (props: AuthScreenProps): LayoutElement => {
       <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <ImageBackground
         style={styles.appBar}
-        source={require('../../assets/image-background.jpeg')}>
+        source={require('../../assets/image-background.png')}>
         <View style={styles.viewForm}>
           <View style={styles.empty1} />
           <Button

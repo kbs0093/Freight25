@@ -64,7 +64,7 @@ export const MainScreen = (props: MainScreenProps): LayoutElement => {
       <Layout style={{alignItems: 'center', flex: 1}}>
         <Image
           style={styles.adImage}
-          source={require('../../assets/AD/ad.jpg')}
+          source={require('../../assets/AD/ad.png')}
         />
       </Layout>
     </React.Fragment>
@@ -108,7 +108,7 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
       <TouchableOpacity onPress={clickButtonType} style={styles.Button}>
           <Image
             style={styles.Image}
-            source={require('../../assets/ApplyButton.png')}
+            source={require('../../assets/ApplyButton.jpg')}
           />
         </TouchableOpacity>                      
         <TouchableOpacity onPress={clickCheck} style={styles.Button}>
@@ -126,7 +126,7 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
       <Layout style={{alignItems: 'center', flex: 1}}>
         <Image
           style={styles.adImage}
-          source={require('../../assets/AD/ad.jpg')}
+          source={require('../../assets/AD/ad.png')}
         />
       </Layout>
     </React.Fragment>
