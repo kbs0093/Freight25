@@ -24,8 +24,9 @@ import RNPickerSelect from 'react-native-picker-select';
 import Modal from 'react-native-modal'
 import Postcode from 'react-native-daum-postcode'
 import Toast from 'react-native-tiny-toast';
-const isAndroid = Platform.OS === 'android';
+import {ThemeContext} from '../../component/theme-context';
 
+const isAndroid = Platform.OS === 'android';
 const OwnerNavigate = CommonActions.reset({
   index: 0,
   routes: [{name: AppRoute.OWNER}],
@@ -54,6 +55,7 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
   const [accountNumInput, accountNum] = React.useState('');
   const [phoneNumInput, phoneNum] = React.useState('');
   const [BankValue, setBankValue] = React.useState('');
+  const themeContext = React.useContext(ThemeContext);
 
   // Postcode API를 위한 변수들 선언
   const [modalAddAddrVisible, setmodalAddAddrVisible] = useState<boolean>(false);
@@ -271,11 +273,25 @@ export const SignupOwnerScreen = (props: SignupOwnerScreenProps): LayoutElement 
                     label: '은행을 선택하세요',
                     value: null,
                   }}
-                  style={{
-                    placeholder:{
-                      color: 'black'
-                    }
-                  }}
+                  style={
+                    themeContext.theme == 'dark'
+                      ? {
+                          placeholder: {
+                            color: 'orange',
+                          },
+                          inputIOS: {
+                            color: 'white',
+                          },
+                        }
+                      : {
+                          placeholder: {
+                            color: 'orange',
+                          },
+                          inputIOS: {
+                            color: 'black',
+                          },
+                        }
+                  }
                   useNativeAndroidPickerStyle={isAndroid? true: false}
                   items={[
                     {label: '국민', value: 'kukmin'},

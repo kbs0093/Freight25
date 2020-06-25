@@ -22,6 +22,7 @@ import firestore from '@react-native-firebase/firestore';
 import { CommonActions } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
 import Toast from 'react-native-tiny-toast';
+import {ThemeContext} from '../../component/theme-context';
 
 const isAndroid = Platform.OS === 'android';
 
@@ -52,6 +53,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
   const [manNumInput, manNum] = React.useState('');
   const [accountNumInput, accountNum] = React.useState('');
   const [phoneNumInput, phoneNum] = React.useState('');
+  const themeContext = React.useContext(ThemeContext);
 
   const [TonValue, setTonValue] = React.useState('');
   const [TypeValue, setTypeValue] = React.useState('');
@@ -229,11 +231,25 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                     label: '차량 톤수를 선택하세요',
                     value: null,
                   }}
-                  style={{
-                    placeholder:{
-                      color: 'black'
-                    }
-                  }}
+                  style={
+                    themeContext.theme == 'dark'
+                      ? {
+                          placeholder: {
+                            color: 'orange',
+                          },
+                          inputIOS: {
+                            color: 'white',
+                          },
+                        }
+                      : {
+                          placeholder: {
+                            color: 'orange',
+                          },
+                          inputIOS: {
+                            color: 'black',
+                          },
+                        }
+                  }
                   useNativeAndroidPickerStyle={isAndroid? true: false}
                   items={[
                     { label: '1 톤', value: '1'},
@@ -242,7 +258,7 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                     { label: '11-15 톤' ,value: '11-15'},
                     { label: '18 톤' ,value: '18'},
                     { label: '25 톤' ,value: '25'},
-                  ]}
+                  ]}                  
                 />          
               </View>
             </View>
@@ -257,11 +273,25 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                       label: '차량 유형을 선택하세요',
                       value: null,
                     }}
-                    style={{
-                      placeholder:{
-                        color: 'black'
-                      }
-                    }}
+                    style={
+                      themeContext.theme == 'dark'
+                        ? {
+                            placeholder: {
+                              color: 'orange',
+                            },
+                            inputIOS: {
+                              color: 'white',
+                            },
+                          }
+                        : {
+                            placeholder: {
+                              color: 'orange',
+                            },
+                            inputIOS: {
+                              color: 'black',
+                            },
+                          }
+                    }
                     useNativeAndroidPickerStyle={isAndroid? true: false}
                     items={[
                       {label: '카고', value: '카고'},
@@ -289,11 +319,25 @@ export const SignupDriverScreen = (props: SignupDriverScreenProps): LayoutElemen
                     label: '은행을 선택하세요',
                     value: null,
                   }}
-                  style={{
-                    placeholder:{
-                      color: 'black'
-                    }
-                  }}
+                  style={
+                    themeContext.theme == 'dark'
+                      ? {
+                          placeholder: {
+                            color: 'orange',
+                          },
+                          inputIOS: {
+                            color: 'white',
+                          },
+                        }
+                      : {
+                          placeholder: {
+                            color: 'orange',
+                          },
+                          inputIOS: {
+                            color: 'black',
+                          },
+                        }
+                  }
                   useNativeAndroidPickerStyle={isAndroid? true: false}
                   items={[
                     {label: '국민', value: 'kukmin'},

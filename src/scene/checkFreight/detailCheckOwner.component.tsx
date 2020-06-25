@@ -35,6 +35,7 @@ import {ThemeContext} from '../../component/theme-context';
 const tmapLocURL =
   'https://apis.openapi.sk.com/tmap/app/poi?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 
+
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
 const naviIcon = (style) => <Icon {...style} name="compass-outline" />;
 const plusIcon = (style) => <Icon {...style} name="plus-outline" />;
@@ -191,6 +192,7 @@ export const DetailCheckOwnerScreen = (
           `&name=${driverAddrNoSpace}&lat=${driverLat}&lon=${driverLong}`,
       );
       Linking.openURL(tmapLocURL + `&name=${driverAddrNoSpace}`);
+
     }
   };
 
@@ -376,7 +378,19 @@ export const DetailCheckOwnerScreen = (
             <Text style={styles.infoTitle}>{item.driverTel}</Text>
           ) : null}
           {item.lastState == '배송중' ? (
-            <Text style={styles.infoTitle}>{driverAddr}</Text>
+            <TextTicker
+              style={
+                themeContext.theme == 'dark'
+                  ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                  : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+              }
+              duration={3000}
+              loop
+              bounce
+              repeatSpacer={50}
+              marqueeDelay={1000}>
+              {driverAddr}
+            </TextTicker>
           ) : null}
         </View>
       </View>
