@@ -87,6 +87,20 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
     messaging().registerDeviceForRemoteMessages();
   }
   
+  messaging().onNotificationOpenedApp(remoteMessage => {
+    console.log(
+      'Notification caused app to open from background state:',
+      remoteMessage.notification,
+    );
+    AsyncStorage.setItem('FreightID', remoteMessage.notification.id)
+    .then(() => {
+      AsyncStorage.setItem('OppoFreightID', remoteMessage.notification.oppositeFreightId)
+      .then(() => {
+        props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
+      })
+    })
+  });
+
   // Push Notification part (foreground)
   useEffect(() => {
       
