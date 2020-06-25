@@ -264,11 +264,25 @@ export const CheckScreen = (props: CheckScreenProps): LayoutElement => {
               {label: '예전 날짜 순', value: '2'},
               {label: '상태별 정렬', value: '3'},
             ]}
-            style={{
-              placeholder: {
-                color: 'orange',
-              },
-            }}
+            style={
+              themeContext.theme == 'dark'
+                ? {
+                    placeholder: {
+                      color: 'orange',
+                    },
+                    inputIOS: {
+                      color: 'white',
+                    },
+                  }
+                : {
+                    placeholder: {
+                      color: 'orange',
+                    },
+                    inputIOS: {
+                      color: 'black',
+                    },
+                  }
+            }
           />
         </Layout>
       </Layout>
@@ -335,7 +349,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: RFPercentage(3),
-    lineHeight: 25
+    lineHeight: 25,
   },
   timeText: {
     fontWeight: 'bold',

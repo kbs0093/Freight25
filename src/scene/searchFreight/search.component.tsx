@@ -478,12 +478,25 @@ export const SearchScreen = (props): SearchScreenProps => {
               {label: '운임 순', value: '2'},
               {label: '스마트 확률 순', value: '1'},
             ]}
-            style={{
-              placeholder: {
-                color: 'orange'
-              },
-            }}
-    
+            style={
+                themeContext.theme == 'dark'
+                ? {
+                    placeholder: {
+                      color: 'orange',
+                    },
+                    inputIOS: {
+                      color: 'white',
+                    },
+                  }
+                : {
+                    placeholder: {
+                      color: 'orange',
+                    },
+                    inputIOS: {
+                      color: 'black',
+                    },
+                  }
+            }
           />
       </Layout>      
     </Layout>
@@ -510,11 +523,25 @@ export const SearchScreen = (props): SearchScreenProps => {
               {label: '50Km', value: '2'},
               {label: '100Km', value: '1'},
             ]}
-            style={{
-              placeholder: {
-                color: 'orange'
-              },
-            }}
+            style={
+                themeContext.theme == 'dark'
+                ? {
+                    placeholder: {
+                      color: 'orange',
+                    },
+                    inputIOS: {
+                      color: 'white',
+                    },
+                  }
+                : {
+                    placeholder: {
+                      color: 'orange',
+                    },
+                    inputIOS: {
+                      color: 'black',
+                    },
+                  }
+            }
           />
       </Layout>      
     </Layout>     
