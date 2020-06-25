@@ -3,6 +3,9 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import <KakaoOpenSDK/KakaoOpenSDK.h>
+#import <GoogleMaps/GoogleMaps.h>
+@import Firebase;
 
 #if DEBUG
 #import <FlipperKit/FlipperClient.h>
@@ -11,10 +14,7 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-#import <KakaoOpenSDK/KakaoOpenSDK.h>
-#import <GoogleMaps/GoogleMaps.h>
 
-@import Firebase;
 
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
