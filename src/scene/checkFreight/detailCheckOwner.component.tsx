@@ -34,8 +34,6 @@ import {ThemeContext} from '../../component/theme-context';
 
 const tmapLocURL =
   'https://apis.openapi.sk.com/tmap/app/poi?appKey=l7xxce3558ee38884b2da0da786de609a5be';
-// const tmapLocURL =
-//   'https://apis.openapi.sk.com/tmap/app/map?appKey=l7xxce3558ee38884b2da0da786de609a5be';
 
 
 const phoneIcon = (style) => <Icon {...style} name="phone-outline" />;
@@ -189,9 +187,12 @@ export const DetailCheckOwnerScreen = (
     } else {
       console.log(driverLat);
       console.log(driverLong);
-      //Linking.openURL(tmapLocURL + `&name=&lat=${driverLat}&lon=${driverLong}`);
+      console.log(
+        tmapLocURL +
+          `&name=${driverAddrNoSpace}&lat=${driverLat}&lon=${driverLong}`,
+      );
       Linking.openURL(tmapLocURL + `&name=${driverAddrNoSpace}`);
-     
+
     }
   };
 
@@ -404,7 +405,7 @@ export const DetailCheckOwnerScreen = (
     } else if (lastState == '배송중') {
       isDisable = false;
     } else if (lastState == '배송완료') {
-      isDisable = false;
+      isDisable = true;
     }
     return (
       <Button
@@ -425,7 +426,7 @@ export const DetailCheckOwnerScreen = (
     } else if (lastState == '배송중') {
       isDisable = false;
     } else if (lastState == '배송완료') {
-      isDisable = false;
+      isDisable = true;
     }
     return (
       <Button

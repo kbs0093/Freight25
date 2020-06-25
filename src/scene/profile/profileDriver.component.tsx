@@ -282,6 +282,25 @@ export const ProfileDriverScreen = (
                 {label: '11-15 톤', value: '15'},
                 {label: '25 톤', value: '25'},
               ]}
+              style={
+                themeContext.theme == 'dark'
+                  ? {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'white',
+                      },
+                    }
+                  : {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'black',
+                      },
+                    }
+              }
             />
           </Layout>
           <Layout style={styles.rowContainer}>
@@ -299,6 +318,25 @@ export const ProfileDriverScreen = (
                 {label: '냉동', value: 'ice'},
                 {label: '냉장', value: 'superice'},
               ]}
+              style={
+                themeContext.theme == 'dark'
+                  ? {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'white',
+                      },
+                    }
+                  : {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'black',
+                      },
+                    }
+              }
             />
           </Layout>
         </Layout>
@@ -320,6 +358,25 @@ export const ProfileDriverScreen = (
                 {label: '신한', value: 'shinhan'},
                 {label: '농협', value: 'nognhyeob'},
               ]}
+              style={
+                themeContext.theme == 'dark'
+                  ? {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'white',
+                      },
+                    }
+                  : {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'black',
+                      },
+                    }
+              }
             />
           </Layout>
           <Layout style={styles.rowContainer}>
