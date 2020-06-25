@@ -383,8 +383,11 @@ const App = () => {
   };
 
   useEffect(() => {
-    //toggleBackground();
-    toggleBg();
+    if (isAndroid) {
+      toggleBackground();
+    } else {
+      toggleBg();
+    }
   }, []);
 
   return (
