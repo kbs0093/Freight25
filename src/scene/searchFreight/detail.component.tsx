@@ -302,8 +302,11 @@ export const DetailScreen = (props) : DetailScreenProps => {
       .then(function (response) {
         return response.json();
       })
-      .then(async function (jsonData) {                         
+      .then(async function (jsonData) {             
+        let date = new Date();
+
         time = jsonData.features[0].properties.totalTime;
+        date.setSeconds(date.getSeconds() + time);        
 
         if (Platform.OS === 'android') {
           try {
@@ -322,7 +325,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
               DirectSms.sendDirectSms(
                 recvTel,
-                ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + time.toString() +' 입니다.',
+                ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.',
               );
               console.log('SMS sent successfully to ', recvTel);
             } else {
@@ -336,7 +339,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
           console.log(recvTel);
     
           const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
-            ownerName + '님이 보내신 배차가 완료되어' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + time.toString() +' 입니다.'
+            ownerName + '님이 보내신 배차가 완료되어' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.'
           }`;
           Linking.openURL(url).catch((err) =>
             console.error('An error occurred', err),
