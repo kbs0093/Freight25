@@ -33,7 +33,7 @@ export const DetailScreen = (props) : DetailScreenProps => {
   const [mapVisible, setmapVisible] = useState(true);
   const [stopoverVisible, setstopoverVisible] = useState(true);
   const [FreightID, setFreightID] = useState('');
-  const [totalTime, settotalTime] = useState();
+  const [totalTime, settotalTime] = useState(null);
   const [region, setRegion] = useState({
     latitude: 37.78825,
     longitude: -122.4324,
@@ -240,7 +240,6 @@ export const DetailScreen = (props) : DetailScreenProps => {
               .then(function (jsonData) {                         
                 settotalTime(jsonData.features[0].properties.totalTime);
               });
-
               console.log('파이어베이스 함수 끝')
         } else {
           console.log('No such document!');
@@ -271,43 +270,81 @@ export const DetailScreen = (props) : DetailScreenProps => {
   };
   
   const sendDirectSms = async (recvName, ownerName, recvTel, date) => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.SEND_SMS,
-          {
-            title: 'Freight25 App Sms Permission',
-            message:
-              'Freight25 App needs access to your inbox ' +
-              'so you can send messages in background.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          DirectSms.sendDirectSms(
-            recvTel,
-            ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.',
-          );
-          console.log('SMS sent successfully to ', recvTel);
-        } else {
-          console.log('SMS permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    } else {
-      console.log('Send message');
-      console.log(recvTel);
+    var time;
+    fetch(
+      'https://apis.openapi.sk.com/tmap/truck/routes?version=1&format=json&callback=result',
+      {
+        method: 'POST',
+        headers: {
+          appKey: 'l7xxce3558ee38884b2da0da786de609a5be',
+        },
+        body: JSON.stringify({
+          startX: data.startX,
+          startY: data.startY,
+          endX: data.endX,
+          endY: data.endY,
+          reqCoordType: 'WGS84GEO',
+          resCoordType: 'WGS84GEO',
+          angle: '172',
+          searchOption: '1',
+          passlist: ``, //경유지 정보 (5개까지 추가 가능이므로 고려 할 것)
+          trafficInfo: 'Y',
+          truckType: '1',
+          truckWidth: '100',
+          truckHeight: '100',
+          truckWeight: '2000', // 트럭 무게를 의미하기 때문에 값을 불러오는것이 좋을 듯
+          truckTotalWeight: '20000', // 화물 무게도 불러올 것
+          truckLength: '200', // 길이 및 높이는 일반적인 트럭 (2.5톤 트럭의 크기 등) 을 따를 것
+          totalValue: '2'
+        }),
+      },
+      )
+      .then(function (response) {
+        return response.json();
+      })
+      .then(async function (jsonData) {                         
+        time = jsonData.features[0].properties.totalTime;
 
-      const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
-        ownerName + '님이 보내신 배차가 완료되어' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + date.toString() +' 입니다.'
-      }`;
-      Linking.openURL(url).catch((err) =>
-        console.error('An error occurred', err),
-      );
-    }
+        if (Platform.OS === 'android') {
+          try {
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.SEND_SMS,
+              {
+                title: 'Freight25 App Sms Permission',
+                message:
+                  'Freight25 App needs access to your inbox ' +
+                  'so you can send messages in background.',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+              DirectSms.sendDirectSms(
+                recvTel,
+                ownerName + '님이 보내신 배차가 완료되어 ' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + time.toString() +' 입니다.',
+              );
+              console.log('SMS sent successfully to ', recvTel);
+            } else {
+              console.log('SMS permission denied');
+            }
+          } catch (err) {
+            console.warn(err);
+          }
+        } else {
+          console.log('Send message');
+          console.log(recvTel);
+    
+          const url = `sms:${recvTel}${Platform.OS === 'ios' ? '&' : '?'}body=${
+            ownerName + '님이 보내신 배차가 완료되어' + recvName+ '님께 배달될 예정입니다! 도착예정시각은 ' + time.toString() +' 입니다.'
+          }`;
+          Linking.openURL(url).catch((err) =>
+            console.error('An error occurred', err),
+          );
+        }
+      });
+
+    
   };
 
   const ClickApply = async () => {
