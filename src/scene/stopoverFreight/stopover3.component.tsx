@@ -99,7 +99,7 @@ export const StopoverScreen3 = (props) : StopoverScreen3Props => {
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
           var smart;
-          await RegionCode(endArr[0]).then((result)=>{smart = result});
+          await RegionCode(endArr[0], doc.data().endDate).then((result)=>{smart = result});
 
           var detaildata = {
             startAddress: startArr,
@@ -369,11 +369,17 @@ export const StopoverScreen3 = (props) : StopoverScreen3Props => {
     }
   };
 
-  const RegionCode = async(address) =>{
+  const RegionCode = async(address, endType) =>{
     var week = new Array('sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
     var date = new Date();
+
+    var tomorrow = new Date(date.valueOf() + (24*60*60*1000));
     var dayName = week[date.getDay()];
     let smart;
+
+    if(endType == '내일 도착(내착)'){
+      dayName = week[tomorrow.getDay()];
+    }
 
     var data = await firestore().collection('probability').doc(dayName)
     .get()
