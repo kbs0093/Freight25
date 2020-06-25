@@ -377,7 +377,19 @@ export const DetailCheckOwnerScreen = (
             <Text style={styles.infoTitle}>{item.driverTel}</Text>
           ) : null}
           {item.lastState == '배송중' ? (
-            <Text style={styles.infoTitle}>{driverAddr}</Text>
+            <TextTicker
+              style={
+                themeContext.theme == 'dark'
+                  ? {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'white'}
+                  : {fontWeight: 'bold', fontSize: 18, margin: 2, color: 'black'}
+              }
+              duration={3000}
+              loop
+              bounce
+              repeatSpacer={50}
+              marqueeDelay={1000}>
+              {driverAddr}
+            </TextTicker>
           ) : null}
         </View>
       </View>
