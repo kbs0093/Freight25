@@ -239,7 +239,7 @@ export const ProfileOwnerScreen = (
             onPress={() => {
               reviseProfile();
               Toast.showSuccess('수정 완료');
-              props.navigation.navigate(AppRoute.HOME);
+              props.navigation.navigate(AppRoute.OWNER);
             }}
             style={styles.Button}
             textStyle={styles.ButtonText}>
@@ -345,6 +345,25 @@ export const ProfileOwnerScreen = (
                 {label: '신한', value: 'shinhan'},
                 {label: '농협', value: 'nognhyeob'},
               ]}
+              style={
+                themeContext.theme == 'dark'
+                  ? {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'white',
+                      },
+                    }
+                  : {
+                      placeholder: {
+                        color: 'orange',
+                      },
+                      inputIOS: {
+                        color: 'black',
+                      },
+                    }
+              }
             />
           </Layout>
           <Layout style={styles.rowContainer}>
@@ -559,7 +578,7 @@ const styles = StyleSheet.create({
   Subtitle: {
     fontSize: RFPercentage(3),
     fontWeight: 'bold',
-    lineHeight: 25
+    lineHeight: 25,
   },
   titleContainer: {
     paddingHorizontal: 20,
