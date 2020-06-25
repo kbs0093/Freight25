@@ -92,9 +92,9 @@ export const OwnerScreen = (props: OwnerScreenProps): LayoutElement => {
       'Notification caused app to open from background state:',
       remoteMessage.notification,
     );
-    AsyncStorage.setItem('FreightID', remoteMessage.notification.id)
+    AsyncStorage.setItem('FreightID', remoteMessage.data.id)
     .then(() => {
-      AsyncStorage.setItem('OppoFreightID', remoteMessage.notification.oppositeFreightId)
+      AsyncStorage.setItem('OppoFreightID', remoteMessage.data.oppositeFreightId)
       .then(() => {
         props.navigation.navigate(AppRoute.CHECK_DETAIL_DRIVER);
       })
