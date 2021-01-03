@@ -1195,13 +1195,6 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
-"@mauron85/react-native-background-geolocation@^0.6.3":
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/@mauron85/react-native-background-geolocation/-/react-native-background-geolocation-0.6.3.tgz#9d0133e42021fbfa0ff7b6283d9561a18f127a2f"
-  integrity sha512-Q4o6OcCooYC4WrddrXS73pqAzowbxwuI3xOjOo2eYYWhNZCs+mioR2T5tij/pqUoJEfzt1h52Yn1a3rhRflKLQ==
-  dependencies:
-    plist "^3.0.1"
-
 "@react-native-community/async-storage@^1.11.0":
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/async-storage/-/async-storage-1.11.0.tgz#bf81b8813080846f150c67f531987c429b442166"
@@ -6660,10 +6653,10 @@ react-native-tiny-toast@^1.0.7:
     react-native-iphone-x-helper "1.2.1"
     react-native-root-siblings "3.2.3"
 
-react-native-webview@^9.2.2:
-  version "9.4.0"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-9.4.0.tgz#108da34a6c7e1c032dcabc942b7e4947ca1d8028"
-  integrity sha512-BBOFUuza0p04+7fNi7TJmB0arpDJzGxHYwTCgI4vj5n/fl7u4jbm7ETp88mf7lo9lP6C6HGLo38KnEy1aXCQkg==
+react-native-webview@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-11.0.0.tgz#d667cbcc772e963fe88a4156290d25fe47ed43b0"
+  integrity sha512-gzID5ebCFVNkxreuabClymo6QkJbXCLEtiIUY9QAhxY58HsDUp8x0YzDVEROYyEJ4ghL71koAOeQRDNAgNnh1w==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
